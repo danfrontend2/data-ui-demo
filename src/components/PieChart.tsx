@@ -13,10 +13,13 @@ interface PieChartProps {
   }>;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ data, chartId }) => {
+const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
   const chartRef = useRef<am5.Root | null>(null);
 
   useLayoutEffect(() => {
+    console.log('PieChart data:', data);
+    console.log('PieChart series:', series);
+
     // Create root element
     const root = am5.Root.new(chartId);
 
@@ -26,25 +29,74 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId }) => {
     // Create chart
     const chart = root.container.children.push(
       am5percent.PieChart.new(root, {
-        layout: root.verticalLayout
+        layout: root.verticalLayout,
+        radius: am5.percent(90)
       })
     );
 
-    // Create series
-    const series = chart.series.push(
-      am5percent.PieSeries.new(root, {
-        valueField: Object.keys(data[0]).find(key => key !== 'category') || '',
-        categoryField: "category",
-        endAngle: 270
-      })
-    );
+    // Calculate total number of series for radius distribution
+    const totalSeries = series.length || 1;
+    console.log('Total series:', totalSeries);
 
-    series.states.create("hidden", {
-      endAngle: -90
+    // Create series for each field
+    const chartSeries = (series.length ? series : [{
+      field: Object.keys(data[0]).find(key => key !== 'category') || '',
+      name: 'Value'
+    }]).map((seriesConfig, index) => {
+      console.log('Creating series:', seriesConfig);
+      console.log('With radius:', 90 - (index * (80 / totalSeries)));
+
+      const colors = [
+        0x6794dc,
+        0x67b7dc,
+        0x8067dc,
+        0xdc67ce,
+        0xdc6967,
+        0xa367dc,
+        0x67dcb0
+      ];
+      const color = am5.color(colors[index % colors.length]);
+
+      // Для каждой следующей серии уменьшаем внешний и внутренний радиус
+      const outerRadius = am5.percent(90 - (index * (80 / totalSeries)));
+      const innerRadius = am5.percent(45 - (index * (35 / totalSeries)));
+
+      const pieSeries = chart.series.push(
+        am5percent.PieSeries.new(root, {
+          name: seriesConfig.name,
+          valueField: seriesConfig.field,
+          categoryField: "category",
+          radius: outerRadius,
+          innerRadius: innerRadius
+        })
+      );
+
+      pieSeries.slices.template.setAll({
+        stroke: am5.color(0xffffff),
+        strokeWidth: 2,
+        fill: color,
+        fillOpacity: 0.8,
+        cornerRadius: 5
+      });
+
+      pieSeries.labels.template.setAll({
+        text: "{category}: {valuePercentTotal.formatNumber('0.0')}%",
+        textType: "circular",
+        radius: 10,
+        centerX: am5.percent(50),
+        centerY: am5.percent(50),
+        fill: am5.color(0x000000)
+      });
+
+      pieSeries.ticks.template.setAll({
+        forceHidden: true
+      });
+
+      pieSeries.data.setAll(data);
+      console.log('Series data set:', data);
+
+      return pieSeries;
     });
-
-    // Set data
-    series.data.setAll(data);
 
     // Create legend
     const legend = chart.children.push(am5.Legend.new(root, {
@@ -54,7 +106,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId }) => {
       marginBottom: 15
     }));
 
-    legend.data.setAll(series.dataItems);
+    legend.data.setAll(chartSeries);
 
     // Save root for cleanup
     chartRef.current = root;
@@ -62,7 +114,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId }) => {
     return () => {
       root.dispose();
     };
-  }, [data, chartId]);
+  }, [data, chartId, series]);
 
   return (
     <div id={chartId} style={{ 
