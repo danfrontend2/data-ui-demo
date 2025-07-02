@@ -33,7 +33,8 @@ const PieChart: React.FC<PieChartProps> = ({ data }) => {
       am5percent.PieSeries.new(root, {
         name: "Series",
         valueField: "value",
-        categoryField: "category"
+        categoryField: "category",
+        radius: am5.percent(80)
       })
     );
 
@@ -44,7 +45,8 @@ const PieChart: React.FC<PieChartProps> = ({ data }) => {
     const legend = chart.children.push(am5.Legend.new(root, {
       centerX: am5.percent(50),
       x: am5.percent(50),
-      layout: root.horizontalLayout
+      marginTop: 15,
+      marginBottom: 15
     }));
     legend.data.setAll(series.dataItems);
 
@@ -57,7 +59,13 @@ const PieChart: React.FC<PieChartProps> = ({ data }) => {
   }, [data]);
 
   return (
-    <div id="chartdiv" style={{ width: "100%", height: "100%" }}></div>
+    <div id="chartdiv" style={{ 
+      width: "100%", 
+      height: "100%",
+      position: "absolute",
+      top: 0,
+      left: 0
+    }}></div>
   );
 };
 

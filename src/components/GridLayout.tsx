@@ -309,7 +309,9 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
             border: '1px solid #ccc',
             borderRadius: '4px',
             overflow: 'hidden',
-            position: 'relative'
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column'
           }}
         >
           <Box 
@@ -318,7 +320,8 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
               height: '20px', 
               backgroundColor: '#f5f5f5',
               borderBottom: '1px solid #ddd',
-              cursor: 'move'
+              cursor: 'move',
+              flexShrink: 0
             }} 
           />
           <IconButton
@@ -332,7 +335,13 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
           >
             <CloseIcon />
           </IconButton>
-          <PieChart data={item.chartData || []} />
+          <Box sx={{ 
+            flex: 1,
+            minHeight: 0, // Важно для корректной работы flex в Firefox
+            position: 'relative'
+          }}>
+            <PieChart data={item.chartData || []} />
+          </Box>
         </Box>
       );
     }
