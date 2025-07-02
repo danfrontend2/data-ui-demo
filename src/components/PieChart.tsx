@@ -8,14 +8,15 @@ interface PieChartProps {
     category: string;
     value: number;
   }>;
+  chartId: string;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ data }) => {
+const PieChart: React.FC<PieChartProps> = ({ data, chartId }) => {
   const chartRef = useRef<am5.Root | null>(null);
 
   useLayoutEffect(() => {
     // Create root element
-    const root = am5.Root.new("chartdiv");
+    const root = am5.Root.new(chartId);
 
     // Set themes
     root.setThemes([am5themes_Animated.new(root)]);
@@ -56,10 +57,10 @@ const PieChart: React.FC<PieChartProps> = ({ data }) => {
     return () => {
       root.dispose();
     };
-  }, [data]);
+  }, [data, chartId]);
 
   return (
-    <div id="chartdiv" style={{ 
+    <div id={chartId} style={{ 
       width: "100%", 
       height: "100%",
       position: "absolute",

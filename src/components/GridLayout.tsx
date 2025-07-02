@@ -340,7 +340,10 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
             minHeight: 0, // Важно для корректной работы flex в Firefox
             position: 'relative'
           }}>
-            <PieChart data={item.chartData || []} />
+            <PieChart 
+              data={item.chartData || []} 
+              chartId={`chart-${item.i}`}
+            />
           </Box>
         </Box>
       );
