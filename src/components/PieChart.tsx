@@ -2,13 +2,15 @@ import React, { useLayoutEffect, useRef } from 'react';
 import * as am5 from "@amcharts/amcharts5";
 import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import { ChartDataPoint } from '../types';
 
 interface PieChartProps {
-  data: Array<{
-    category: string;
-    value: number;
-  }>;
+  data: ChartDataPoint[];
   chartId: string;
+  series?: Array<{
+    field: string;
+    name: string;
+  }>;
 }
 
 const PieChart: React.FC<PieChartProps> = ({ data, chartId }) => {
@@ -24,20 +26,22 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId }) => {
     // Create chart
     const chart = root.container.children.push(
       am5percent.PieChart.new(root, {
-        layout: root.verticalLayout,
-        innerRadius: am5.percent(50)
+        layout: root.verticalLayout
       })
     );
 
     // Create series
     const series = chart.series.push(
       am5percent.PieSeries.new(root, {
-        name: "Series",
-        valueField: "value",
+        valueField: Object.keys(data[0]).find(key => key !== 'category') || '',
         categoryField: "category",
-        radius: am5.percent(80)
+        endAngle: 270
       })
     );
+
+    series.states.create("hidden", {
+      endAngle: -90
+    });
 
     // Set data
     series.data.setAll(data);
@@ -49,6 +53,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId }) => {
       marginTop: 15,
       marginBottom: 15
     }));
+
     legend.data.setAll(series.dataItems);
 
     // Save root for cleanup

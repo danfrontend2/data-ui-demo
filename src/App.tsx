@@ -3,13 +3,8 @@ import { Box } from '@mui/material';
 import Toolbar from './components/Toolbar';
 import GridLayout from './components/GridLayout';
 import { Layout } from 'react-grid-layout';
+import { GridItem } from './types';
 import './App.css';
-
-interface GridItem extends Layout {
-  data?: any[];
-  type?: 'grid' | 'chart';
-  chartData?: Array<{ category: string; value: number; }>;
-}
 
 function App() {
   const [items, setItems] = useState<GridItem[]>([]);

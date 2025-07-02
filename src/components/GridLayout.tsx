@@ -5,19 +5,18 @@ import CloseIcon from '@mui/icons-material/Close';
 import { AgGridReact } from 'ag-grid-react';
 import { 
   ColDef, 
-  GridApi,
   GridOptions,
   CellValueChangedEvent,
   ModuleRegistry,
   AllCommunityModule,
   GetContextMenuItemsParams,
   MenuItemDef,
-  RangeSelectionChangedEvent,
   GetContextMenuItems
 } from 'ag-grid-community';
 import { AllEnterpriseModule } from 'ag-grid-enterprise';
-import { GridData } from '../types';
+import { GridData, GridItem, ChartDataPoint } from '../types';
 import PieChart from './PieChart';
+import LineChart from './LineChart';
 import * as XLSX from 'xlsx';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -28,12 +27,6 @@ import 'ag-grid-community/styles/ag-theme-balham.css';
 ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 
 const ReactGridLayout = WidthProvider(RGL);
-
-interface GridItem extends Layout {
-  data?: GridData[];
-  type?: 'grid' | 'chart';
-  chartData?: Array<{ category: string; value: number; }>;
-}
 
 interface GridLayoutProps {
   items: GridItem[];
@@ -243,56 +236,118 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     }
   };
 
+  const createChartItem = (type: 'pie-chart' | 'line-chart', params: GetContextMenuItemsParams) => {
+    const cellRanges = params.api.getCellRanges();
+    if (!cellRanges || cellRanges.length === 0) {
+      console.log('No range selected');
+      return;
+    }
+
+    const range = cellRanges[0];
+    const startRow = range.startRow?.rowIndex ?? 0;
+    const endRow = range.endRow?.rowIndex ?? 0;
+    const columns = range.columns;
+
+    if (type === 'pie-chart' && columns.length !== 2) {
+      console.log('Please select exactly 2 columns for pie chart: one for categories and one for values');
+      return;
+    }
+
+    if (type === 'line-chart' && columns.length < 2) {
+      console.log('Please select at least 2 columns for line chart: first for X axis, others for Y values');
+      return;
+    }
+
+    // Get selected data
+    if (type === 'pie-chart') {
+      const chartData: Array<{ category: string; value: number }> = [];
+      params.api.forEachNodeAfterFilterAndSort((node) => {
+        const rowIndex = node.rowIndex;
+        if (rowIndex !== null && rowIndex !== undefined && 
+            rowIndex >= startRow && 
+            rowIndex <= endRow) {
+          const category = node.data[columns[0].getColId()];
+          const value = parseFloat(node.data[columns[1].getColId()]);
+          if (!isNaN(value)) {
+            chartData.push({ category: String(category), value });
+          }
+        }
+      });
+
+      // Create new chart item
+      const newItem: GridItem = {
+        i: `${type}-${Date.now()}`,
+        x: (items.length * 2) % 12,
+        y: Math.floor(items.length / 6) * 4,
+        w: 6,
+        h: 4,
+        type,
+        chartData
+      };
+
+      // Add new item to layout using the provided callback
+      onAddChart(newItem);
+    } else {
+      // Line chart with multiple series
+      const chartData: Array<ChartDataPoint> = [];
+      const xField = columns[0].getColId();
+      
+      params.api.forEachNodeAfterFilterAndSort((node) => {
+        const rowIndex = node.rowIndex;
+        if (rowIndex !== null && rowIndex !== undefined && 
+            rowIndex >= startRow && 
+            rowIndex <= endRow) {
+          const point: ChartDataPoint = {
+            category: String(node.data[xField])
+          };
+          
+          // Add values for each Y-axis column
+          columns.slice(1).forEach(col => {
+            const field = col.getColId();
+            const value = parseFloat(node.data[field]);
+            if (!isNaN(value)) {
+              point[field] = value;
+            }
+          });
+          
+          chartData.push(point);
+        }
+      });
+
+      // Create series configuration
+      const series = columns.slice(1).map(col => ({
+        field: col.getColId(),
+        name: col.getColDef().headerName || col.getColId()
+      }));
+
+      // Create new chart item
+      const newItem: GridItem = {
+        i: `${type}-${Date.now()}`,
+        x: (items.length * 2) % 12,
+        y: Math.floor(items.length / 6) * 4,
+        w: 6,
+        h: 4,
+        type,
+        chartData,
+        chartConfig: {
+          series
+        }
+      };
+
+      // Add new item to layout using the provided callback
+      onAddChart(newItem);
+    }
+  };
+
   const getContextMenuItems: GetContextMenuItems = (params: GetContextMenuItemsParams) => {
     const result: MenuItemDef[] = [
       {
-        name: 'Draw Chart',
-        action: () => {
-          const cellRanges = params.api.getCellRanges();
-          if (!cellRanges || cellRanges.length === 0) {
-            console.log('No range selected');
-            return;
-          }
-
-          const range = cellRanges[0];
-          const startRow = range.startRow?.rowIndex ?? 0;
-          const endRow = range.endRow?.rowIndex ?? 0;
-          const columns = range.columns;
-
-          if (columns.length !== 2) {
-            console.log('Please select exactly 2 columns: one for categories and one for values');
-            return;
-          }
-
-          // Get selected data
-          const chartData: Array<{ category: string; value: number }> = [];
-          params.api.forEachNodeAfterFilterAndSort((node) => {
-            const rowIndex = node.rowIndex;
-            if (rowIndex !== null && rowIndex !== undefined && 
-                rowIndex >= startRow && 
-                rowIndex <= endRow) {
-              const category = node.data[columns[0].getColId()];
-              const value = parseFloat(node.data[columns[1].getColId()]);
-              if (!isNaN(value)) {
-                chartData.push({ category: String(category), value });
-              }
-            }
-          });
-
-          // Create new chart item
-          const newItem: GridItem = {
-            i: `chart-${Date.now()}`,
-            x: (items.length * 2) % 12,
-            y: Math.floor(items.length / 6) * 4,
-            w: 6,
-            h: 4,
-            type: 'chart',
-            chartData
-          };
-
-          // Add new item to layout using the provided callback
-          onAddChart(newItem);
-        }
+        name: 'Draw Pie Chart',
+        action: () => createChartItem('pie-chart', params)
+      },
+      {
+        name: 'Draw Line Chart',
+        action: () => createChartItem('line-chart', params)
       }
     ];
 
@@ -300,7 +355,12 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
   };
 
   const renderGrid = (item: GridItem) => {
-    if (item.type === 'chart') {
+    if (item.type === 'pie-chart' || item.type === 'line-chart') {
+      const ChartComponent = item.type === 'pie-chart' ? PieChart : LineChart;
+      const chartData = item.type === 'pie-chart' 
+        ? (item.chartData as Array<{ category: string; value: number }>) 
+        : (item.chartData as ChartDataPoint[]);
+
       return (
         <Box
           key={item.i}
@@ -337,12 +397,13 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
           </IconButton>
           <Box sx={{ 
             flex: 1,
-            minHeight: 0, // Важно для корректной работы flex в Firefox
+            minHeight: 0,
             position: 'relative'
           }}>
-            <PieChart 
-              data={item.chartData || []} 
+            <ChartComponent 
+              data={chartData || []} 
               chartId={`chart-${item.i}`}
+              series={item.type === 'line-chart' ? (item.chartConfig?.series || []) : []}
             />
           </Box>
         </Box>
