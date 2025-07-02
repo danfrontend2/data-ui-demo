@@ -298,13 +298,23 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
 
     console.log('Series config:', series);
 
+    // Find the maximum Y coordinate among existing items
+    const maxY = items.reduce((max, item) => {
+      const itemBottom = item.y + item.h;
+      return itemBottom > max ? itemBottom : max;
+    }, 0);
+
+    // Get the source grid's height
+    const sourceGridItem = items.find(item => item.i === params.api.getGridId());
+    const sourceHeight = sourceGridItem?.h || 4;
+
     // Create new chart item
     const newItem: GridItem = {
       i: `${type}-${Date.now()}`,
-      x: (items.length * 2) % 12,
-      y: Math.floor(items.length / 6) * 4,
-      w: 6,
-      h: 4,
+      x: 0, // Start from the left
+      y: maxY, // Place below all existing items
+      w: 12, // Full width
+      h: sourceHeight * 2, // Double the height of source grid
       type,
       chartData,
       chartConfig: {
