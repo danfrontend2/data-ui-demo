@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import RGL, { WidthProvider, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -17,6 +17,7 @@ import {
 } from 'ag-grid-community';
 import { AllEnterpriseModule } from 'ag-grid-enterprise';
 import { GridData } from '../types';
+import PieChart from './PieChart';
 import * as XLSX from 'xlsx';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -30,16 +31,19 @@ const ReactGridLayout = WidthProvider(RGL);
 
 interface GridItem extends Layout {
   data?: GridData[];
+  type?: 'grid' | 'chart';
+  chartData?: Array<{ category: string; value: number; }>;
 }
 
 interface GridLayoutProps {
   items: GridItem[];
   onRemoveItem: (itemId: string) => void;
+  onAddChart: (chartItem: GridItem) => void;
 }
 
-const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
+const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart }) => {
   // Sample data for initial grid state
-  const defaultData: GridData[] = [
+  const defaultData = useMemo(() => [
     { id: '1', country: 'China', population: 1412, gdp: 17.7, area: 9597 },
     { id: '2', country: 'India', population: 1400, gdp: 3.7, area: 3287 },
     { id: '3', country: 'USA', population: 339, gdp: 28.8, area: 9834 },
@@ -50,7 +54,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
     { id: '8', country: 'Bangladesh', population: 172, gdp: 0.5, area: 148 },
     { id: '9', country: 'Russia', population: 144, gdp: 2.0, area: 17098 },
     { id: '10', country: 'Mexico', population: 129, gdp: 1.8, area: 1964 }
-  ];
+  ], []);
 
   const [gridData, setGridData] = useState<{ [key: string]: GridData[] }>({});
   const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
@@ -255,32 +259,39 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
           const endRow = range.endRow?.rowIndex ?? 0;
           const columns = range.columns;
 
-          // Get column headers
-          const headers = columns.map(col => ({
-            field: col.getColId(),
-            headerName: col.getColDef().headerName || col.getColId()
-          }));
+          if (columns.length !== 2) {
+            console.log('Please select exactly 2 columns: one for categories and one for values');
+            return;
+          }
 
           // Get selected data
-          const selectedData: any[] = [];
+          const chartData: Array<{ category: string; value: number }> = [];
           params.api.forEachNodeAfterFilterAndSort((node) => {
             const rowIndex = node.rowIndex;
             if (rowIndex !== null && rowIndex !== undefined && 
                 rowIndex >= startRow && 
                 rowIndex <= endRow) {
-              const rowData: any = {};
-              columns.forEach(col => {
-                const field = col.getColId();
-                rowData[field] = node.data[field];
-              });
-              selectedData.push(rowData);
+              const category = node.data[columns[0].getColId()];
+              const value = parseFloat(node.data[columns[1].getColId()]);
+              if (!isNaN(value)) {
+                chartData.push({ category: String(category), value });
+              }
             }
           });
 
-          console.log('Selected Range Data:', {
-            headers: headers,
-            data: selectedData
-          });
+          // Create new chart item
+          const newItem: GridItem = {
+            i: `chart-${Date.now()}`,
+            x: (items.length * 2) % 12,
+            y: Math.floor(items.length / 6) * 4,
+            w: 6,
+            h: 4,
+            type: 'chart',
+            chartData
+          };
+
+          // Add new item to layout using the provided callback
+          onAddChart(newItem);
         }
       }
     ];
@@ -289,6 +300,43 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
   };
 
   const renderGrid = (item: GridItem) => {
+    if (item.type === 'chart') {
+      return (
+        <Box
+          key={item.i}
+          data-grid={item}
+          sx={{
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            overflow: 'hidden',
+            position: 'relative'
+          }}
+        >
+          <Box 
+            className="drag-handle"
+            sx={{ 
+              height: '20px', 
+              backgroundColor: '#f5f5f5',
+              borderBottom: '1px solid #ddd',
+              cursor: 'move'
+            }} 
+          />
+          <IconButton
+            onClick={(e) => handleRemoveItem(e, item.i)}
+            sx={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              zIndex: 1
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <PieChart data={item.chartData || []} />
+        </Box>
+      );
+    }
+
     const gridOptions: GridOptions = {
       rowData: gridData[item.i] || defaultData,
       columnDefs: columnDefs[item.i] || defaultColumns,
@@ -310,6 +358,15 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
           position: 'relative'
         }}
       >
+        <Box 
+          className="drag-handle"
+          sx={{ 
+            height: '20px', 
+            backgroundColor: '#f5f5f5',
+            borderBottom: '1px solid #ddd',
+            cursor: 'move'
+          }} 
+        />
         <IconButton
           onClick={(e) => handleRemoveItem(e, item.i)}
           sx={{
@@ -324,7 +381,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
         <Box
           className="ag-theme-balham"
           sx={{
-            height: '100%',
+            height: 'calc(100% - 20px)',
             width: '100%'
           }}
           onDragOver={handleDragOver}
@@ -339,13 +396,10 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
   return (
     <ReactGridLayout
       className="layout"
-      layout={items}
       cols={12}
       rowHeight={30}
       draggableHandle=".drag-handle"
-      isResizable={true}
-      isDraggable={true}
-      onLayoutChange={(newLayout: Layout[]) => {
+      onLayoutChange={(newLayout) => {
         console.log('Layout changed:', newLayout);
       }}
     >

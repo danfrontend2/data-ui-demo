@@ -7,6 +7,8 @@ import './App.css';
 
 interface GridItem extends Layout {
   data?: any[];
+  type?: 'grid' | 'chart';
+  chartData?: Array<{ category: string; value: number; }>;
 }
 
 function App() {
@@ -15,6 +17,7 @@ function App() {
   const handleAddItem = (newItem: Layout) => {
     const gridItem: GridItem = {
       ...newItem,
+      type: 'grid',
       data: undefined // Let GridLayout use its default data
     };
     setItems(prev => [...prev, gridItem]);
@@ -24,11 +27,19 @@ function App() {
     setItems(prev => prev.filter(item => item.i !== itemId));
   };
 
+  const handleAddChart = (chartItem: GridItem) => {
+    setItems(prev => [...prev, chartItem]);
+  };
+
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
       <Box sx={{ flexGrow: 1 }}>
         <Toolbar onAddItem={handleAddItem} />
-        <GridLayout items={items} onRemoveItem={handleRemoveItem} />
+        <GridLayout 
+          items={items} 
+          onRemoveItem={handleRemoveItem}
+          onAddChart={handleAddChart}
+        />
       </Box>
     </Box>
   );

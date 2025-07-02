@@ -20,11 +20,13 @@ describe('GridLayout Component', () => {
     }];
 
     const mockOnRemoveItem = jest.fn();
+    const mockOnAddChart = jest.fn();
 
     render(
       <GridLayout
         items={mockItems}
         onRemoveItem={mockOnRemoveItem}
+        onAddChart={mockOnAddChart}
       />
     );
 
