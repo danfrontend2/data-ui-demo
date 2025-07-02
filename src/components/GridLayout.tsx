@@ -17,6 +17,7 @@ import { AllEnterpriseModule } from 'ag-grid-enterprise';
 import { GridData, GridItem, ChartDataPoint } from '../types';
 import PieChart from './PieChart';
 import LineChart from './LineChart';
+import BarChart from './BarChart';
 import * as XLSX from 'xlsx';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -236,7 +237,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     }
   };
 
-  const createChartItem = (type: 'pie-chart' | 'line-chart', params: GetContextMenuItemsParams) => {
+  const createChartItem = (type: 'pie-chart' | 'line-chart' | 'bar-chart', params: GetContextMenuItemsParams) => {
     const cellRanges = params.api.getCellRanges();
     if (!cellRanges || cellRanges.length === 0) {
       console.log('No range selected');
@@ -323,6 +324,10 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       {
         name: 'Draw Line Chart',
         action: () => createChartItem('line-chart', params)
+      },
+      {
+        name: 'Draw Bar Chart',
+        action: () => createChartItem('bar-chart', params)
       }
     ];
 
@@ -330,8 +335,20 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
   };
 
   const renderGrid = (item: GridItem) => {
-    if (item.type === 'pie-chart' || item.type === 'line-chart') {
-      const ChartComponent = item.type === 'pie-chart' ? PieChart : LineChart;
+    if (item.type === 'pie-chart' || item.type === 'line-chart' || item.type === 'bar-chart') {
+      let ChartComponent;
+      switch (item.type) {
+        case 'pie-chart':
+          ChartComponent = PieChart;
+          break;
+        case 'line-chart':
+          ChartComponent = LineChart;
+          break;
+        case 'bar-chart':
+          ChartComponent = BarChart;
+          break;
+      }
+
       return (
         <Box
           key={item.i}

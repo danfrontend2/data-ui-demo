@@ -24,7 +24,7 @@ export interface ChartDataPoint {
 
 export interface GridItem extends Layout {
   data?: GridData[];
-  type?: 'grid' | 'pie-chart' | 'line-chart';
+  type?: 'grid' | 'pie-chart' | 'line-chart' | 'bar-chart';
   chartData?: Array<ChartDataPoint>;
   chartConfig?: {
     series?: Array<{
