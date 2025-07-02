@@ -3,7 +3,7 @@ import RGL, { WidthProvider, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, ModuleRegistry, AllCommunityModule, Theme, CellValueChangedEvent } from 'ag-grid-community';
+import { ColDef, ModuleRegistry, AllCommunityModule, CellValueChangedEvent } from 'ag-grid-community';
 import { GridData } from '../types';
 import * as XLSX from 'xlsx';
 import 'react-grid-layout/css/styles.css';
@@ -18,7 +18,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const ReactGridLayout = WidthProvider(RGL);
 
 interface GridItem extends Layout {
-  data?: any[];
+  data?: GridData[];
 }
 
 interface GridLayoutProps {
@@ -59,7 +59,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
     if (hasNewData) {
       setGridData(newGridData);
     }
-  }, [items]);
+  }, [items, gridData, defaultData]);
 
   const onCellValueChanged = (params: CellValueChangedEvent) => {
     console.log('Cell changed:', {
@@ -128,7 +128,6 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
       const workbook = XLSX.read(data);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       
-      // Read data with explicit options
       const jsonData = XLSX.utils.sheet_to_json(worksheet, {
         raw: false,
         blankrows: false,
@@ -137,7 +136,6 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
       });
 
       if (jsonData.length > 0) {
-        // Get all keys and create mapping for safe names
         const keyMapping = Array.from(
           new Set(
             jsonData.reduce((keys: string[], row: any) => {
@@ -145,26 +143,19 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
             }, [])
           )
         ).reduce((acc: { [key: string]: string }, key: string) => {
-          // Replace dots with underscores for safe names
           const safeKey = key.replace(/\./g, '_');
           acc[key] = safeKey;
           return acc;
         }, {});
-
-        console.log('Key mapping:', keyMapping);
 
         // Function to convert string or number with thousand separators to number
         const parseNumberWithSeparators = (value: string | number): number | string => {
           if (typeof value === 'number') return value;
           if (typeof value !== 'string') return value;
            
-          // Remove spaces and quotes
           const cleanValue = value.trim().replace(/["']/g, '');
-
-          // If string is empty, return empty string
           if (!cleanValue) return '';
           
-          // Replace comma separators with empty string and try to convert to number
           const numericValue = cleanValue.replace(/,/g, '');
           const parsed = parseFloat(numericValue);
           return isNaN(parsed) ? value : parsed;
@@ -174,7 +165,6 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
         const columns = [
           { field: 'id', hide: true },
           ...Object.entries(keyMapping).map(([originalKey, safeKey]) => {
-            // Check data type across all rows
             const hasNumericValue = jsonData.some(row => {
               const value = (row as any)[originalKey];
               const parsedValue = parseNumberWithSeparators(value);
@@ -186,6 +176,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
               headerName: originalKey,
               sortable: true,
               filter: true,
+              editable: true,
               type: hasNumericValue ? 'numericColumn' : undefined,
               valueFormatter: hasNumericValue ? (params: any) => {
                 const value = parseNumberWithSeparators(params.value);
@@ -196,13 +187,13 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
         ];
 
         // Normalize data using safe keys and add unique ids
-        const formattedData = jsonData.map((row: any, index: number) => {
+        const formattedData: GridData[] = jsonData.map((row: any, index: number) => {
           const newRow: Record<string, any> = { id: (index + 1).toString() };
           Object.entries(keyMapping).forEach(([originalKey, safeKey]) => {
             const value = row[originalKey];
             newRow[safeKey] = parseNumberWithSeparators(value);
           });
-          return newRow;
+          return newRow as GridData;
         });
 
         console.log('Formatted data:', formattedData);
