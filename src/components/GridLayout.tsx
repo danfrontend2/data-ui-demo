@@ -3,7 +3,15 @@ import RGL, { WidthProvider, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, ModuleRegistry, AllCommunityModule, CellValueChangedEvent } from 'ag-grid-community';
+import { 
+  ColDef, 
+  GridApi,
+  GridOptions,
+  CellValueChangedEvent,
+  ModuleRegistry,
+  AllCommunityModule
+} from 'ag-grid-community';
+import { AllEnterpriseModule } from 'ag-grid-enterprise';
 import { GridData } from '../types';
 import * as XLSX from 'xlsx';
 import 'react-grid-layout/css/styles.css';
@@ -11,9 +19,8 @@ import 'react-resizable/css/styles.css';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 
-
 // Register AG Grid Modules
-ModuleRegistry.registerModules([AllCommunityModule]);
+ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 
 const ReactGridLayout = WidthProvider(RGL);
 
@@ -108,12 +115,12 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
   };
 
   // Default columns
-      const defaultColumns: ColDef[] = [
-      { field: 'country', headerName: 'Country', editable: true },
-      { field: 'population', headerName: 'Population (M)', editable: true, type: 'numericColumn' },
-      { field: 'gdp', headerName: 'GDP (T$)', editable: true, type: 'numericColumn' },
-      { field: 'area', headerName: 'Area (K km²)', editable: true, type: 'numericColumn' }
-    ];
+  const defaultColumns: ColDef[] = [
+    { field: 'country', headerName: 'Country', editable: true },
+    { field: 'population', headerName: 'Population (M)', editable: true, type: 'numericColumn' },
+    { field: 'gdp', headerName: 'GDP (T$)', editable: true, type: 'numericColumn' },
+    { field: 'area', headerName: 'Area (K km²)', editable: true, type: 'numericColumn' }
+  ];
 
   const handleRemoveItem = (e: React.MouseEvent, itemId: string) => {
     console.log('Click on close button');
@@ -284,7 +291,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
             onDrop={(e) => handleDrop(e, item.i)}
           >
             <AgGridReact
-              key={item.i} // Add key to force re-render when data changes
+              key={item.i}
               gridId={item.i}
               theme="legacy"
               rowData={gridData[item.i]}
@@ -297,6 +304,10 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
                 filter: true,
                 resizable: true
               }}
+              enableRangeSelection={true}
+              enableFillHandle={true}
+              suppressRowClickSelection={true}
+              rowSelection={undefined}
             />
           </div>
         </div>
