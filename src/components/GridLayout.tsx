@@ -9,7 +9,11 @@ import {
   GridOptions,
   CellValueChangedEvent,
   ModuleRegistry,
-  AllCommunityModule
+  AllCommunityModule,
+  GetContextMenuItemsParams,
+  MenuItemDef,
+  RangeSelectionChangedEvent,
+  GetContextMenuItems
 } from 'ag-grid-community';
 import { AllEnterpriseModule } from 'ag-grid-enterprise';
 import { GridData } from '../types';
@@ -235,6 +239,103 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
     }
   };
 
+  const getContextMenuItems: GetContextMenuItems = (params: GetContextMenuItemsParams) => {
+    const result: MenuItemDef[] = [
+      {
+        name: 'Draw Chart',
+        action: () => {
+          const cellRanges = params.api.getCellRanges();
+          if (!cellRanges || cellRanges.length === 0) {
+            console.log('No range selected');
+            return;
+          }
+
+          const range = cellRanges[0];
+          const startRow = range.startRow?.rowIndex ?? 0;
+          const endRow = range.endRow?.rowIndex ?? 0;
+          const columns = range.columns;
+
+          // Get column headers
+          const headers = columns.map(col => ({
+            field: col.getColId(),
+            headerName: col.getColDef().headerName || col.getColId()
+          }));
+
+          // Get selected data
+          const selectedData: any[] = [];
+          params.api.forEachNodeAfterFilterAndSort((node) => {
+            const rowIndex = node.rowIndex;
+            if (rowIndex !== null && rowIndex !== undefined && 
+                rowIndex >= startRow && 
+                rowIndex <= endRow) {
+              const rowData: any = {};
+              columns.forEach(col => {
+                const field = col.getColId();
+                rowData[field] = node.data[field];
+              });
+              selectedData.push(rowData);
+            }
+          });
+
+          console.log('Selected Range Data:', {
+            headers: headers,
+            data: selectedData
+          });
+        }
+      }
+    ];
+
+    return [...result, 'separator', ...(params.defaultItems || [])];
+  };
+
+  const renderGrid = (item: GridItem) => {
+    const gridOptions: GridOptions = {
+      rowData: gridData[item.i] || defaultData,
+      columnDefs: columnDefs[item.i] || defaultColumns,
+      enableRangeSelection: true,
+      enableFillHandle: true,
+      suppressRowClickSelection: true,
+      getContextMenuItems: getContextMenuItems,
+      onCellValueChanged: onCellValueChanged
+    };
+
+    return (
+      <Box
+        key={item.i}
+        data-grid={item}
+        sx={{
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          overflow: 'hidden',
+          position: 'relative'
+        }}
+      >
+        <IconButton
+          onClick={(e) => handleRemoveItem(e, item.i)}
+          sx={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            zIndex: 1
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <Box
+          className="ag-theme-balham"
+          sx={{
+            height: '100%',
+            width: '100%'
+          }}
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, item.i)}
+        >
+          <AgGridReact {...gridOptions} />
+        </Box>
+      </Box>
+    );
+  };
+
   return (
     <ReactGridLayout
       className="layout"
@@ -248,70 +349,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
         console.log('Layout changed:', newLayout);
       }}
     >
-      {items.map((item) => (
-        <div key={item.i} className="grid-item">
-          <Box
-            className="grid-item-header"
-            sx={{
-              padding: '8px',
-              backgroundColor: '#f5f5f5',
-              borderBottom: '1px solid #ddd',
-              display: 'flex',
-              justifyContent: 'flex-end',
-              position: 'relative',
-            }}
-          >
-            <Box 
-              sx={{ 
-                flex: 1, 
-                cursor: 'move',
-                height: '100%'
-              }} 
-              className="drag-handle"
-            />
-            <IconButton
-              size="small"
-              onClick={(e) => handleRemoveItem(e, item.i)}
-              sx={{
-                marginLeft: 'auto',
-                zIndex: 1000,
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                }
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <div
-            className="ag-theme-balham"
-            style={{ height: 'calc(100% - 40px)', width: '100%' }}
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, item.i)}
-          >
-            <AgGridReact
-              key={item.i}
-              gridId={item.i}
-              theme="legacy"
-              rowData={gridData[item.i]}
-              columnDefs={columnDefs[item.i] || defaultColumns}
-              suppressMovableColumns={true}
-              onCellValueChanged={onCellValueChanged}
-              getRowId={(params) => params.data.id}
-              defaultColDef={{
-                sortable: true,
-                filter: true,
-                resizable: true
-              }}
-              enableRangeSelection={true}
-              enableFillHandle={true}
-              suppressRowClickSelection={true}
-              rowSelection={undefined}
-            />
-          </div>
-        </div>
-      ))}
+      {items.map((item) => renderGrid(item))}
     </ReactGridLayout>
   );
 };
