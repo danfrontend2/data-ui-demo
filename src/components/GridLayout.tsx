@@ -3,13 +3,14 @@ import RGL, { WidthProvider, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { ColDef, ModuleRegistry, AllCommunityModule, Theme } from 'ag-grid-community';
 import { LayoutItem, GridData } from '../types';
 import * as XLSX from 'xlsx';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+import 'ag-grid-community/styles/ag-theme-balham.css';
+
 
 // Register AG Grid Modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -217,15 +218,16 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
             </IconButton>
           </Box>
           <div
-            className="ag-theme-quartz"
+                          className="ag-theme-balham"
             style={{ height: 'calc(100% - 40px)', width: '100%' }}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, item.i)}
           >
-            <AgGridReact
-              rowData={gridData[item.i] || defaultData}
-              columnDefs={columnDefs[item.i] || defaultColumns}
-              suppressMovableColumns={true}
+                          <AgGridReact
+                theme="legacy"
+                rowData={gridData[item.i] || defaultData}
+                columnDefs={columnDefs[item.i] || defaultColumns}
+                suppressMovableColumns={true}
             />
           </div>
         </div>
