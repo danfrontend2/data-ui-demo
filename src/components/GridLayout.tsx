@@ -2,6 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import RGL, { WidthProvider, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import DonutLargeIcon from '@mui/icons-material/DonutLarge';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import { AgGridReact } from 'ag-grid-react';
 import { 
   ColDef, 
@@ -315,24 +318,46 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     onAddChart(newItem);
   };
 
-  const getContextMenuItems: GetContextMenuItems = (params: GetContextMenuItemsParams) => {
+  const getContextMenuItems = (params: GetContextMenuItemsParams): MenuItemDef[] => {
     const result: MenuItemDef[] = [
       {
-        name: 'Draw Pie Chart',
+        name: "Draw Pie Chart",
+        icon: '<span class="custom-menu-icon"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M11,2V22C5.9,21.5 2,17.2 2,12C2,6.8 5.9,2.5 11,2M13,2V11H22C21.5,6.2 17.8,2.5 13,2M13,13V22C17.7,21.5 21.5,17.8 22,13H13Z" fill="currentColor"></path></svg></span>',
         action: () => createChartItem('pie-chart', params)
       },
       {
-        name: 'Draw Line Chart',
+        name: "Draw Line Chart",
+        icon: '<span class="custom-menu-icon"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z" fill="currentColor"></path></svg></span>',
         action: () => createChartItem('line-chart', params)
       },
       {
-        name: 'Draw Bar Chart',
+        name: "Draw Bar Chart",
+        icon: '<span class="custom-menu-icon"><svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z" fill="currentColor"></path></svg></span>',
         action: () => createChartItem('bar-chart', params)
       }
     ];
-
-    return [...result, 'separator', ...(params.defaultItems || [])];
+    return result;
   };
+
+  // Add styles for menu icons
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .custom-menu-icon {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 8px;
+        color: #666;
+      }
+      .ag-menu-option-active .custom-menu-icon {
+        color: #2196f3;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   const renderGrid = (item: GridItem) => {
     if (item.type === 'pie-chart' || item.type === 'line-chart' || item.type === 'bar-chart') {
