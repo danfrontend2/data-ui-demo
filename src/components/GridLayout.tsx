@@ -111,7 +111,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
             type: hasNumericValue ? 'numericColumn' : undefined,
             valueFormatter: hasNumericValue ? (params: any) => {
               const value = parseNumberWithSeparators(params.value);
-              return value;
+              return value.toString();
             } : undefined
           };
         });

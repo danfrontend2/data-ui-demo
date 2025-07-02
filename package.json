@@ -40,6 +40,11 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "transform": {
+      "^.+\\.xlsx$": "<rootDir>/src/jest-transform-xlsx.js"
+    }
+  },
   "browserslist": {
     "production": [
       ">0.2%",

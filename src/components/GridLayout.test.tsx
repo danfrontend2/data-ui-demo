@@ -2,9 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import GridLayout from './GridLayout';
-import { act } from 'react-dom/test-utils';
-import * as fs from 'fs';
-import path from 'path';
+import { act } from 'react';
 
 describe('GridLayout Component', () => {
   beforeEach(() => {
@@ -35,11 +33,11 @@ describe('GridLayout Component', () => {
       expect(screen.getByRole('grid')).toBeInTheDocument();
     });
 
-    // Read the real Excel file
-    const filePath = path.join(__dirname, '..', '__fixtures__', 'my-data.xlsx');
-    const fileBuffer = fs.readFileSync(filePath);
+    // Import the Excel file directly
+    const excelFile = require('../__fixtures__/my-data.xlsx');
+    
     const file = new File(
-      [fileBuffer],
+      [excelFile],
       'my-data.xlsx',
       { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
     );
