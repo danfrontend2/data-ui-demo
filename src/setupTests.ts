@@ -4,7 +4,7 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
-// Мок для ResizeObserver
+// Mock for ResizeObserver
 class ResizeObserverMock {
   observe() {}
   unobserve() {}
@@ -13,7 +13,7 @@ class ResizeObserverMock {
 
 window.ResizeObserver = ResizeObserverMock;
 
-// Мок для matchMedia
+// Mock for matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation(query => ({

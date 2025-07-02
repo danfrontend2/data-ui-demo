@@ -22,7 +22,7 @@ interface GridLayoutProps {
 }
 
 const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
-  // State для хранения данных каждого грида
+  // State for storing grid data for each grid
   const [gridData, setGridData] = useState<{ [key: string]: any[] }>({});
   const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
 
@@ -52,7 +52,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
       const workbook = XLSX.read(data);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       
-      // Читаем данные с явным указанием всех опций
+      // Read data with explicit options
       const jsonData = XLSX.utils.sheet_to_json(worksheet, {
         raw: false,
         blankrows: false,
@@ -61,7 +61,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
       });
 
       if (jsonData.length > 0) {
-        // Получаем все ключи и создаем маппинг для безопасных имен
+        // Get all keys and create mapping for safe names
         const keyMapping = Array.from(
           new Set(
             jsonData.reduce((keys: string[], row: any) => {
@@ -69,7 +69,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
             }, [])
           )
         ).reduce((acc: { [key: string]: string }, key: string) => {
-          // Заменяем точки на безопасный символ в ключе для внутреннего использования
+          // Replace dots with underscores for safe names
           const safeKey = key.replace(/\./g, '_');
           acc[key] = safeKey;
           return acc;
@@ -77,27 +77,26 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
 
         console.log('Key mapping:', keyMapping);
 
-        // Функция для преобразования строки с разделителями тысяч в число
-        const parseNumberWithSeparators = (value: string | number): number | string => {
-          if (typeof value === 'number') return value;
-          if (typeof value !== 'string') return value;
+                  // Function to convert string or number with thousand separators to number
+         const parseNumberWithSeparators = (value: string | number): number | string => {
+           if (typeof value === 'number') return value;
+           if (typeof value !== 'string') return value;
+           
+           // Remove spaces and quotes
+           const cleanValue = value.trim().replace(/["']/g, '');
+
+          // If string is empty, return empty string
+          if (!cleanValue) return '';
           
-          // Убираем пробелы и кавычки
-          const cleanValue = value.trim().replace(/["']/g, '');
-          
-          // Если строка пустая, возвращаем пустую строку
-          if (cleanValue === '') return '';
-          
-          // Заменяем запятые-разделители на пустую строку и пробуем преобразовать в число
-          const numberStr = cleanValue.replace(/,/g, '');
-          const num = Number(numberStr);
-          
-          return !isNaN(num) ? num : value;
+          // Replace comma separators with empty string and try to convert to number
+          const numericValue = cleanValue.replace(/,/g, '');
+          const parsed = parseFloat(numericValue);
+          return isNaN(parsed) ? value : parsed;
         };
 
-        // Создаем колонки на основе всех найденных ключей
+        // Create columns based on all found keys
         const columns = Object.entries(keyMapping).map(([originalKey, safeKey]) => {
-          // Проверяем тип данных по всем строкам
+          // Check data type across all rows
           const hasNumericValue = jsonData.some(row => {
             const value = (row as any)[originalKey];
             const parsedValue = parseNumberWithSeparators(value);
@@ -110,19 +109,14 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
             sortable: true,
             filter: true,
             type: hasNumericValue ? 'numericColumn' : undefined,
-            valueFormatter: hasNumericValue
-              ? (params: any) => {
-                  if (params.value === null || params.value === undefined || params.value === '') return '';
-                  const num = typeof params.value === 'number' 
-                    ? params.value 
-                    : parseNumberWithSeparators(params.value);
-                  return typeof num === 'number' ? num.toLocaleString() : params.value;
-                }
-              : undefined
+            valueFormatter: hasNumericValue ? (params: any) => {
+              const value = parseNumberWithSeparators(params.value);
+              return value;
+            } : undefined
           };
         });
 
-        // Нормализуем данные, используя безопасные ключи
+        // Normalize data using safe keys
         const formattedData = jsonData.map((row: any) => {
           const newRow: Record<string, any> = {};
           Object.entries(keyMapping).forEach(([originalKey, safeKey]) => {

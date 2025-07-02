@@ -8,7 +8,7 @@ import path from 'path';
 
 describe('GridLayout Component', () => {
   beforeEach(() => {
-    // Очищаем моки перед каждым тестом
+    // Clear mocks before each test
     jest.clearAllMocks();
   });
 
@@ -30,12 +30,12 @@ describe('GridLayout Component', () => {
       />
     );
 
-    // Проверяем, что грид отрисовался
+    // Check if grid is rendered
     await waitFor(() => {
       expect(screen.getByRole('grid')).toBeInTheDocument();
     });
 
-    // Читаем реальный Excel файл
+    // Read the real Excel file
     const filePath = path.join(__dirname, '..', '__fixtures__', 'my-data.xlsx');
     const fileBuffer = fs.readFileSync(filePath);
     const file = new File(
@@ -44,7 +44,7 @@ describe('GridLayout Component', () => {
       { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
     );
 
-    // Симулируем drag and drop
+    // Simulate drag and drop
     const dropZone = screen.getByRole('grid').closest('.react-grid-item');
     expect(dropZone).toBeInTheDocument();
 
@@ -58,17 +58,17 @@ describe('GridLayout Component', () => {
       dropZone?.dispatchEvent(dropEvent);
     });
 
-    // Проверяем, что данные загрузились
+    // Check if data is loaded
     await waitFor(() => {
-      // Проверяем наличие заголовков колонок
+      // Check column headers
       const headers = screen.getAllByRole('columnheader');
       expect(headers.length).toBeGreaterThan(0);
 
-      // Проверяем наличие данных в гриде
+      // Check grid cells
       const gridCells = screen.getAllByRole('gridcell');
       expect(gridCells.length).toBeGreaterThan(0);
 
-      // Проверяем, что последняя колонка тоже содержит данные
+      // Check if last column contains data
       const lastColumnCells = gridCells.slice(-headers.length);
       lastColumnCells.forEach(cell => {
         expect(cell.textContent).toBeTruthy();
