@@ -1,28 +1,28 @@
 import React from 'react';
-import { Box, IconButton, Tooltip } from '@mui/material';
-import GridViewIcon from '@mui/icons-material/GridView';
+import { Box, Button } from '@mui/material';
+import { Layout } from 'react-grid-layout';
 
 interface ToolbarProps {
-  onAddGrid: () => void;
+  onAddItem: (item: Layout) => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddGrid }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem }) => {
+  const addItem = () => {
+    const id = new Date().getTime().toString();
+    onAddItem({
+      i: id,
+      x: 0,
+      y: Infinity, // Put it at the bottom
+      w: 12, // Full width
+      h: 8,
+    });
+  };
+
   return (
-    <Box
-      sx={{
-        width: '60px',
-        backgroundColor: '#f5f5f5',
-        borderRight: '1px solid #ddd',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '8px',
-      }}
-    >
-      <Tooltip title="Add Grid" placement="right">
-        <IconButton onClick={onAddGrid} size="large">
-          <GridViewIcon />
-        </IconButton>
-      </Tooltip>
+    <Box sx={{ padding: 2 }}>
+      <Button variant="contained" onClick={addItem}>
+        Add Grid
+      </Button>
     </Box>
   );
 };

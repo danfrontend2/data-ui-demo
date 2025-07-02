@@ -2,40 +2,33 @@ import React, { useState } from 'react';
 import { Box } from '@mui/material';
 import Toolbar from './components/Toolbar';
 import GridLayout from './components/GridLayout';
-import { LayoutItem } from './types';
+import { Layout } from 'react-grid-layout';
 import './App.css';
 
+interface GridItem extends Layout {
+  data?: any[];
+}
+
 function App() {
-  const [layoutItems, setLayoutItems] = useState<LayoutItem[]>([]);
-  
-  const handleAddGrid = () => {
-    const newItem: LayoutItem = {
-      i: `grid-${Date.now()}`,
-      x: (layoutItems.length * 2) % 12,
-      y: Infinity, // puts it at the bottom
-      w: 6,
-      h: 4,
+  const [items, setItems] = useState<GridItem[]>([]);
+
+  const handleAddItem = (newItem: Layout) => {
+    const gridItem: GridItem = {
+      ...newItem,
+      data: undefined // Let GridLayout use its default data
     };
-    setLayoutItems([...layoutItems, newItem]);
+    setItems(prev => [...prev, gridItem]);
   };
 
   const handleRemoveItem = (itemId: string) => {
-    console.log('App: handleRemoveItem triggered');
-    console.log('Current items:', layoutItems);
-    console.log('Removing item with ID:', itemId);
-    const updatedItems = layoutItems.filter(item => item.i !== itemId);
-    console.log('Updated items:', updatedItems);
-    setLayoutItems(updatedItems);
+    setItems(prev => prev.filter(item => item.i !== itemId));
   };
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
-      <Toolbar onAddGrid={handleAddGrid} />
-      <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
-        <GridLayout 
-          items={layoutItems} 
-          onRemoveItem={handleRemoveItem}
-        />
+      <Box sx={{ flexGrow: 1 }}>
+        <Toolbar onAddItem={handleAddItem} />
+        <GridLayout items={items} onRemoveItem={handleRemoveItem} />
       </Box>
     </Box>
   );

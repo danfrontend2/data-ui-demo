@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import RGL, { WidthProvider, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, ModuleRegistry, AllCommunityModule, Theme } from 'ag-grid-community';
-import { LayoutItem, GridData } from '../types';
+import { ColDef, ModuleRegistry, AllCommunityModule, Theme, CellValueChangedEvent } from 'ag-grid-community';
+import { GridData } from '../types';
 import * as XLSX from 'xlsx';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -17,37 +17,103 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const ReactGridLayout = WidthProvider(RGL);
 
+interface GridItem extends Layout {
+  data?: any[];
+}
+
 interface GridLayoutProps {
-  items: LayoutItem[];
+  items: GridItem[];
   onRemoveItem: (itemId: string) => void;
 }
 
 const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
-  // State for storing grid data for each grid
-  const [gridData, setGridData] = useState<{ [key: string]: any[] }>({});
-  const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
-
   // Sample data for initial grid state
   const defaultData: GridData[] = [
-    { country: 'China', population: 1412, gdp: 17.7, area: 9597 },
-    { country: 'India', population: 1400, gdp: 3.7, area: 3287 },
-    { country: 'USA', population: 339, gdp: 28.8, area: 9834 },
-    { country: 'Indonesia', population: 278, gdp: 1.5, area: 1905 },
-    { country: 'Pakistan', population: 241, gdp: 0.4, area: 881 },
-    { country: 'Nigeria', population: 223, gdp: 0.5, area: 924 },
-    { country: 'Brazil', population: 216, gdp: 2.2, area: 8516 },
-    { country: 'Bangladesh', population: 172, gdp: 0.5, area: 148 },
-    { country: 'Russia', population: 144, gdp: 2.0, area: 17098 },
-    { country: 'Mexico', population: 129, gdp: 1.8, area: 1964 }
+    { id: '1', country: 'China', population: 1412, gdp: 17.7, area: 9597 },
+    { id: '2', country: 'India', population: 1400, gdp: 3.7, area: 3287 },
+    { id: '3', country: 'USA', population: 339, gdp: 28.8, area: 9834 },
+    { id: '4', country: 'Indonesia', population: 278, gdp: 1.5, area: 1905 },
+    { id: '5', country: 'Pakistan', population: 241, gdp: 0.4, area: 881 },
+    { id: '6', country: 'Nigeria', population: 223, gdp: 0.5, area: 924 },
+    { id: '7', country: 'Brazil', population: 216, gdp: 2.2, area: 8516 },
+    { id: '8', country: 'Bangladesh', population: 172, gdp: 0.5, area: 148 },
+    { id: '9', country: 'Russia', population: 144, gdp: 2.0, area: 17098 },
+    { id: '10', country: 'Mexico', population: 129, gdp: 1.8, area: 1964 }
   ];
 
+  const [gridData, setGridData] = useState<{ [key: string]: GridData[] }>({});
+  const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
+
+  // Initialize data for new grids
+  useEffect(() => {
+    const newGridData = { ...gridData };
+    let hasNewData = false;
+
+    items.forEach(item => {
+      if (!newGridData[item.i]) {
+        newGridData[item.i] = item.data || [...defaultData];
+        hasNewData = true;
+      }
+    });
+
+    if (hasNewData) {
+      setGridData(newGridData);
+    }
+  }, [items]);
+
+  const onCellValueChanged = (params: CellValueChangedEvent) => {
+    console.log('Cell changed:', {
+      rowIndex: params.rowIndex,
+      data: params.data,
+      newValue: params.newValue,
+      oldValue: params.oldValue,
+      field: params.colDef.field
+    });
+
+    if (!params.colDef.field) return;
+
+    const newValue = params.colDef.type === 'numericColumn' 
+      ? parseFloat(params.newValue) 
+      : params.newValue;
+
+    const gridId = params.api.getGridId();
+    console.log('Grid ID:', gridId);
+    
+    if (!gridId) return;
+
+    const rowId = params.data.id;
+    const field = params.colDef.field;
+
+    setGridData(prev => {
+      const currentData = [...(prev[gridId] || defaultData)];
+      const rowIndex = currentData.findIndex(row => row.id === rowId);
+      
+      if (rowIndex >= 0) {
+        const updatedData = currentData.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...row,
+              [field]: newValue
+            } as GridData;
+          }
+          return row;
+        });
+        
+        console.log('Updated data:', updatedData);
+        return { ...prev, [gridId]: updatedData };
+      }
+      
+      return prev;
+    });
+  };
+
   // Default columns
-  const defaultColumns: ColDef[] = [
-    { field: 'country', headerName: 'Country' },
-    { field: 'population', headerName: 'Population (M)' },
-    { field: 'gdp', headerName: 'GDP (T$)' },
-    { field: 'area', headerName: 'Area (K km²)' }
-  ];
+      const defaultColumns: ColDef[] = [
+      { field: 'country', headerName: 'Country', editable: true },
+      { field: 'population', headerName: 'Population (M)', editable: true, type: 'numericColumn' },
+      { field: 'gdp', headerName: 'GDP (T$)', editable: true, type: 'numericColumn' },
+      { field: 'area', headerName: 'Area (K km²)', editable: true, type: 'numericColumn' }
+    ];
 
   const handleRemoveItem = (e: React.MouseEvent, itemId: string) => {
     console.log('Click on close button');
@@ -87,13 +153,13 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
 
         console.log('Key mapping:', keyMapping);
 
-                  // Function to convert string or number with thousand separators to number
-         const parseNumberWithSeparators = (value: string | number): number | string => {
-           if (typeof value === 'number') return value;
-           if (typeof value !== 'string') return value;
+        // Function to convert string or number with thousand separators to number
+        const parseNumberWithSeparators = (value: string | number): number | string => {
+          if (typeof value === 'number') return value;
+          if (typeof value !== 'string') return value;
            
-           // Remove spaces and quotes
-           const cleanValue = value.trim().replace(/["']/g, '');
+          // Remove spaces and quotes
+          const cleanValue = value.trim().replace(/["']/g, '');
 
           // If string is empty, return empty string
           if (!cleanValue) return '';
@@ -105,30 +171,33 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
         };
 
         // Create columns based on all found keys
-        const columns = Object.entries(keyMapping).map(([originalKey, safeKey]) => {
-          // Check data type across all rows
-          const hasNumericValue = jsonData.some(row => {
-            const value = (row as any)[originalKey];
-            const parsedValue = parseNumberWithSeparators(value);
-            return typeof parsedValue === 'number';
-          });
+        const columns = [
+          { field: 'id', hide: true },
+          ...Object.entries(keyMapping).map(([originalKey, safeKey]) => {
+            // Check data type across all rows
+            const hasNumericValue = jsonData.some(row => {
+              const value = (row as any)[originalKey];
+              const parsedValue = parseNumberWithSeparators(value);
+              return typeof parsedValue === 'number';
+            });
 
-          return {
-            field: safeKey,
-            headerName: originalKey,
-            sortable: true,
-            filter: true,
-            type: hasNumericValue ? 'numericColumn' : undefined,
-            valueFormatter: hasNumericValue ? (params: any) => {
-              const value = parseNumberWithSeparators(params.value);
-              return value.toString();
-            } : undefined
-          };
-        });
+            return {
+              field: safeKey,
+              headerName: originalKey,
+              sortable: true,
+              filter: true,
+              type: hasNumericValue ? 'numericColumn' : undefined,
+              valueFormatter: hasNumericValue ? (params: any) => {
+                const value = parseNumberWithSeparators(params.value);
+                return value.toString();
+              } : undefined
+            };
+          })
+        ];
 
-        // Normalize data using safe keys
-        const formattedData = jsonData.map((row: any) => {
-          const newRow: Record<string, any> = {};
+        // Normalize data using safe keys and add unique ids
+        const formattedData = jsonData.map((row: any, index: number) => {
+          const newRow: Record<string, any> = { id: (index + 1).toString() };
           Object.entries(keyMapping).forEach(([originalKey, safeKey]) => {
             const value = row[originalKey];
             newRow[safeKey] = parseNumberWithSeparators(value);
@@ -218,16 +287,25 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
             </IconButton>
           </Box>
           <div
-                          className="ag-theme-balham"
+            className="ag-theme-balham"
             style={{ height: 'calc(100% - 40px)', width: '100%' }}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, item.i)}
           >
-                          <AgGridReact
-                theme="legacy"
-                rowData={gridData[item.i] || defaultData}
-                columnDefs={columnDefs[item.i] || defaultColumns}
-                suppressMovableColumns={true}
+            <AgGridReact
+              key={item.i} // Add key to force re-render when data changes
+              gridId={item.i}
+              theme="legacy"
+              rowData={gridData[item.i]}
+              columnDefs={columnDefs[item.i] || defaultColumns}
+              suppressMovableColumns={true}
+              onCellValueChanged={onCellValueChanged}
+              getRowId={(params) => params.data.id}
+              defaultColDef={{
+                sortable: true,
+                filter: true,
+                resizable: true
+              }}
             />
           </div>
         </div>

@@ -1,3 +1,5 @@
+import { Layout } from 'react-grid-layout';
+
 export interface LayoutItem {
   i: string;
   x: number;
@@ -7,6 +9,7 @@ export interface LayoutItem {
 }
 
 export interface GridData {
+  id: string;
   country: string;
   population: number;  // millions
   gdp: number;        // trillions $
@@ -19,4 +22,7 @@ export interface GridItem {
   y: number;
   w: number;
   h: number;
-} 
+}
+
+// Use Layout type from react-grid-layout instead of our custom LayoutItem
+export type { Layout }; 
