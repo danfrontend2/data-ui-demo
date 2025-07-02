@@ -28,15 +28,24 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
 
   // Sample data for initial grid state
   const defaultData: GridData[] = [
-    { id: 1, name: 'Item 1', value: 100 },
-    { id: 2, name: 'Item 2', value: 200 },
-    { id: 3, name: 'Item 3', value: 300 },
+    { country: 'China', population: 1412, gdp: 17.7, area: 9597 },
+    { country: 'India', population: 1400, gdp: 3.7, area: 3287 },
+    { country: 'USA', population: 339, gdp: 28.8, area: 9834 },
+    { country: 'Indonesia', population: 278, gdp: 1.5, area: 1905 },
+    { country: 'Pakistan', population: 241, gdp: 0.4, area: 881 },
+    { country: 'Nigeria', population: 223, gdp: 0.5, area: 924 },
+    { country: 'Brazil', population: 216, gdp: 2.2, area: 8516 },
+    { country: 'Bangladesh', population: 172, gdp: 0.5, area: 148 },
+    { country: 'Russia', population: 144, gdp: 2.0, area: 17098 },
+    { country: 'Mexico', population: 129, gdp: 1.8, area: 1964 }
   ];
 
+  // Default columns
   const defaultColumns: ColDef[] = [
-    { field: 'id' },
-    { field: 'name' },
-    { field: 'value' },
+    { field: 'country', headerName: 'Country' },
+    { field: 'population', headerName: 'Population (M)' },
+    { field: 'gdp', headerName: 'GDP (T$)' },
+    { field: 'area', headerName: 'Area (K km²)' }
   ];
 
   const handleRemoveItem = (e: React.MouseEvent, itemId: string) => {
@@ -208,7 +217,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
             </IconButton>
           </Box>
           <div
-            className="ag-theme-alpine"
+            className="ag-theme-quartz"
             style={{ height: 'calc(100% - 40px)', width: '100%' }}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, item.i)}
@@ -217,7 +226,6 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem }) => {
               rowData={gridData[item.i] || defaultData}
               columnDefs={columnDefs[item.i] || defaultColumns}
               suppressMovableColumns={true}
-              animateRows={true}
             />
           </div>
         </div>
