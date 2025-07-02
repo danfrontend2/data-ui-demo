@@ -22,6 +22,7 @@ import PieChart from './PieChart';
 import LineChart from './LineChart';
 import BarChart from './BarChart';
 import * as XLSX from 'xlsx';
+import ActionManager from '../services/ActionManager';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -39,7 +40,6 @@ interface GridLayoutProps {
 }
 
 const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart }) => {
-  // Sample data for initial grid state
   const defaultData = useMemo(() => [
     { id: '1', country: 'China', population: 1412, gdp: 17.7, area: 9597 },
     { id: '2', country: 'India', population: 1400, gdp: 3.7, area: 3287 },
@@ -53,25 +53,36 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     { id: '10', country: 'Mexico', population: 129, gdp: 1.8, area: 1964 }
   ], []);
 
+  // Default columns
+  const defaultColumns: ColDef[] = useMemo(() => [
+    { field: 'country', headerName: 'Country', editable: true },
+    { field: 'population', headerName: 'Population (M)', editable: true, type: 'numericColumn' },
+    { field: 'gdp', headerName: 'GDP (T$)', editable: true, type: 'numericColumn' },
+    { field: 'area', headerName: 'Area (K km²)', editable: true, type: 'numericColumn' }
+  ], []);
+
   const [gridData, setGridData] = useState<{ [key: string]: GridData[] }>({});
   const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
 
   // Initialize data for new grids
   useEffect(() => {
     const newGridData = { ...gridData };
+    const newColumnDefs = { ...columnDefs };
     let hasNewData = false;
 
     items.forEach(item => {
-      if (!newGridData[item.i]) {
+      if (item.type === 'grid' && !newGridData[item.i]) {
         newGridData[item.i] = item.data || [...defaultData];
+        newColumnDefs[item.i] = defaultColumns;
         hasNewData = true;
       }
     });
 
     if (hasNewData) {
       setGridData(newGridData);
+      setColumnDefs(newColumnDefs);
     }
-  }, [items, gridData, defaultData]);
+  }, [items, gridData, columnDefs, defaultData, defaultColumns]);
 
   const onCellValueChanged = (params: CellValueChangedEvent) => {
     console.log('Cell changed:', {
@@ -112,20 +123,22 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
         });
         
         console.log('Updated data:', updatedData);
+
+        // Log cell update action
+        ActionManager.getInstance().logAction('UPDATE_CELL', {
+          gridId,
+          rowId,
+          field,
+          oldValue: params.oldValue,
+          newValue: params.newValue
+        });
+
         return { ...prev, [gridId]: updatedData };
       }
       
       return prev;
     });
   };
-
-  // Default columns
-  const defaultColumns: ColDef[] = [
-    { field: 'country', headerName: 'Country', editable: true },
-    { field: 'population', headerName: 'Population (M)', editable: true, type: 'numericColumn' },
-    { field: 'gdp', headerName: 'GDP (T$)', editable: true, type: 'numericColumn' },
-    { field: 'area', headerName: 'Area (K km²)', editable: true, type: 'numericColumn' }
-  ];
 
   const handleRemoveItem = (e: React.MouseEvent, itemId: string) => {
     console.log('Click on close button');
@@ -134,20 +147,59 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     onRemoveItem(itemId);
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    console.log('DragOver event triggered');
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent, gridId: string) => {
+    console.log('Drop event triggered for grid:', gridId);
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const files = e.dataTransfer.files;
+    console.log('Dropped files:', files);
+    console.log('Files length:', files.length);
+    
+    if (files.length) {
+      const file = files[0];
+      console.log('File type:', file.type);
+      console.log('File name:', file.name);
+      
+      if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+          file.type === 'text/csv' ||
+          file.name.endsWith('.xlsx') ||
+          file.name.endsWith('.csv')) {
+        console.log('Processing file...');
+        processFile(file, gridId);
+      } else {
+        console.warn('Unsupported file type:', file.type);
+      }
+    }
+  };
+
   const processFile = async (file: File, gridId: string) => {
+    console.log('Starting file processing for grid:', gridId);
     try {
+      console.log('Reading file as ArrayBuffer...');
       const data = await file.arrayBuffer();
+      console.log('Creating XLSX workbook...');
       const workbook = XLSX.read(data);
+      console.log('Available sheets:', workbook.SheetNames);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       
+      console.log('Converting sheet to JSON...');
       const jsonData = XLSX.utils.sheet_to_json(worksheet, {
         raw: false,
         blankrows: false,
         defval: '',
         rawNumbers: true
       });
+      console.log('Initial JSON data:', jsonData);
 
       if (jsonData.length > 0) {
+        console.log('Processing column keys...');
         const keyMapping = Array.from(
           new Set(
             jsonData.reduce((keys: string[], row: any) => {
@@ -159,6 +211,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
           acc[key] = safeKey;
           return acc;
         }, {});
+        console.log('Key mapping:', keyMapping);
 
         // Function to convert string or number with thousand separators to number
         const parseNumberWithSeparators = (value: string | number): number | string => {
@@ -174,6 +227,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
         };
 
         // Create columns based on all found keys
+        console.log('Creating column definitions...');
         const columns = [
           { field: 'id', hide: true },
           ...Object.entries(keyMapping).map(([originalKey, safeKey]) => {
@@ -191,6 +245,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
               editable: true,
               type: hasNumericValue ? 'numericColumn' : undefined,
               valueFormatter: hasNumericValue ? (params: any) => {
+                if (params.value === undefined || params.value === null) return '';
                 const value = parseNumberWithSeparators(params.value);
                 return value.toString();
               } : undefined
@@ -199,6 +254,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
         ];
 
         // Normalize data using safe keys and add unique ids
+        console.log('Formatting data...');
         const formattedData: GridData[] = jsonData.map((row: any, index: number) => {
           const newRow: Record<string, any> = { id: (index + 1).toString() };
           Object.entries(keyMapping).forEach(([originalKey, safeKey]) => {
@@ -208,54 +264,100 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
           return newRow as GridData;
         });
 
-        console.log('Formatted data:', formattedData);
-        console.log('Columns:', columns);
+        console.log('Final formatted data:', formattedData);
+        console.log('Final columns:', columns);
 
-        setColumnDefs(prev => ({ ...prev, [gridId]: columns }));
-        setGridData(prev => ({ ...prev, [gridId]: formattedData }));
+        console.log('Current gridData state:', gridData);
+        console.log('Current columnDefs state:', columnDefs);
+
+        // Update grid state
+        setColumnDefs(prev => {
+          const newState = { ...prev };
+          newState[gridId] = columns;
+          console.log('New columnDefs state:', newState);
+          return newState;
+        });
+        
+        setGridData(prev => {
+          const newState = { ...prev };
+          newState[gridId] = formattedData;
+          console.log('New gridData state:', newState);
+          return newState;
+        });
+
+        // Update grid directly through API
+        const gridApi = window.gridApis[gridId];
+        if (gridApi) {
+          console.log('Updating grid through API...');
+          // First clear all rows
+          const rowCount = gridApi.getDisplayedRowCount();
+          if (rowCount > 0) {
+            const rowsToRemove: GridData[] = [];
+            gridApi.forEachNode(node => {
+              if (node.data) {
+                rowsToRemove.push(node.data);
+              }
+            });
+            gridApi.applyTransaction({ remove: rowsToRemove });
+          }
+
+          // Then add new rows and update columns
+          gridApi.setGridOption('columnDefs', columns);
+          gridApi.applyTransaction({ add: formattedData });
+        }
+      } else {
+        console.warn('No data found in the file');
       }
     } catch (error) {
       console.error('Error processing file:', error);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e: React.DragEvent, gridId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const files = e.dataTransfer.files;
-    if (files.length) {
-      const file = files[0];
-      if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-          file.type === 'text/csv' ||
-          file.name.endsWith('.xlsx') ||
-          file.name.endsWith('.csv')) {
-        processFile(file, gridId);
+      if (error instanceof Error) {
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
       }
     }
   };
 
-  const createChartItem = (type: 'pie-chart' | 'line-chart' | 'bar-chart', params: GetContextMenuItemsParams) => {
+  // Add selection handling
+  const handleRangeSelection = (params: GetContextMenuItemsParams) => {
+    const gridId = params.api.getGridId();
+    if (!gridId) return;
+
     const cellRanges = params.api.getCellRanges();
-    if (!cellRanges || cellRanges.length === 0) {
-      console.log('No range selected');
-      return;
-    }
+    if (!cellRanges || cellRanges.length === 0) return;
 
     const range = cellRanges[0];
     const startRow = range.startRow?.rowIndex ?? 0;
     const endRow = range.endRow?.rowIndex ?? 0;
-    const columns = range.columns;
+    const columns = range.columns.map(col => col.getColId());
 
-    console.log('Selected columns:', columns.map(col => ({
-      id: col.getColId(),
-      name: col.getColDef().headerName
-    })));
+    ActionManager.getInstance().logAction('SELECT_RANGE', {
+      gridId,
+      range: {
+        columns,
+        startRow,
+        endRow
+      }
+    });
+
+    return {
+      gridId,
+      range: {
+        columns,
+        startRow,
+        endRow
+      }
+    };
+  };
+
+  const createChartItem = (type: 'pie-chart' | 'line-chart' | 'bar-chart', params: GetContextMenuItemsParams) => {
+    const selection = handleRangeSelection(params);
+    if (!selection) {
+      console.log('No range selected');
+      return;
+    }
+
+    const { gridId, range } = selection;
+    const { columns, startRow, endRow } = range;
 
     if (columns.length < 2) {
       console.log('Please select at least 2 columns: first for categories, others for values');
@@ -264,7 +366,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
 
     // Get selected data
     const chartData: Array<ChartDataPoint> = [];
-    const xField = columns[0].getColId();
+    const xField = columns[0];
     
     params.api.forEachNodeAfterFilterAndSort((node) => {
       const rowIndex = node.rowIndex;
@@ -276,8 +378,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
         };
         
         // Add values for each Y-axis column
-        columns.slice(1).forEach(col => {
-          const field = col.getColId();
+        columns.slice(1).forEach(field => {
           const value = parseFloat(node.data[field]);
           if (!isNaN(value)) {
             point[field] = value;
@@ -288,16 +389,6 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       }
     });
 
-    console.log('Chart data:', chartData);
-
-    // Create series configuration
-    const series = columns.slice(1).map(col => ({
-      field: col.getColId(),
-      name: col.getColDef().headerName || col.getColId()
-    }));
-
-    console.log('Series config:', series);
-
     // Find the maximum Y coordinate among existing items
     const maxY = items.reduce((max, item) => {
       const itemBottom = item.y + item.h;
@@ -305,27 +396,33 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     }, 0);
 
     // Get the source grid's height
-    const sourceGridItem = items.find(item => item.i === params.api.getGridId());
+    const sourceGridItem = items.find(item => item.i === gridId);
     const sourceHeight = sourceGridItem?.h || 4;
 
     // Create new chart item
-    const newItem: GridItem = {
+    const chartItem: GridItem = {
       i: `${type}-${Date.now()}`,
-      x: 0, // Start from the left
-      y: maxY, // Place below all existing items
-      w: 12, // Full width
-      h: sourceHeight * 2, // Double the height of source grid
+      x: 0,
+      y: maxY,
+      w: 12,
+      h: sourceHeight,
       type,
       chartData,
       chartConfig: {
-        series
+        series: columns.slice(1).map(field => ({
+          field,
+          name: field
+        }))
       }
     };
 
-    console.log('New chart item:', newItem);
-
-    // Add new item to layout using the provided callback
-    onAddChart(newItem);
+    onAddChart(chartItem);
+    
+    ActionManager.getInstance().logAction('ADD_CHART', {
+      item: chartItem,
+      sourceGridId: gridId,
+      selectedRange: range
+    });
   };
 
   const getContextMenuItems = (params: GetContextMenuItemsParams): MenuItemDef[] => {
@@ -367,6 +464,13 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     return () => {
       document.head.removeChild(style);
     };
+  }, []);
+
+  useEffect(() => {
+    // Initialize gridApis object if it doesn't exist
+    if (!window.gridApis) {
+      window.gridApis = {};
+    }
   }, []);
 
   const renderGrid = (item: GridItem) => {
@@ -439,20 +543,29 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       enableRangeSelection: true,
       enableFillHandle: true,
       suppressRowClickSelection: true,
+      rowSelection: 'multiple',
       getContextMenuItems: getContextMenuItems,
-      onCellValueChanged: onCellValueChanged
+      onCellValueChanged: onCellValueChanged,
+      onGridReady: (params) => {
+        // Store grid API in the global map
+        window.gridApis = window.gridApis || {};
+        window.gridApis[item.i] = params.api;
+      }
     };
 
     return (
       <Box
         key={item.i}
         data-grid={item}
+        data-grid-id={item.i}
         sx={{
           border: '1px solid #ccc',
           borderRadius: '4px',
           overflow: 'hidden',
           position: 'relative'
         }}
+        onDragOver={handleDragOver}
+        onDrop={(e) => handleDrop(e, item.i)}
       >
         <Box 
           className="drag-handle"
@@ -480,13 +593,19 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
             height: 'calc(100% - 20px)',
             width: '100%'
           }}
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, item.i)}
         >
-          <AgGridReact {...gridOptions} />
+          <AgGridReact gridOptions={gridOptions} />
         </Box>
       </Box>
     );
+  };
+
+  // Add layout change logging
+  const onLayoutChange = (newLayout: Layout[]) => {
+    console.log('Layout changed:', newLayout);
+    ActionManager.getInstance().logAction('UPDATE_LAYOUT', {
+      layout: newLayout
+    });
   };
 
   return (
@@ -495,9 +614,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       cols={12}
       rowHeight={30}
       draggableHandle=".drag-handle"
-      onLayoutChange={(newLayout) => {
-        console.log('Layout changed:', newLayout);
-      }}
+      onLayoutChange={onLayoutChange}
     >
       {items.map((item) => renderGrid(item))}
     </ReactGridLayout>

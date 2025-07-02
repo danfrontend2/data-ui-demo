@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Box, Button } from '@mui/material';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Layout } from 'react-grid-layout';
 import Chat from './Chat';
 
 interface ToolbarProps {
   onAddItem: (item: Layout) => void;
+  onRunMacro: () => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const addItem = () => {
@@ -39,6 +41,14 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem }) => {
         startIcon={<SmartToyIcon />}
       >
         AI
+      </Button>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={onRunMacro}
+        startIcon={<PlayArrowIcon />}
+      >
+        Run Demo
       </Button>
       {isChatOpen && <Chat onClose={() => setIsChatOpen(false)} />}
     </Box>

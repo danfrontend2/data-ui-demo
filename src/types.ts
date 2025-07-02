@@ -1,4 +1,12 @@
 import { Layout } from 'react-grid-layout';
+import { GridApi } from 'ag-grid-community';
+
+declare global {
+  interface Window {
+    [key: string]: any;
+    gridApis: { [key: string]: GridApi };
+  }
+}
 
 export interface LayoutItem {
   i: string;
