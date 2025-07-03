@@ -173,6 +173,11 @@ function App() {
     actionManager.executeMacro(DEMO_MACRO);
   };
 
+  const handleRunCustomMacro = (macro: any[]) => {
+    console.log('Running custom macro:', macro);
+    actionManager.executeMacro(macro);
+  };
+
   const handleLayoutChange = (layout: Layout[]) => {
     // Update items state with new layout
     setItems(prev => {
@@ -198,7 +203,11 @@ function App() {
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
       <Box sx={{ flexGrow: 1 }}>
-        <Toolbar onAddItem={handleAddItem} onRunMacro={handleRunMacro} />
+        <Toolbar 
+          onAddItem={handleAddItem} 
+          onRunMacro={handleRunMacro}
+          onRunCustomMacro={handleRunCustomMacro}
+        />
         <GridLayout 
           items={items}
           onRemoveItem={handleRemoveItem}

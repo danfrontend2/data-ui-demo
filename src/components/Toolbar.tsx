@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Box, Button } from '@mui/material';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import SaveIcon from '@mui/icons-material/Save';
+import UploadIcon from '@mui/icons-material/Upload';
 import { Layout } from 'react-grid-layout';
 import Chat from './Chat';
 import ActionManager from '../services/ActionManager';
@@ -14,11 +15,13 @@ let idCounter = 0;
 interface ToolbarProps {
   onAddItem: (item: Layout) => void;
   onRunMacro: () => void;
+  onRunCustomMacro: (macro: any[]) => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addItem = () => {
     // Use UUID v4 for guaranteed uniqueness
@@ -58,6 +61,25 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro }) => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Failed to save macro:', error);
+    }
+  };
+
+  const handleLoadMacro = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    console.log('Selected file:', file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          console.log('File content:', e.target?.result);
+          const macro = JSON.parse(e.target?.result as string);
+          console.log('Parsed macro:', macro);
+          onRunCustomMacro(macro);
+        } catch (error) {
+          console.error('Failed to parse macro file:', error);
+        }
+      };
+      reader.readAsText(file);
     }
   };
 
@@ -106,6 +128,21 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro }) => {
           Save Macro
         </Button>
       )}
+      <input
+        type="file"
+        accept=".json"
+        style={{ display: 'none' }}
+        ref={fileInputRef}
+        onChange={handleLoadMacro}
+      />
+      <Button
+        variant="contained"
+        color="info"
+        onClick={() => fileInputRef.current?.click()}
+        startIcon={<UploadIcon />}
+      >
+        Load Macro
+      </Button>
       {isChatOpen && <Chat onClose={() => setIsChatOpen(false)} />}
     </Box>
   );
