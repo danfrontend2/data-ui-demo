@@ -17,6 +17,11 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
   const chartRef = useRef<am5.Root | null>(null);
 
   useLayoutEffect(() => {
+    // Clean up any existing root
+    if (chartRef.current) {
+      chartRef.current.dispose();
+    }
+
     // Create root element
     const root = am5.Root.new(chartId);
 

@@ -136,32 +136,26 @@ function App() {
   }, [actionManager]);
 
   const handleAddItem = (newItem: Layout) => {
-    setItems(prev => {
-      // Calculate the maximum Y coordinate of existing items
-      const maxY = prev.reduce((max, item) => {
-        const itemBottom = item.y + item.h;
-        return itemBottom > max ? itemBottom : max;
-      }, 0);
+    // Calculate the maximum Y coordinate of existing items
+    const maxY = items.reduce((max, item) => {
+      const itemBottom = item.y + item.h;
+      return itemBottom > max ? itemBottom : max;
+    }, 0);
 
-      // Create new grid item, preserving the width from newItem if provided
-      const gridItem: GridItem = {
-        ...newItem,
-        type: 'grid',
-        data: undefined,
-        w: newItem.w || 12,  // Use provided width or default to 12
-        h: newItem.h || 9,   // Use provided height or default to 9
-        y: maxY             // Place new item below existing ones
-      };
+    // Create new grid item with fixed dimensions
+    const gridItem: GridItem = {
+      ...newItem,
+      type: 'grid',
+      data: undefined,
+      x: 0,
+      y: maxY,
+      w: 12,  // Always full width
+      h: 12   // Fixed height
+    };
 
-      // Create new layout preserving ALL properties of existing items
-      const newLayout = [...prev, gridItem];
-
-      // Log the layout update
-      ActionManager.getInstance().logAction('UPDATE_LAYOUT', {
-        layout: newLayout
-      });
-
-      return newLayout;
+    // Log the action to add grid
+    ActionManager.getInstance().logAction('ADD_GRID', {
+      item: gridItem
     });
   };
 
@@ -172,7 +166,6 @@ function App() {
   };
 
   const handleAddChart = (chartItem: GridItem) => {
-    setItems(prev => [...prev, chartItem]);
     actionManager.logAction('ADD_CHART', { item: chartItem });
   };
 

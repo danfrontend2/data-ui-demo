@@ -15,115 +15,126 @@ interface PieChartProps {
 
 const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
   const chartRef = useRef<am5.Root | null>(null);
+  const chartDivRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    console.log('PieChart data:', data);
-    console.log('PieChart series:', series);
+    // Wait for the next frame to ensure the div is mounted
+    const timer = requestAnimationFrame(() => {
+      // Cleanup previous root if exists
+      if (chartRef.current) {
+        chartRef.current.dispose();
+      }
 
-    // Create root element
-    const root = am5.Root.new(chartId);
+      // Check if the div exists
+      if (!chartDivRef.current) {
+        return;
+      }
 
-    // Set themes
-    root.setThemes([am5themes_Animated.new(root)]);
+      // Create root element
+      const root = am5.Root.new(chartDivRef.current);
 
-    // Create chart
-    const chart = root.container.children.push(
-      am5percent.PieChart.new(root, {
-        layout: root.verticalLayout,
-        radius: am5.percent(90)
-      })
-    );
+      // Set themes
+      root.setThemes([am5themes_Animated.new(root)]);
 
-    // Calculate total number of series for radius distribution
-    const totalSeries = series.length || 1;
-    console.log('Total series:', totalSeries);
-
-    // Create series for each field
-    const chartSeries = (series.length ? series : [{
-      field: Object.keys(data[0]).find(key => key !== 'category') || '',
-      name: 'Value'
-    }]).map((seriesConfig, index) => {
-      console.log('Creating series:', seriesConfig);
-      console.log('With radius:', 90 - (index * (80 / totalSeries)));
-
-      const colors = [
-        0x6794dc,
-        0x67b7dc,
-        0x8067dc,
-        0xdc67ce,
-        0xdc6967,
-        0xa367dc,
-        0x67dcb0
-      ];
-      const color = am5.color(colors[index % colors.length]);
-
-      // Для каждой следующей серии уменьшаем внешний и внутренний радиус
-      const outerRadius = am5.percent(90 - (index * (80 / totalSeries)));
-      const innerRadius = am5.percent(45 - (index * (35 / totalSeries)));
-
-      const pieSeries = chart.series.push(
-        am5percent.PieSeries.new(root, {
-          name: seriesConfig.name,
-          valueField: seriesConfig.field,
-          categoryField: "category",
-          radius: outerRadius,
-          innerRadius: innerRadius
+      // Create chart
+      const chart = root.container.children.push(
+        am5percent.PieChart.new(root, {
+          layout: root.verticalLayout,
+          radius: am5.percent(90)
         })
       );
 
-      pieSeries.slices.template.setAll({
-        stroke: am5.color(0xffffff),
-        strokeWidth: 2,
-        fill: color,
-        fillOpacity: 0.8,
-        cornerRadius: 5
+      // Calculate total number of series for radius distribution
+      const totalSeries = series.length || 1;
+
+      // Create series for each field
+      const chartSeries = (series.length ? series : [{
+        field: Object.keys(data[0] || {}).find(key => key !== 'category') || '',
+        name: 'Value'
+      }]).map((seriesConfig, index) => {
+        const colors = [
+          0x6794dc,
+          0x67b7dc,
+          0x8067dc,
+          0xdc67ce,
+          0xdc6967,
+          0xa367dc,
+          0x67dcb0
+        ];
+        const color = am5.color(colors[index % colors.length]);
+
+        // Для каждой следующей серии уменьшаем внешний и внутренний радиус
+        const outerRadius = am5.percent(90 - (index * (80 / totalSeries)));
+        const innerRadius = am5.percent(45 - (index * (35 / totalSeries)));
+
+        const pieSeries = chart.series.push(
+          am5percent.PieSeries.new(root, {
+            name: seriesConfig.name,
+            valueField: seriesConfig.field,
+            categoryField: "category",
+            radius: outerRadius,
+            innerRadius: innerRadius
+          })
+        );
+
+        pieSeries.slices.template.setAll({
+          stroke: am5.color(0xffffff),
+          strokeWidth: 2,
+          fill: color,
+          fillOpacity: 0.8,
+          cornerRadius: 5
+        });
+
+        pieSeries.labels.template.setAll({
+          text: "{category}: {valuePercentTotal.formatNumber('0.0')}%",
+          textType: "circular",
+          radius: 10,
+          centerX: am5.percent(50),
+          centerY: am5.percent(50),
+          fill: am5.color(0x000000)
+        });
+
+        pieSeries.ticks.template.setAll({
+          forceHidden: true
+        });
+
+        pieSeries.data.setAll(data);
+        return pieSeries;
       });
 
-      pieSeries.labels.template.setAll({
-        text: "{category}: {valuePercentTotal.formatNumber('0.0')}%",
-        textType: "circular",
-        radius: 10,
+      // Create legend
+      const legend = chart.children.push(am5.Legend.new(root, {
         centerX: am5.percent(50),
-        centerY: am5.percent(50),
-        fill: am5.color(0x000000)
-      });
+        x: am5.percent(50),
+        marginTop: 15,
+        marginBottom: 15
+      }));
 
-      pieSeries.ticks.template.setAll({
-        forceHidden: true
-      });
+      legend.data.setAll(chartSeries);
 
-      pieSeries.data.setAll(data);
-      console.log('Series data set:', data);
-
-      return pieSeries;
+      // Save root for cleanup
+      chartRef.current = root;
     });
 
-    // Create legend
-    const legend = chart.children.push(am5.Legend.new(root, {
-      centerX: am5.percent(50),
-      x: am5.percent(50),
-      marginTop: 15,
-      marginBottom: 15
-    }));
-
-    legend.data.setAll(chartSeries);
-
-    // Save root for cleanup
-    chartRef.current = root;
-
     return () => {
-      root.dispose();
+      cancelAnimationFrame(timer);
+      if (chartRef.current) {
+        chartRef.current.dispose();
+      }
     };
   }, [data, chartId, series]);
 
   return (
-    <div id={chartId} style={{ 
-      width: "100%", 
-      height: "100%",
-      position: "absolute",
-      top: 0,
-      left: 0
-    }}></div>
+    <div 
+      ref={chartDivRef}
+      style={{ 
+        width: "100%", 
+        height: "100%",
+        position: "absolute",
+        top: 0,
+        left: 0
+      }}
+    />
   );
 };
 

@@ -674,11 +674,12 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
   const layouts = useMemo(() => {
     return {
       lg: localItems.map(item => ({
-        ...item,
+        i: item.i,
         w: item.w || 12,
         h: item.h || 9,
         x: item.x || 0,
-        y: item.y || 0
+        y: item.y || 0,
+        static: false
       }))
     };
   }, [localItems]);
