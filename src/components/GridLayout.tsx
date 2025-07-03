@@ -423,10 +423,8 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       }
     };
 
-    onAddChart(chartItem);
-    
-    ActionManager.getInstance().logAction('ADD_CHART', {
-      item: chartItem,
+    onAddChart({
+      ...chartItem,
       sourceGridId: gridId,
       selectedRange: range
     });

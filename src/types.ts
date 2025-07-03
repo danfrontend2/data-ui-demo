@@ -40,6 +40,12 @@ export interface GridItem extends Layout {
       name: string;
     }>;
   };
+  sourceGridId?: string;
+  selectedRange?: {
+    columns: string[];
+    startRow: number;
+    endRow: number;
+  };
 }
 
 // Use Layout type from react-grid-layout instead of our custom LayoutItem
