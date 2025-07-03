@@ -72,8 +72,8 @@ function App() {
       // Find the grid API and select the range
       const gridApi = window.gridApis[gridId];
       if (gridApi) {
-        // First select all cells
-        gridApi.selectAll();
+        // First clear any existing selection
+        gridApi.deselectAll();
         
         // Then create a range selection
         const allColumns = gridApi.getColumnDefs();
@@ -85,6 +85,12 @@ function App() {
             columns: columnIds
           });
         }
+
+        // Clear selection after a short delay
+        setTimeout(() => {
+          gridApi.deselectAll();
+          gridApi.clearRangeSelection();
+        }, 500);
       }
     });
   }, [actionManager]);
