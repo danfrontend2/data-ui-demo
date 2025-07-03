@@ -186,6 +186,14 @@ function App() {
     actionManager.executeMacro(macro);
   };
 
+  const handleCloseAll = () => {
+    // Get all item IDs and remove them one by one
+    const itemIds = items.map(item => item.i);
+    itemIds.forEach(id => {
+      actionManager.logAction('REMOVE_GRID', { itemId: id });
+    });
+  };
+
   const handleLayoutChange = (layout: Layout[]) => {
     // Update items state with new layout
     setItems(prev => {
@@ -215,6 +223,7 @@ function App() {
           onAddItem={handleAddItem} 
           onRunMacro={handleRunMacro}
           onRunCustomMacro={handleRunCustomMacro}
+          onCloseAll={handleCloseAll}
         />
         <GridLayout 
           items={items}

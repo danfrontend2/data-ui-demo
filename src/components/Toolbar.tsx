@@ -5,6 +5,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import SaveIcon from '@mui/icons-material/Save';
 import UploadIcon from '@mui/icons-material/Upload';
+import CloseIcon from '@mui/icons-material/Close';
 import { Layout } from 'react-grid-layout';
 import Chat from './Chat';
 import ActionManager from '../services/ActionManager';
@@ -16,9 +17,10 @@ interface ToolbarProps {
   onAddItem: (item: Layout) => void;
   onRunMacro: () => void;
   onRunCustomMacro: (macro: any[]) => void;
+  onCloseAll: () => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -142,6 +144,14 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         startIcon={<UploadIcon />}
       >
         Load Macro
+      </Button>
+      <Button
+        variant="contained"
+        color="error"
+        onClick={onCloseAll}
+        startIcon={<CloseIcon />}
+      >
+        Close All
       </Button>
       {isChatOpen && <Chat onClose={() => setIsChatOpen(false)} />}
     </Box>
