@@ -670,16 +670,23 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
   };
 
   const layouts = useMemo(() => {
-    return {
-      lg: localItems.map(item => ({
-        i: item.i,
-        w: item.w || 12,
-        h: item.h || 9,
-        x: item.x || 0,
-        y: item.y || 0,
-        static: false
-      }))
+    const result = {
+      lg: localItems.map(item => {
+        const layoutItem = {
+          i: item.i,
+          w: item.w || 12,
+          h: item.h || 9,
+          x: item.x || 0,
+          y: item.y || 0,
+          static: false,
+          type: item.type
+        };
+        console.log('Creating layout item:', { original: item, layout: layoutItem });
+        return layoutItem;
+      })
     };
+    console.log('Created layouts:', result);
+    return result;
   }, [localItems]);
 
   const onResizeStop = (layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent, element: HTMLElement) => {
@@ -687,8 +694,17 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     console.log('Resize stopped - new item:', newItem);
     console.log('Resize stopped - full layout:', layout);
     
-    // Call parent's onLayoutChange
-    onLayoutChange(layout);
+    // Preserve types in layout
+    const layoutWithTypes = layout.map(layoutItem => {
+      const originalItem = localItems.find(item => item.i === layoutItem.i);
+      return {
+        ...layoutItem,
+        type: originalItem?.type
+      };
+    });
+    
+    // Call parent's onLayoutChange with preserved types
+    onLayoutChange(layoutWithTypes);
 
     // Update local state
     setLocalItems(prev => {
@@ -713,8 +729,17 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     console.log('Drag stopped - new item:', newItem);
     console.log('Drag stopped - full layout:', layout);
     
-    // Call parent's onLayoutChange
-    onLayoutChange(layout);
+    // Preserve types in layout
+    const layoutWithTypes = layout.map(layoutItem => {
+      const originalItem = localItems.find(item => item.i === layoutItem.i);
+      return {
+        ...layoutItem,
+        type: originalItem?.type
+      };
+    });
+    
+    // Call parent's onLayoutChange with preserved types
+    onLayoutChange(layoutWithTypes);
 
     // Update local state
     setLocalItems(prev => {

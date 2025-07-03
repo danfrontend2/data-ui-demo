@@ -34,30 +34,38 @@ function App() {
         // Update each item in the layout
         const updatedItems = layout.map((layoutItem: Layout) => {
           const currentItem = currentItems.get(layoutItem.i);
-          console.log(`Processing item ${layoutItem.i}:`, { layoutItem, currentItem });
+          console.log(`Processing item ${layoutItem.i}:`, { 
+            layoutItem, 
+            currentItem,
+            currentItemType: currentItem?.type
+          });
           
           if (!currentItem) {
-            console.log(`No current item found for ${layoutItem.i}, using layout item`);
-            return layoutItem as GridItem;
+            console.warn(`No current item found for ${layoutItem.i}, this should not happen`);
+            return {
+              ...layoutItem,
+              type: 'grid' // Default type if no current item found
+            } as GridItem;
           }
           
-          // Preserve all properties except layout-related ones
-          const { x, y, w, h, ...rest } = currentItem;
+          // Keep all properties from current item and only update layout-related ones
           const updatedItem = {
-            ...rest,
-            i: layoutItem.i,
+            ...currentItem,
             x: layoutItem.x,
             y: layoutItem.y,
             w: layoutItem.w,
             h: layoutItem.h
           };
-          console.log(`Updated item ${layoutItem.i}:`, updatedItem);
+          console.log('Updated item:', updatedItem);
           return updatedItem;
         });
 
         // Sort items by y coordinate to maintain order
         const sortedItems = updatedItems.sort((a: GridItem, b: GridItem) => a.y - b.y);
-        console.log('Final sorted items:', sortedItems);
+        console.log('Final sorted items with types:', sortedItems.map((item: GridItem) => ({ 
+          id: item.i, 
+          type: item.type 
+        })));
         return sortedItems;
       });
     });

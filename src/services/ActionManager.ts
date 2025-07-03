@@ -70,6 +70,8 @@ export default class ActionManager {
   async executeMacro(steps: MacroStep[]) {
     console.log('Starting macro execution with steps:', steps);
     let lastGridId: string | null = null;
+    // Map to store old ID to new ID mappings
+    const idMap = new Map<string, string>();
 
     for (const step of steps) {
       console.log('Executing step:', step);
@@ -81,12 +83,16 @@ export default class ActionManager {
         console.log('Processing ADD_GRID step');
         const newItem = details.newItem || details.item;
         if (newItem) {
+          const oldId = newItem.i;
+          const newId = `containergrid_${Date.now()}`;
           const gridItem = {
             ...newItem,
-            i: `containergrid_${Date.now()}`,
+            i: newId,
             type: 'grid'
           };
-          lastGridId = gridItem.i;
+          // Store ID mapping
+          idMap.set(oldId, newId);
+          lastGridId = newId;
           await this.actionHandlers[step.type]({ item: gridItem });
         }
       }
@@ -104,12 +110,16 @@ export default class ActionManager {
         console.log('Processing ADD_CHART step');
         const newItem = details.newItem || details.item;
         if (newItem) {
+          const oldId = newItem.i;
+          const newId = `${newItem.type}-${Date.now()}`;
           const chartItem = {
             ...newItem,
-            i: `${newItem.type}-${Date.now()}`,
+            i: newId,
             type: newItem.type,
             chartData: newItem.chartData || []
           };
+          // Store ID mapping
+          idMap.set(oldId, newId);
           const chartDetails = {
             item: chartItem,
             sourceGridId: lastGridId || details.sourceGridId,
@@ -119,6 +129,13 @@ export default class ActionManager {
         }
       } else if (step.type === 'UPDATE_LAYOUT') {
         console.log('Processing UPDATE_LAYOUT step');
+        // Update layout with new IDs
+        if (details.layout) {
+          details.layout = details.layout.map((item: any) => ({
+            ...item,
+            i: idMap.get(item.i) || item.i
+          }));
+        }
         await this.actionHandlers[step.type](details);
       }
 
