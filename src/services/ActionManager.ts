@@ -1,13 +1,29 @@
-import { Action, MacroStep } from '../types/actions';
+import { Action, ActionType } from '../types/actions';
+import { GridItem } from '../types';
+import { Layout } from 'react-grid-layout';
+import { GridApi } from 'ag-grid-community';
+import { SetStateAction } from 'react';
+
+declare global {
+  interface Window {
+    gridApis: {
+      [key: string]: GridApi;
+    };
+  }
+}
 
 export default class ActionManager {
   private static instance: ActionManager;
-  private actions: Action[] = [];
-  private actionHandlers: { [key: string]: (details: any) => void } = {};
+  private actionHandlers: { [key in ActionType]?: (details: any) => void } = {};
+  private actionLog: Action[] = [];
   private isRecording: boolean = false;
-  private recordedActions: any[] = [];
+  private recordedActions: Action[] = [];
+  private setItems: ((value: SetStateAction<GridItem[]>) => void) | null = null;
+  private selectedData: Record<string, any>[] = [];
 
-  private constructor() {}
+  private constructor() {
+    console.log('Initializing ActionManager...');
+  }
 
   static getInstance(): ActionManager {
     if (!ActionManager.instance) {
@@ -16,135 +32,259 @@ export default class ActionManager {
     return ActionManager.instance;
   }
 
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  setItemsHandler(handler: (value: SetStateAction<GridItem[]>) => void) {
+    console.log('Setting items handler');
+    this.setItems = handler;
+    this.initializeHandlers();
   }
 
-  registerHandler(type: Action['type'], handler: (details: any) => void) {
-    this.actionHandlers[type] = handler;
+  private initializeHandlers() {
+    if (!this.setItems) {
+      console.warn('Items handler not set, skipping handlers initialization');
+      return;
+    }
+
+    console.log('Initializing action handlers...');
+
+    this.registerHandler('ADD_GRID', ({ item }) => {
+      this.setItems?.((prev: GridItem[]) => [...prev, item]);
+    });
+
+    this.registerHandler('REMOVE_GRID', ({ itemId }) => {
+      this.setItems?.((prev: GridItem[]) => prev.filter(item => item.i !== itemId));
+    });
+
+    this.registerHandler('UPDATE_LAYOUT', ({ layout }) => {
+      this.setItems?.((prev: GridItem[]) => {
+        const currentItems = new Map(prev.map(item => [item.i, item]));
+        const updatedItems = layout.map((layoutItem: Layout) => {
+          const currentItem = currentItems.get(layoutItem.i);
+          if (!currentItem) {
+            return {
+              ...layoutItem,
+              type: 'grid'
+            } as GridItem;
+          }
+          return {
+            ...currentItem,
+            x: layoutItem.x,
+            y: layoutItem.y,
+            w: layoutItem.w,
+            h: layoutItem.h
+          };
+        });
+        return updatedItems.sort((a: GridItem, b: GridItem) => a.y - b.y);
+      });
+    });
+
+    this.registerHandler('UPDATE_CELL', ({ gridId, rowId, field, newValue }) => {
+      const gridApi = window.gridApis[gridId];
+      if (gridApi) {
+        // Find the row node
+        let rowNode: any;
+        gridApi.forEachNode(node => {
+          if (node.data.id === rowId) {
+            rowNode = node;
+          }
+        });
+
+        if (rowNode) {
+          // Update the cell value
+          const newData = { ...rowNode.data, [field]: newValue };
+          rowNode.setData(newData);
+        }
+      }
+    });
+
+    this.registerHandler('DROP_FILE', async ({ gridId, excelData }) => {
+      console.log('DROP_FILE handler called with:', { gridId, excelData });
+      
+      // Wait for grid to be ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const gridApi = window.gridApis[gridId];
+      console.log('Grid API:', gridApi);
+      
+      if (gridApi) {
+        try {
+          // First row is headers
+          const headers = excelData[0] as string[];
+          console.log('Original headers:', headers);
+
+          // Create column definitions
+          const columnDefs = [
+            { field: 'id', hide: true },
+            ...headers.map(header => {
+              // Create a safe field name by removing special characters
+              const safeField = header.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_');
+              return {
+                field: safeField,
+                headerName: header,
+                editable: true,
+                type: typeof excelData[1][headers.indexOf(header)] === 'number' ? 'numericColumn' : undefined
+              };
+            })
+          ];
+          console.log('Column definitions:', columnDefs);
+
+          // Convert array data to row objects
+          const rowData = excelData.slice(1).map((row: any[], index: number) => {
+            const obj: Record<string, any> = { id: (index + 1).toString() };
+            headers.forEach((header, i) => {
+              const safeField = header.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_');
+              obj[safeField] = row[i];
+            });
+            return obj;
+          });
+          console.log('Row data:', rowData);
+
+          // Update grid
+          console.log('Updating grid with new data...');
+          try {
+            gridApi.setGridOption('columnDefs', columnDefs);
+            gridApi.setGridOption('rowData', rowData);
+            console.log('Grid updated successfully');
+          } catch (error) {
+            console.error('Error updating grid:', error);
+          }
+        } catch (error) {
+          console.error('Error processing file data:', error);
+        }
+      } else {
+        console.warn('Grid API not found for grid:', gridId);
+        console.log('Available grid APIs:', window.gridApis);
+      }
+    });
+
+    this.registerHandler('SELECT_RANGE', ({ gridId, startCell, endCell }) => {
+      const gridApi = window.gridApis[gridId];
+      if (gridApi) {
+        // Get all rows data
+        const rowData = gridApi.getRenderedNodes().map(node => node.data);
+        if (!rowData) return;
+
+        // Get column definitions
+        const columnDefs = gridApi.getColumnDefs() as any[];
+        const columns = columnDefs
+          .filter(col => !col.hide && 'field' in col)
+          .map(col => ({
+            field: col.field as string,
+            headerName: col.headerName as string
+          }));
+
+        // Extract selected data
+        const startRow = Math.min(startCell.rowIndex, endCell.rowIndex);
+        const endRow = Math.max(startCell.rowIndex, endCell.rowIndex);
+        const selectedData = rowData.slice(startRow, endRow + 1);
+
+        // Convert to chart format
+        const chartData = selectedData.map((row: Record<string, any>) => {
+          const point: Record<string, any> = {};
+          columns.forEach(col => {
+            if (col.field && col.headerName) {
+              point[col.headerName] = row[col.field];
+            }
+          });
+          return point;
+        });
+
+        // Store the selected data
+        this.selectedData = chartData;
+      }
+    });
+
+    this.registerHandler('ADD_CHART', ({ item }) => {
+      if (!this.selectedData || !this.setItems) return;
+
+      const chartItem: GridItem = {
+        ...item,
+        data: this.selectedData
+      };
+
+      // Update items through the handler
+      this.setItems(prevItems => {
+        const newItems = [...prevItems];
+        const existingIndex = newItems.findIndex(i => i.i === item.i);
+        if (existingIndex >= 0) {
+          newItems[existingIndex] = chartItem;
+        } else {
+          newItems.push(chartItem);
+        }
+        return newItems;
+      });
+    });
+
+    console.log('Action handlers initialized');
   }
 
-  logAction(type: Action['type'], details: any) {
+  registerHandler(actionType: ActionType, handler: (details: any) => void) {
+    console.log('Registering handler for:', actionType);
+    this.actionHandlers[actionType] = handler;
+  }
+
+  clearHandlers() {
+    this.actionHandlers = {};
+  }
+
+  hasHandler(actionType: ActionType): boolean {
+    return !!this.actionHandlers[actionType];
+  }
+
+  logAction(type: ActionType, details: any) {
+    console.log('Logging action:', { type, details });
     const action: Action = {
-      id: new Date().getTime().toString(),
-      timestamp: new Date().getTime(),
+      id: Date.now().toString(),
+      timestamp: Date.now(),
       type,
       details
     };
-    
-    this.actions.push(action);
-    console.log('Action logged:', action);
-    
-    // If recording, store the action
+
+    this.actionLog.push(action);
+
     if (this.isRecording) {
-      this.recordedActions.push({
-        type,
-        details
-      });
+      this.recordedActions.push(action);
     }
 
-    // Execute the action
-    if (this.actionHandlers[type]) {
-      this.actionHandlers[type](details);
+    // Execute handler if exists
+    const handler = this.actionHandlers[type];
+    if (handler) {
+      console.log('Executing handler for action:', type);
+      handler(details);
+    } else {
+      console.warn('No handler registered for action:', type);
     }
   }
 
   startRecording() {
     this.isRecording = true;
     this.recordedActions = [];
-    console.log('Started recording macro');
   }
 
-  stopRecording() {
+  stopRecording(): Action[] {
     this.isRecording = false;
-    console.log('Stopped recording macro:', this.recordedActions);
-    const macro = [...this.recordedActions];
-    this.recordedActions = [];
-    return macro;
+    return this.recordedActions;
   }
 
-  private generateUniqueId(prefix: string): string {
-    return `${prefix}-${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  async executeMacro(steps: MacroStep[]) {
-    console.log('Starting macro execution with steps:', steps);
-    let lastGridId: string | null = null;
-    // Map to store old ID to new ID mappings
-    const idMap = new Map<string, string>();
-
-    for (const step of steps) {
-      console.log('Executing step:', step);
-      // Deep clone the step details to avoid modifying the original macro
-      const details = JSON.parse(JSON.stringify(step.details));
-
-      // For ADD_GRID, create a new grid item like handleAddItem does
-      if (step.type === 'ADD_GRID') {
-        console.log('Processing ADD_GRID step');
-        const newItem = details.newItem || details.item;
-        if (newItem) {
-          const oldId = newItem.i;
-          const newId = `containergrid_${Date.now()}`;
-          const gridItem = {
-            ...newItem,
-            i: newId,
-            type: 'grid'
-          };
-          // Store ID mapping
-          idMap.set(oldId, newId);
-          lastGridId = newId;
-          await this.actionHandlers[step.type]({ item: gridItem });
-        }
+  async executeMacro(actions: Action[]) {
+    console.log('Starting macro execution with actions:', actions);
+    for (const action of actions) {
+      console.log('Executing step:', action);
+      
+      // Small delay between actions
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const handler = this.actionHandlers[action.type];
+      if (handler) {
+        console.log('Handler found for action:', action.type);
+        await handler(action.details);
+      } else {
+        console.warn('No handler found for action:', action.type);
       }
-      // For SELECT_RANGE, use the last created grid ID
-      else if (step.type === 'SELECT_RANGE' && lastGridId) {
-        console.log('Processing SELECT_RANGE step');
-        const selectDetails = {
-          ...details,
-          gridId: lastGridId
-        };
-        await this.actionHandlers[step.type](selectDetails);
-      }
-      // For ADD_CHART, create a new chart item and use the last grid as source
-      else if (step.type === 'ADD_CHART') {
-        console.log('Processing ADD_CHART step');
-        const newItem = details.newItem || details.item;
-        if (newItem) {
-          const oldId = newItem.i;
-          const newId = `${newItem.type}-${Date.now()}`;
-          const chartItem = {
-            ...newItem,
-            i: newId,
-            type: newItem.type,
-            chartData: newItem.chartData || []
-          };
-          // Store ID mapping
-          idMap.set(oldId, newId);
-          const chartDetails = {
-            item: chartItem,
-            sourceGridId: lastGridId || details.sourceGridId,
-            selectedRange: details.selectedRange
-          };
-          await this.actionHandlers[step.type](chartDetails);
-        }
-      } else if (step.type === 'UPDATE_LAYOUT') {
-        console.log('Processing UPDATE_LAYOUT step');
-        // Update layout with new IDs
-        if (details.layout) {
-          details.layout = details.layout.map((item: any) => ({
-            ...item,
-            i: idMap.get(item.i) || item.i
-          }));
-        }
-        await this.actionHandlers[step.type](details);
-      }
-
-      // Add delay after each step
-      await this.delay(1000);
     }
   }
 
-  getActions(): Action[] {
-    return [...this.actions];
+  // Utility function to normalize field names
+  private normalizeFieldName(field: string): string {
+    return field.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_');
   }
 } 

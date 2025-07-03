@@ -18,9 +18,6 @@ import { Layout } from 'react-grid-layout';
 import Chat from './Chat';
 import ActionManager from '../services/ActionManager';
 
-// Counter for unique IDs
-let idCounter = 0;
-
 interface ToolbarProps {
   onAddItem: (item: Layout) => void;
   onRunMacro: () => void;

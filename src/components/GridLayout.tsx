@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import RGL, { WidthProvider, Layout, Responsive } from 'react-grid-layout';
+import { WidthProvider, Responsive, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import DonutLargeIcon from '@mui/icons-material/DonutLarge';
-import ShowChartIcon from '@mui/icons-material/ShowChart';
-import BarChartIcon from '@mui/icons-material/BarChart';
 import { AgGridReact } from 'ag-grid-react';
 import { 
   ColDef, 
@@ -14,7 +11,8 @@ import {
   AllCommunityModule,
   GetContextMenuItemsParams,
   MenuItemDef,
-  GetContextMenuItems
+  GridApi,
+  GridReadyEvent
 } from 'ag-grid-community';
 import { AllEnterpriseModule } from 'ag-grid-enterprise';
 import { GridData, GridItem, ChartDataPoint } from '../types';
@@ -27,6 +25,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
+import UploadIcon from '@mui/icons-material/Upload';
 
 // Register AG Grid Modules
 ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
@@ -38,6 +37,14 @@ interface GridLayoutProps {
   onRemoveItem: (itemId: string) => void;
   onAddChart: (chartItem: GridItem) => void;
   onLayoutChange: (layout: Layout[]) => void;
+}
+
+declare global {
+  interface Window {
+    gridApis: {
+      [key: string]: GridApi;
+    };
+  }
 }
 
 const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart, onLayoutChange }) => {
@@ -196,131 +203,31 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       console.log('Available sheets:', workbook.SheetNames);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       
-      console.log('Converting sheet to JSON...');
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-        raw: false,
-        blankrows: false,
-        defval: '',
-        rawNumbers: true
+      // Get the raw Excel data in array format
+      const excelData = XLSX.utils.sheet_to_json(worksheet, {
+        header: 1, // Use array format instead of objects
+        raw: true, // Keep raw values
+        defval: null
       });
-      console.log('Initial JSON data:', jsonData);
 
-      if (jsonData.length > 0) {
-        console.log('Processing column keys...');
-        const keyMapping = Array.from(
-          new Set(
-            jsonData.reduce((keys: string[], row: any) => {
-              return keys.concat(Object.keys(row));
-            }, [])
-          )
-        ).reduce((acc: { [key: string]: string }, key: string) => {
-          const safeKey = key.replace(/\./g, '_');
-          acc[key] = safeKey;
-          return acc;
-        }, {});
-        console.log('Key mapping:', keyMapping);
+      console.log('Excel data raw:', excelData);
+      console.log('First row (headers):', excelData[0]);
+      console.log('Second row (first data row):', excelData[1]);
 
-        // Function to convert string or number with thousand separators to number
-        const parseNumberWithSeparators = (value: string | number): number | string => {
-          if (typeof value === 'number') return value;
-          if (typeof value !== 'string') return value;
-           
-          const cleanValue = value.trim().replace(/["']/g, '');
-          if (!cleanValue) return '';
-          
-          const numericValue = cleanValue.replace(/,/g, '');
-          const parsed = parseFloat(numericValue);
-          return isNaN(parsed) ? value : parsed;
-        };
+      // Log the DROP_FILE action with Excel data
+      ActionManager.getInstance().logAction('DROP_FILE', {
+        gridId,
+        excelData,
+        fileType: file.type
+      });
 
-        // Create columns based on all found keys
-        console.log('Creating column definitions...');
-        const columns = [
-          { field: 'id', hide: true },
-          ...Object.entries(keyMapping).map(([originalKey, safeKey]) => {
-            const hasNumericValue = jsonData.some(row => {
-              const value = (row as any)[originalKey];
-              const parsedValue = parseNumberWithSeparators(value);
-              return typeof parsedValue === 'number';
-            });
-
-            return {
-              field: safeKey,
-              headerName: originalKey,
-              sortable: true,
-              filter: true,
-              editable: true,
-              type: hasNumericValue ? 'numericColumn' : undefined,
-              valueFormatter: hasNumericValue ? (params: any) => {
-                if (params.value === undefined || params.value === null) return '';
-                const value = parseNumberWithSeparators(params.value);
-                return value.toString();
-              } : undefined
-            };
-          })
-        ];
-
-        // Normalize data using safe keys and add unique ids
-        console.log('Formatting data...');
-        const formattedData: GridData[] = jsonData.map((row: any, index: number) => {
-          const newRow: Record<string, any> = { id: (index + 1).toString() };
-          Object.entries(keyMapping).forEach(([originalKey, safeKey]) => {
-            const value = row[originalKey];
-            newRow[safeKey] = parseNumberWithSeparators(value);
-          });
-          return newRow as GridData;
-        });
-
-        console.log('Final formatted data:', formattedData);
-        console.log('Final columns:', columns);
-
-        console.log('Current gridData state:', gridData);
-        console.log('Current columnDefs state:', columnDefs);
-
-        // Update grid state
-        setColumnDefs(prev => {
-          const newState = { ...prev };
-          newState[gridId] = columns;
-          console.log('New columnDefs state:', newState);
-          return newState;
-        });
-        
-        setGridData(prev => {
-          const newState = { ...prev };
-          newState[gridId] = formattedData;
-          console.log('New gridData state:', newState);
-          return newState;
-        });
-
-        // Update grid directly through API
-        const gridApi = window.gridApis[gridId];
-        if (gridApi) {
-          console.log('Updating grid through API...');
-          // First clear all rows
-          const rowCount = gridApi.getDisplayedRowCount();
-          if (rowCount > 0) {
-            const rowsToRemove: GridData[] = [];
-            gridApi.forEachNode(node => {
-              if (node.data) {
-                rowsToRemove.push(node.data);
-              }
-            });
-            gridApi.applyTransaction({ remove: rowsToRemove });
-          }
-
-          // Then add new rows and update columns
-          gridApi.setGridOption('columnDefs', columns);
-          gridApi.applyTransaction({ add: formattedData });
-        }
-      } else {
-        console.warn('No data found in the file');
-      }
+      console.log('Action logged with data:', {
+        gridId,
+        excelData,
+        fileType: file.type
+      });
     } catch (error) {
-      console.error('Error processing file:', error);
-      if (error instanceof Error) {
-        console.error('Error details:', error.message);
-        console.error('Error stack:', error.stack);
-      }
+      console.error('Failed to process file:', error);
     }
   };
 
@@ -523,92 +430,40 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     }
   }, []);
 
-  const renderGrid = (item: GridItem) => {
-    if (item.type === 'pie-chart' || item.type === 'line-chart' || item.type === 'bar-chart') {
-      let ChartComponent;
-      switch (item.type) {
-        case 'pie-chart':
-          ChartComponent = PieChart;
-          break;
-        case 'line-chart':
-          ChartComponent = LineChart;
-          break;
-        case 'bar-chart':
-          ChartComponent = BarChart;
-          break;
-      }
+  // Move gridOptions to the component level
+  const baseGridOptions = useMemo(() => ({
+    enableRangeSelection: true,
+    rowSelection: 'multiple' as const, // Fix type error
+    suppressRowClickSelection: true,
+    suppressCellSelection: false,
+    suppressContextMenu: false,
+    defaultColDef: {
+      editable: true,
+      resizable: true,
+      sortable: true,
+      filter: true
+    }
+  }), []);
 
-      return (
-        <Box
-          key={item.i}
-          className="react-grid-item"
-          sx={{
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            overflow: 'hidden',
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
-          <Box sx={{ 
-            display: 'flex',
-            alignItems: 'center',
-            height: '20px',
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            position: 'relative'
-          }}>
-            <Box 
-              className="drag-handle"
-              sx={{ 
-                flex: 1,
-                height: '100%',
-                cursor: 'move',
-                pl: 1
-              }}
-            />
-            <IconButton
-              onClick={(e) => handleRemoveItem(e, item.i)}
-              size="small"
-              sx={{ 
-                mr: 0.5,
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.1)'
-                }
-              }}
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </Box>
-          <Box sx={{ 
-            flex: 1,
-            minHeight: 0,
-            position: 'relative'
-          }}>
-            <ChartComponent 
-              data={item.chartData || []} 
-              chartId={`chart-${item.i}`}
-              series={item.chartConfig?.series || []}
-            />
-          </Box>
-        </Box>
-      );
+  const renderGrid = (item: GridItem) => {
+    if (item.type === 'pie-chart') {
+      return renderChart(item, PieChart);
+    } else if (item.type === 'line-chart') {
+      return renderChart(item, LineChart);
+    } else if (item.type === 'bar-chart') {
+      return renderChart(item, BarChart);
     }
 
-    const gridOptions: GridOptions = {
-      rowData: gridData[item.i] || defaultData,
+    // Combine base options with item-specific options
+    const gridOptions = {
+      ...baseGridOptions,
       columnDefs: columnDefs[item.i] || defaultColumns,
-      enableRangeSelection: true,
-      enableFillHandle: true,
-      suppressRowClickSelection: true,
-      rowSelection: 'multiple',
-      getContextMenuItems: getContextMenuItems,
-      onCellValueChanged: onCellValueChanged,
-      onGridReady: (params) => {
-        window.gridApis = window.gridApis || {};
+      rowData: gridData[item.i] || defaultData,
+      onGridReady: (params: GridReadyEvent) => {
         window.gridApis[item.i] = params.api;
-      }
+      },
+      onCellValueChanged,
+      getContextMenuItems
     };
 
     return (
@@ -643,6 +498,32 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
               pl: 1
             }}
           />
+          <input
+            type="file"
+            accept=".xlsx,.csv"
+            style={{ display: 'none' }}
+            id={`file-input-${item.i}`}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                processFile(file, item.i);
+              }
+              // Reset input value so the same file can be selected again
+              e.target.value = '';
+            }}
+          />
+          <IconButton
+            onClick={() => document.getElementById(`file-input-${item.i}`)?.click()}
+            size="small"
+            sx={{ 
+              mr: 0.5,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.1)'
+              }
+            }}
+          >
+            <UploadIcon fontSize="small" />
+          </IconButton>
           <IconButton
             onClick={(e) => handleRemoveItem(e, item.i)}
             size="small"
@@ -663,7 +544,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
             minHeight: 0
           }}
         >
-          <AgGridReact gridOptions={gridOptions} />
+          <AgGridReact {...gridOptions} />
         </Box>
       </Box>
     );
@@ -757,6 +638,65 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       });
       return newItems;
     });
+  };
+
+  const renderChart = (item: GridItem, ChartComponent: React.ComponentType<any>) => {
+    return (
+      <Box
+        key={item.i}
+        className="react-grid-item"
+        sx={{
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          overflow: 'hidden',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        <Box sx={{ 
+          display: 'flex',
+          alignItems: 'center',
+          height: '20px',
+          backgroundColor: '#f5f5f5',
+          borderBottom: '1px solid #ddd',
+          position: 'relative'
+        }}>
+          <Box 
+            className="drag-handle"
+            sx={{ 
+              flex: 1,
+              height: '100%',
+              cursor: 'move',
+              pl: 1
+            }}
+          />
+          <IconButton
+            onClick={(e) => handleRemoveItem(e, item.i)}
+            size="small"
+            sx={{ 
+              mr: 0.5,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.1)'
+              }
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Box>
+        <Box sx={{ 
+          flex: 1,
+          minHeight: 0,
+          position: 'relative'
+        }}>
+          <ChartComponent 
+            data={item.chartData || []} 
+            chartId={`chart-${item.i}`}
+            series={item.chartConfig?.series || []}
+          />
+        </Box>
+      </Box>
+    );
   };
 
   return (

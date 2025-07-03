@@ -18,11 +18,7 @@ export interface LayoutItem {
 
 export interface GridData {
   id: string;
-  country: string;
-  population: number;  // millions
-  gdp: number;        // trillions $
-  area: number;       // thousands km²
-  [key: string]: any;
+  [key: string]: string | number;
 }
 
 export interface ChartDataPoint {
