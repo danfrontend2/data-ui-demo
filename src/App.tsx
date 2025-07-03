@@ -22,6 +22,46 @@ function App() {
       setItems(prev => prev.filter(item => item.i !== itemId));
     });
 
+    actionManager.registerHandler('UPDATE_LAYOUT', ({ layout }) => {
+      console.log('UPDATE_LAYOUT received:', layout);
+      console.log('Current items:', items);
+
+      setItems(prev => {
+        // Create a map of current items for quick lookup
+        const currentItems = new Map(prev.map(item => [item.i, item]));
+        console.log('Current items map:', currentItems);
+        
+        // Update each item in the layout
+        const updatedItems = layout.map((layoutItem: Layout) => {
+          const currentItem = currentItems.get(layoutItem.i);
+          console.log(`Processing item ${layoutItem.i}:`, { layoutItem, currentItem });
+          
+          if (!currentItem) {
+            console.log(`No current item found for ${layoutItem.i}, using layout item`);
+            return layoutItem as GridItem;
+          }
+          
+          // Preserve all properties except layout-related ones
+          const { x, y, w, h, ...rest } = currentItem;
+          const updatedItem = {
+            ...rest,
+            i: layoutItem.i,
+            x: layoutItem.x,
+            y: layoutItem.y,
+            w: layoutItem.w,
+            h: layoutItem.h
+          };
+          console.log(`Updated item ${layoutItem.i}:`, updatedItem);
+          return updatedItem;
+        });
+
+        // Sort items by y coordinate to maintain order
+        const sortedItems = updatedItems.sort((a: GridItem, b: GridItem) => a.y - b.y);
+        console.log('Final sorted items:', sortedItems);
+        return sortedItems;
+      });
+    });
+
     actionManager.registerHandler('ADD_CHART', ({ item, sourceGridId, selectedRange }) => {
       if (sourceGridId && selectedRange) {
         const gridApi = window.gridApis[sourceGridId];
@@ -96,13 +136,33 @@ function App() {
   }, [actionManager]);
 
   const handleAddItem = (newItem: Layout) => {
-    const gridItem: GridItem = {
-      ...newItem,
-      type: 'grid',
-      data: undefined
-    };
-    setItems(prev => [...prev, gridItem]);
-    actionManager.logAction('ADD_GRID', { item: gridItem });
+    setItems(prev => {
+      // Calculate the maximum Y coordinate of existing items
+      const maxY = prev.reduce((max, item) => {
+        const itemBottom = item.y + item.h;
+        return itemBottom > max ? itemBottom : max;
+      }, 0);
+
+      // Create new grid item, preserving the width from newItem if provided
+      const gridItem: GridItem = {
+        ...newItem,
+        type: 'grid',
+        data: undefined,
+        w: newItem.w || 12,  // Use provided width or default to 12
+        h: newItem.h || 9,   // Use provided height or default to 9
+        y: maxY             // Place new item below existing ones
+      };
+
+      // Create new layout preserving ALL properties of existing items
+      const newLayout = [...prev, gridItem];
+
+      // Log the layout update
+      ActionManager.getInstance().logAction('UPDATE_LAYOUT', {
+        layout: newLayout
+      });
+
+      return newLayout;
+    });
   };
 
   const handleRemoveItem = (itemId: string) => {
@@ -120,6 +180,28 @@ function App() {
     actionManager.executeMacro(DEMO_MACRO);
   };
 
+  const handleLayoutChange = (layout: Layout[]) => {
+    // Update items state with new layout
+    setItems(prev => {
+      const newItems = prev.map(item => {
+        const layoutItem = layout.find(l => l.i === item.i);
+        if (!layoutItem) return item;
+        
+        return {
+          ...item,
+          x: layoutItem.x,
+          y: layoutItem.y,
+          w: layoutItem.w,
+          h: layoutItem.h
+        };
+      });
+      return newItems;
+    });
+
+    // Log the layout update
+    actionManager.logAction('UPDATE_LAYOUT', { layout });
+  };
+
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
       <Box sx={{ flexGrow: 1 }}>
@@ -128,6 +210,7 @@ function App() {
           items={items}
           onRemoveItem={handleRemoveItem}
           onAddChart={handleAddChart}
+          onLayoutChange={handleLayoutChange}
         />
       </Box>
     </Box>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import RGL, { WidthProvider, Layout } from 'react-grid-layout';
+import RGL, { WidthProvider, Layout, Responsive } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DonutLargeIcon from '@mui/icons-material/DonutLarge';
@@ -31,15 +31,16 @@ import 'ag-grid-community/styles/ag-theme-balham.css';
 // Register AG Grid Modules
 ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 
-const ReactGridLayout = WidthProvider(RGL);
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface GridLayoutProps {
   items: GridItem[];
   onRemoveItem: (itemId: string) => void;
   onAddChart: (chartItem: GridItem) => void;
+  onLayoutChange: (layout: Layout[]) => void;
 }
 
-const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart }) => {
+const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart, onLayoutChange }) => {
   const defaultData = useMemo(() => [
     { id: '1', country: 'China', population: 1412, gdp: 17.7, area: 9597 },
     { id: '2', country: 'India', population: 1400, gdp: 3.7, area: 3287 },
@@ -61,8 +62,14 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     { field: 'area', headerName: 'Area (K km²)', editable: true, type: 'numericColumn' }
   ], []);
 
+  const [localItems, setLocalItems] = useState<GridItem[]>(items);
   const [gridData, setGridData] = useState<{ [key: string]: GridData[] }>({});
   const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
+
+  // Update local items when props change
+  useEffect(() => {
+    setLocalItems(items);
+  }, [items]);
 
   // Initialize data for new grids
   useEffect(() => {
@@ -70,7 +77,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     const newColumnDefs = { ...columnDefs };
     let hasNewData = false;
 
-    items.forEach(item => {
+    localItems.forEach(item => {
       if (item.type === 'grid' && !newGridData[item.i]) {
         newGridData[item.i] = item.data || [...defaultData];
         newColumnDefs[item.i] = defaultColumns;
@@ -82,7 +89,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       setGridData(newGridData);
       setColumnDefs(newColumnDefs);
     }
-  }, [items, gridData, columnDefs, defaultData, defaultColumns]);
+  }, [localItems, gridData, columnDefs, defaultData, defaultColumns]);
 
   const onCellValueChanged = (params: CellValueChangedEvent) => {
     console.log('Cell changed:', {
@@ -390,13 +397,13 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     });
 
     // Find the maximum Y coordinate among existing items
-    const maxY = items.reduce((max, item) => {
+    const maxY = localItems.reduce((max, item) => {
       const itemBottom = item.y + item.h;
       return itemBottom > max ? itemBottom : max;
     }, 0);
 
     // Get the source grid's height
-    const sourceGridItem = items.find(item => item.i === gridId);
+    const sourceGridItem = localItems.find(item => item.i === gridId);
     const sourceHeight = sourceGridItem?.h || 4;
 
     // Create new chart item
@@ -446,7 +453,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     return result;
   };
 
-  // Add styles for menu icons
+  // Add styles for menu icons and grid layout
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
@@ -458,6 +465,51 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       }
       .ag-menu-option-active .custom-menu-icon {
         color: #2196f3;
+      }
+      .react-grid-item {
+        transition: all 200ms ease;
+        transition-property: left, top, width, height;
+      }
+      .react-grid-item.resizing {
+        z-index: 1;
+        will-change: width, height;
+      }
+      .react-grid-item.react-draggable-dragging {
+        transition: none;
+        z-index: 3;
+        will-change: transform;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        cursor: move !important;
+      }
+      .react-grid-item.react-grid-placeholder {
+        background: rgba(33, 150, 243, 0.1);
+        border: 1px dashed #2196f3;
+        transition: all 100ms linear;
+        z-index: 2;
+        border-radius: 4px;
+        user-select: none;
+      }
+      .react-grid-item > .react-resizable-handle {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        bottom: 0;
+        right: 0;
+        cursor: se-resize;
+      }
+      .react-grid-item > .react-resizable-handle::after {
+        content: "";
+        position: absolute;
+        right: 3px;
+        bottom: 3px;
+        width: 5px;
+        height: 5px;
+        border-right: 2px solid rgba(0, 0, 0, 0.4);
+        border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+      }
+      .drag-handle {
+        touch-action: none;
+        user-select: none;
       }
     `;
     document.head.appendChild(style);
@@ -491,7 +543,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       return (
         <Box
           key={item.i}
-          data-grid={item}
+          className="react-grid-item"
           sx={{
             border: '1px solid #ccc',
             borderRadius: '4px',
@@ -501,27 +553,36 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
             flexDirection: 'column'
           }}
         >
-          <Box 
-            className="drag-handle"
-            sx={{ 
-              height: '20px', 
-              backgroundColor: '#f5f5f5',
-              borderBottom: '1px solid #ddd',
-              cursor: 'move',
-              flexShrink: 0
-            }} 
-          />
-          <IconButton
-            onClick={(e) => handleRemoveItem(e, item.i)}
-            sx={{
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              zIndex: 1
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+          <Box sx={{ 
+            display: 'flex',
+            alignItems: 'center',
+            height: '20px',
+            backgroundColor: '#f5f5f5',
+            borderBottom: '1px solid #ddd',
+            position: 'relative'
+          }}>
+            <Box 
+              className="drag-handle"
+              sx={{ 
+                flex: 1,
+                height: '100%',
+                cursor: 'move',
+                pl: 1
+              }}
+            />
+            <IconButton
+              onClick={(e) => handleRemoveItem(e, item.i)}
+              size="small"
+              sx={{ 
+                mr: 0.5,
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.1)'
+                }
+              }}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
           <Box sx={{ 
             flex: 1,
             minHeight: 0,
@@ -547,7 +608,6 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       getContextMenuItems: getContextMenuItems,
       onCellValueChanged: onCellValueChanged,
       onGridReady: (params) => {
-        // Store grid API in the global map
         window.gridApis = window.gridApis || {};
         window.gridApis[item.i] = params.api;
       }
@@ -556,42 +616,53 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     return (
       <Box
         key={item.i}
-        data-grid={item}
-        data-grid-id={item.i}
+        className="react-grid-item"
         sx={{
           border: '1px solid #ccc',
           borderRadius: '4px',
           overflow: 'hidden',
-          position: 'relative'
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column'
         }}
         onDragOver={handleDragOver}
         onDrop={(e) => handleDrop(e, item.i)}
       >
-        <Box 
-          className="drag-handle"
-          sx={{ 
-            height: '20px', 
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            cursor: 'move'
-          }} 
-        />
-        <IconButton
-          onClick={(e) => handleRemoveItem(e, item.i)}
-          sx={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            zIndex: 1
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+        <Box sx={{ 
+          display: 'flex',
+          alignItems: 'center',
+          height: '20px',
+          backgroundColor: '#f5f5f5',
+          borderBottom: '1px solid #ddd',
+          position: 'relative'
+        }}>
+          <Box 
+            className="drag-handle"
+            sx={{ 
+              flex: 1,
+              height: '100%',
+              cursor: 'move',
+              pl: 1
+            }}
+          />
+          <IconButton
+            onClick={(e) => handleRemoveItem(e, item.i)}
+            size="small"
+            sx={{ 
+              mr: 0.5,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.1)'
+              }
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Box>
         <Box
           className="ag-theme-balham"
           sx={{
-            height: 'calc(100% - 20px)',
-            width: '100%'
+            flex: 1,
+            minHeight: 0
           }}
         >
           <AgGridReact gridOptions={gridOptions} />
@@ -600,24 +671,93 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     );
   };
 
-  // Add layout change logging
-  const onLayoutChange = (newLayout: Layout[]) => {
-    console.log('Layout changed:', newLayout);
-    ActionManager.getInstance().logAction('UPDATE_LAYOUT', {
-      layout: newLayout
+  const layouts = useMemo(() => {
+    return {
+      lg: localItems.map(item => ({
+        ...item,
+        w: item.w || 12,
+        h: item.h || 9,
+        x: item.x || 0,
+        y: item.y || 0
+      }))
+    };
+  }, [localItems]);
+
+  const onResizeStop = (layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent, element: HTMLElement) => {
+    console.log('Resize stopped - old item:', oldItem);
+    console.log('Resize stopped - new item:', newItem);
+    console.log('Resize stopped - full layout:', layout);
+    
+    // Call parent's onLayoutChange
+    onLayoutChange(layout);
+
+    // Update local state
+    setLocalItems(prev => {
+      const newItems = prev.map(item => {
+        const layoutItem = layout.find(l => l.i === item.i);
+        if (!layoutItem) return item;
+        
+        return {
+          ...item,
+          x: layoutItem.x,
+          y: layoutItem.y,
+          w: layoutItem.w,
+          h: layoutItem.h
+        };
+      });
+      return newItems;
+    });
+  };
+
+  const onDragStop = (layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent, element: HTMLElement) => {
+    console.log('Drag stopped - old item:', oldItem);
+    console.log('Drag stopped - new item:', newItem);
+    console.log('Drag stopped - full layout:', layout);
+    
+    // Call parent's onLayoutChange
+    onLayoutChange(layout);
+
+    // Update local state
+    setLocalItems(prev => {
+      const newItems = prev.map(item => {
+        const layoutItem = layout.find(l => l.i === item.i);
+        if (!layoutItem) return item;
+        
+        return {
+          ...item,
+          x: layoutItem.x,
+          y: layoutItem.y,
+          w: layoutItem.w,
+          h: layoutItem.h
+        };
+      });
+      return newItems;
     });
   };
 
   return (
-    <ReactGridLayout
+    <ResponsiveGridLayout
       className="layout"
-      cols={12}
+      layouts={layouts}
+      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+      cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
       rowHeight={30}
       draggableHandle=".drag-handle"
-      onLayoutChange={onLayoutChange}
+      onResizeStop={onResizeStop}
+      onDragStop={onDragStop}
+      compactType={null}
+      preventCollision={true}
+      isBounded={true}
+      isResizable={true}
+      isDraggable={true}
+      useCSSTransforms={true}
+      transformScale={1}
+      margin={[10, 10]}
+      autoSize={true}
+      verticalCompact={false}
     >
-      {items.map((item) => renderGrid(item))}
-    </ReactGridLayout>
+      {localItems.map((item) => renderGrid(item))}
+    </ResponsiveGridLayout>
   );
 };
 
