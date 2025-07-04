@@ -1,0 +1,86 @@
+{
+  "prompt": "give the highest mountains",
+  "steps": [
+    {
+      "id": "1751614945857",
+      "timestamp": 1751614945857,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_ng5t8wbsf",
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 12,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "1751614949926",
+      "timestamp": 1751614949926,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_ng5t8wbsf",
+        "excelData": [
+          [
+            "Mountain",
+            "Height (m)",
+            "Location"
+          ],
+          [
+            "Mount Everest",
+            8848,
+            "Nepal/China"
+          ],
+          [
+            "K2",
+            8611,
+            "Pakistan/China"
+          ],
+          [
+            "Kangchenjunga",
+            8586,
+            "Nepal/India"
+          ],
+          [
+            "Lhotse",
+            8516,
+            "Nepal/China"
+          ],
+          [
+            "Makalu",
+            8485,
+            "Nepal/China"
+          ],
+          [
+            "Cho Oyu",
+            8188,
+            "Nepal/China"
+          ],
+          [
+            "Dhaulagiri I",
+            8167,
+            "Nepal"
+          ],
+          [
+            "Manaslu",
+            8163,
+            "Nepal"
+          ],
+          [
+            "Nanga Parbat",
+            8126,
+            "Pakistan"
+          ],
+          [
+            "Annapurna I",
+            8091,
+            "Nepal"
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    }
+  ]
+} 
