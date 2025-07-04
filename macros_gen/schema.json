@@ -1,0 +1,248 @@
+  {
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+      "prompt": {
+        "type": "string"
+      },
+      "steps": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "timestamp": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            },
+            "details": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": "object",
+                  "properties": {
+                    "i": {
+                      "type": "string"
+                    },
+                    "x": {
+                      "type": "integer"
+                    },
+                    "y": {
+                      "type": "integer"
+                    },
+                    "w": {
+                      "type": "integer"
+                    },
+                    "h": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "chartData": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "category": {
+                            "type": "string"
+                          },
+                          "Population__millions_": {
+                            "type": "integer"
+                          },
+                          "Height__m_": {
+                            "type": "integer"
+                          },
+                          "Atomic_Mass__u_": {
+                            "type": "number"
+                          },
+                          "Mass__10_24_kg_": {
+                            "type": "number"
+                          },
+                          "Average_Distance_from_Sun__10_6_km_": {
+                            "type": "number"
+                          },
+                          "Mean_Diameter__km_": {
+                            "type": "integer"
+                          },
+                          "GDP__trillion___": {
+                            "type": "number"
+                          },
+                          "Area__thousand_km__": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "category"
+                        ]
+                      }
+                    },
+                    "chartConfig": {
+                      "type": "object",
+                      "properties": {
+                        "series": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "field": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "field",
+                              "name"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "series"
+                      ]
+                    },
+                    "sourceGridId": {
+                      "type": "string"
+                    },
+                    "selectedRange": {
+                      "type": "object",
+                      "properties": {
+                        "columns": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "startRow": {
+                          "type": "integer"
+                        },
+                        "endRow": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "columns",
+                        "endRow",
+                        "startRow"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "h",
+                    "i",
+                    "type",
+                    "w",
+                    "x",
+                    "y"
+                  ]
+                },
+                "gridId": {
+                  "type": "string"
+                },
+                "excelData": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": [
+                        "number",
+                        "string"
+                      ]
+                    }
+                  }
+                },
+                "fileType": {
+                  "type": "string"
+                },
+                "range": {
+                  "type": "object",
+                  "properties": {
+                    "columns": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "startRow": {
+                      "type": "integer"
+                    },
+                    "endRow": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "columns",
+                    "endRow",
+                    "startRow"
+                  ]
+                },
+                "itemId": {
+                  "type": "string"
+                },
+                "layout": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "w": {
+                        "type": "integer"
+                      },
+                      "h": {
+                        "type": "integer"
+                      },
+                      "x": {
+                        "type": "integer"
+                      },
+                      "y": {
+                        "type": "integer"
+                      },
+                      "i": {
+                        "type": "string"
+                      },
+                      "moved": {
+                        "type": "boolean"
+                      },
+                      "static": {
+                        "type": "boolean"
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "h",
+                      "i",
+                      "moved",
+                      "static",
+                      "type",
+                      "w",
+                      "x",
+                      "y"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "details",
+            "id",
+            "timestamp",
+            "type"
+          ]
+        }
+      }
+    },
+    "required": [
+      "prompt",
+      "steps"
+    ],
+    "title": "Macro Schema",
+    "description": "JSON Schema for validating macro files"
+  }
