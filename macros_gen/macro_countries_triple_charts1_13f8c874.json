@@ -1,0 +1,765 @@
+{
+  "prompt": "countries - pie chart by population, line chart by GDP, bar chart by area",
+  "steps": [
+    {
+      "id": "1751617637938",
+      "timestamp": 1751617637938,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_r1hudcm4z",
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 12,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "1751617663830",
+      "timestamp": 1751617663830,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_r1hudcm4z",
+        "excelData": [
+          [
+            "Country",
+            "Population (millions)",
+            "GDP (trillion $)",
+            "Area (thousand km\u00b2)"
+          ],
+          [
+            "China",
+            1412,
+            17.7,
+            9597
+          ],
+          [
+            "India",
+            1400,
+            3.7,
+            3287
+          ],
+          [
+            "USA",
+            339,
+            28.8,
+            9834
+          ],
+          [
+            "Indonesia",
+            278,
+            1.5,
+            1905
+          ],
+          [
+            "Pakistan",
+            241,
+            0.4,
+            881
+          ],
+          [
+            "Nigeria",
+            223,
+            0.5,
+            924
+          ],
+          [
+            "Brazil",
+            216,
+            2.2,
+            8516
+          ],
+          [
+            "Bangladesh",
+            172,
+            0.5,
+            148
+          ],
+          [
+            "Russia",
+            144,
+            2,
+            17098
+          ],
+          [
+            "Mexico",
+            129,
+            1.8,
+            1964
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    },
+    {
+      "id": "1751617681055",
+      "timestamp": 1751617681055,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "2",
+        "range": {
+          "columns": [
+            "Country",
+            "Population__millions_"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      }
+    },
+    {
+      "id": "1751617681056",
+      "timestamp": 1751617681056,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "pie-chart-1751617681055",
+          "x": 0,
+          "y": 12,
+          "w": 12,
+          "h": 4,
+          "type": "pie-chart",
+          "chartData": [
+            {
+              "category": "China",
+              "Population__millions_": 1412
+            },
+            {
+              "category": "India",
+              "Population__millions_": 1400
+            },
+            {
+              "category": "USA",
+              "Population__millions_": 339
+            },
+            {
+              "category": "Indonesia",
+              "Population__millions_": 278
+            },
+            {
+              "category": "Pakistan",
+              "Population__millions_": 241
+            },
+            {
+              "category": "Nigeria",
+              "Population__millions_": 223
+            },
+            {
+              "category": "Brazil",
+              "Population__millions_": 216
+            },
+            {
+              "category": "Bangladesh",
+              "Population__millions_": 172
+            },
+            {
+              "category": "Russia",
+              "Population__millions_": 144
+            },
+            {
+              "category": "Mexico",
+              "Population__millions_": 129
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Population__millions_",
+                "name": "Population__millions_"
+              }
+            ]
+          },
+          "sourceGridId": "2",
+          "selectedRange": {
+            "columns": [
+              "Country",
+              "Population__millions_"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      }
+    },
+    {
+      "id": "1751617691388",
+      "timestamp": 1751617691388,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "2",
+        "range": {
+          "columns": [
+            "Country",
+            "GDP__trillion___"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      }
+    },
+    {
+      "id": "1751617691388",
+      "timestamp": 1751617691388,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "line-chart-1751617691388",
+          "x": 0,
+          "y": 16,
+          "w": 12,
+          "h": 4,
+          "type": "line-chart",
+          "chartData": [
+            {
+              "category": "USA",
+              "GDP__trillion___": 28.8
+            },
+            {
+              "category": "China",
+              "GDP__trillion___": 17.7
+            },
+            {
+              "category": "India",
+              "GDP__trillion___": 3.7
+            },
+            {
+              "category": "Brazil",
+              "GDP__trillion___": 2.2
+            },
+            {
+              "category": "Russia",
+              "GDP__trillion___": 2
+            },
+            {
+              "category": "Mexico",
+              "GDP__trillion___": 1.8
+            },
+            {
+              "category": "Indonesia",
+              "GDP__trillion___": 1.5
+            },
+            {
+              "category": "Nigeria",
+              "GDP__trillion___": 0.5
+            },
+            {
+              "category": "Bangladesh",
+              "GDP__trillion___": 0.5
+            },
+            {
+              "category": "Pakistan",
+              "GDP__trillion___": 0.4
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "GDP__trillion___",
+                "name": "GDP__trillion___"
+              }
+            ]
+          },
+          "sourceGridId": "2",
+          "selectedRange": {
+            "columns": [
+              "Country",
+              "GDP__trillion___"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      }
+    },
+    {
+      "id": "1751617699739",
+      "timestamp": 1751617699739,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "2",
+        "range": {
+          "columns": [
+            "Country",
+            "Area__thousand_km__"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      }
+    },
+    {
+      "id": "1751617699739",
+      "timestamp": 1751617699739,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "bar-chart-1751617699739",
+          "x": 0,
+          "y": 20,
+          "w": 12,
+          "h": 4,
+          "type": "bar-chart",
+          "chartData": [
+            {
+              "category": "USA",
+              "Area__thousand_km__": 9834
+            },
+            {
+              "category": "China",
+              "Area__thousand_km__": 9597
+            },
+            {
+              "category": "India",
+              "Area__thousand_km__": 3287
+            },
+            {
+              "category": "Brazil",
+              "Area__thousand_km__": 8516
+            },
+            {
+              "category": "Russia",
+              "Area__thousand_km__": 17098
+            },
+            {
+              "category": "Mexico",
+              "Area__thousand_km__": 1964
+            },
+            {
+              "category": "Indonesia",
+              "Area__thousand_km__": 1905
+            },
+            {
+              "category": "Nigeria",
+              "Area__thousand_km__": 924
+            },
+            {
+              "category": "Bangladesh",
+              "Area__thousand_km__": 148
+            },
+            {
+              "category": "Pakistan",
+              "Area__thousand_km__": 881
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Area__thousand_km__",
+                "name": "Area__thousand_km__"
+              }
+            ]
+          },
+          "sourceGridId": "2",
+          "selectedRange": {
+            "columns": [
+              "Country",
+              "Area__thousand_km__"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      }
+    },
+    {
+      "id": "1751617702102",
+      "timestamp": 1751617702102,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_r1hudcm4z"
+      }
+    },
+    {
+      "id": "1751617704747",
+      "timestamp": 1751617704747,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 16,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 20,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617708741",
+      "timestamp": 1751617708741,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 16,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 20,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617710993",
+      "timestamp": 1751617710993,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 9,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 20,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617714216",
+      "timestamp": 1751617714216,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 4,
+            "h": 6,
+            "x": 0,
+            "y": 9,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 20,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617715922",
+      "timestamp": 1751617715922,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 4,
+            "h": 6,
+            "x": 4,
+            "y": 1,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 20,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617717858",
+      "timestamp": 1751617717858,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 4,
+            "h": 6,
+            "x": 4,
+            "y": 0,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 20,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617720140",
+      "timestamp": 1751617720140,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 4,
+            "h": 8,
+            "x": 4,
+            "y": 0,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 20,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617722912",
+      "timestamp": 1751617722912,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 4,
+            "h": 8,
+            "x": 4,
+            "y": 0,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 10,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617727675",
+      "timestamp": 1751617727675,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 4,
+            "h": 8,
+            "x": 4,
+            "y": 0,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 8,
+            "h": 8,
+            "x": 0,
+            "y": 10,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617730220",
+      "timestamp": 1751617730220,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617681055",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 4,
+            "h": 8,
+            "x": 4,
+            "y": 0,
+            "i": "line-chart-1751617691388",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          },
+          {
+            "w": 8,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "bar-chart-1751617699739",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "prompt": "display statistics for the ten largest nations",
+  "steps": [
+    {
+      "id": "1751614789808",
+      "timestamp": 1751614789808,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_ji3vbrfef",
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 12,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "1751614821624",
+      "timestamp": 1751614821624,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_ji3vbrfef",
+        "excelData": [
+          [
+            "Country",
+            "Population (millions)",
+            "GDP (trillion $)",
+            "Area (thousand km\u00b2)"
+          ],
+          [
+            "China",
+            1412,
+            17.7,
+            9597
+          ],
+          [
+            "India",
+            1400,
+            3.7,
+            3287
+          ],
+          [
+            "USA",
+            339,
+            28.8,
+            9834
+          ],
+          [
+            "Indonesia",
+            278,
+            1.5,
+            1905
+          ],
+          [
+            "Pakistan",
+            241,
+            0.4,
+            881
+          ],
+          [
+            "Nigeria",
+            223,
+            0.5,
+            924
+          ],
+          [
+            "Brazil",
+            216,
+            2.2,
+            8516
+          ],
+          [
+            "Bangladesh",
+            172,
+            0.5,
+            148
+          ],
+          [
+            "Russia",
+            144,
+            2,
+            17098
+          ],
+          [
+            "Mexico",
+            129,
+            1.8,
+            1964
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "prompt": "create a view of various atomic elements",
+  "steps": [
+    {
+      "id": "1751614879889",
+      "timestamp": 1751614879889,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_non4saio6",
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 12,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "1751614889530",
+      "timestamp": 1751614889530,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_non4saio6",
+        "excelData": [
+          [
+            "Element",
+            "Symbol",
+            "Atomic Number",
+            "Atomic Mass (u)"
+          ],
+          [
+            "Hydrogen",
+            "H",
+            1,
+            1.008
+          ],
+          [
+            "Helium",
+            "He",
+            2,
+            4.0026
+          ],
+          [
+            "Carbon",
+            "C",
+            6,
+            12.011
+          ],
+          [
+            "Nitrogen",
+            "N",
+            7,
+            14.007
+          ],
+          [
+            "Oxygen",
+            "O",
+            8,
+            15.999
+          ],
+          [
+            "Sodium",
+            "Na",
+            11,
+            22.99
+          ],
+          [
+            "Magnesium",
+            "Mg",
+            12,
+            24.305
+          ],
+          [
+            "Aluminum",
+            "Al",
+            13,
+            26.982
+          ],
+          [
+            "Silicon",
+            "Si",
+            14,
+            28.085
+          ],
+          [
+            "Iron",
+            "Fe",
+            26,
+            55.845
+          ],
+          [
+            "Copper",
+            "Cu",
+            29,
+            63.546
+          ],
+          [
+            "Silver",
+            "Ag",
+            47,
+            107.87
+          ],
+          [
+            "Gold",
+            "Au",
+            79,
+            196.97
+          ],
+          [
+            "Uranium",
+            "U",
+            92,
+            238.03
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    }
+  ]
+}

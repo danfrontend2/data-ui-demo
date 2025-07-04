@@ -1,0 +1,45 @@
+{
+  "prompt": "dismiss all visible elements",
+  "steps": [
+    {
+      "id": "1751617525477",
+      "timestamp": 1751617525477,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_36an15cli"
+      }
+    },
+    {
+      "id": "1751617525477",
+      "timestamp": 1751617525477,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_8rsput5mj"
+      }
+    },
+    {
+      "id": "1751617525477",
+      "timestamp": 1751617525477,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_89to3zboe"
+      }
+    },
+    {
+      "id": "1751617525477",
+      "timestamp": 1751617525477,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_opuyvfzvm"
+      }
+    },
+    {
+      "id": "1751617525477",
+      "timestamp": 1751617525477,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_s4y10ty23"
+      }
+    }
+  ]
+}

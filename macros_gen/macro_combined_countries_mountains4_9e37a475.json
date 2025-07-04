@@ -1,0 +1,557 @@
+{
+  "prompt": "create visualizations comparing country and mountain metrics",
+  "steps": [
+    {
+      "id": "1751617900420",
+      "timestamp": 1751617900420,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_4pgxk83qc",
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 12,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "1751617923452",
+      "timestamp": 1751617923452,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_4pgxk83qc",
+        "excelData": [
+          [
+            "Country",
+            "Population (millions)",
+            "GDP (trillion $)",
+            "Area (thousand km\u00b2)"
+          ],
+          [
+            "China",
+            1412,
+            17.7,
+            9597
+          ],
+          [
+            "India",
+            1400,
+            3.7,
+            3287
+          ],
+          [
+            "USA",
+            339,
+            28.8,
+            9834
+          ],
+          [
+            "Indonesia",
+            278,
+            1.5,
+            1905
+          ],
+          [
+            "Pakistan",
+            241,
+            0.4,
+            881
+          ],
+          [
+            "Nigeria",
+            223,
+            0.5,
+            924
+          ],
+          [
+            "Brazil",
+            216,
+            2.2,
+            8516
+          ],
+          [
+            "Bangladesh",
+            172,
+            0.5,
+            148
+          ],
+          [
+            "Russia",
+            144,
+            2,
+            17098
+          ],
+          [
+            "Mexico",
+            129,
+            1.8,
+            1964
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    },
+    {
+      "id": "1751617943965",
+      "timestamp": 1751617943965,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "1",
+        "range": {
+          "columns": [
+            "Country",
+            "Population__millions_"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      }
+    },
+    {
+      "id": "1751617943966",
+      "timestamp": 1751617943966,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "pie-chart-1751617943966",
+          "x": 0,
+          "y": 12,
+          "w": 12,
+          "h": 4,
+          "type": "pie-chart",
+          "chartData": [
+            {
+              "category": "China",
+              "Population__millions_": 1412
+            },
+            {
+              "category": "India",
+              "Population__millions_": 1400
+            },
+            {
+              "category": "USA",
+              "Population__millions_": 339
+            },
+            {
+              "category": "Indonesia",
+              "Population__millions_": 278
+            },
+            {
+              "category": "Pakistan",
+              "Population__millions_": 241
+            },
+            {
+              "category": "Nigeria",
+              "Population__millions_": 223
+            },
+            {
+              "category": "Brazil",
+              "Population__millions_": 216
+            },
+            {
+              "category": "Bangladesh",
+              "Population__millions_": 172
+            },
+            {
+              "category": "Russia",
+              "Population__millions_": 144
+            },
+            {
+              "category": "Mexico",
+              "Population__millions_": 129
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Population__millions_",
+                "name": "Population__millions_"
+              }
+            ]
+          },
+          "sourceGridId": "1",
+          "selectedRange": {
+            "columns": [
+              "Country",
+              "Population__millions_"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      }
+    },
+    {
+      "id": "1751617945694",
+      "timestamp": 1751617945694,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_4pgxk83qc"
+      }
+    },
+    {
+      "id": "1751617948263",
+      "timestamp": 1751617948263,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 12,
+            "h": 4,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617943966",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617951238",
+      "timestamp": 1751617951238,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 7,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617943966",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617952507",
+      "timestamp": 1751617952507,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_bfjk1yqb0",
+          "x": 0,
+          "y": 7,
+          "w": 12,
+          "h": 12,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "1751617957832",
+      "timestamp": 1751617957832,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_bfjk1yqb0",
+        "excelData": [
+          [
+            "Mountain",
+            "Height (m)",
+            "Location"
+          ],
+          [
+            "Mount Everest",
+            8848,
+            "Nepal/China"
+          ],
+          [
+            "K2",
+            8611,
+            "Pakistan/China"
+          ],
+          [
+            "Kangchenjunga",
+            8586,
+            "Nepal/India"
+          ],
+          [
+            "Lhotse",
+            8516,
+            "Nepal/China"
+          ],
+          [
+            "Makalu",
+            8485,
+            "Nepal/China"
+          ],
+          [
+            "Cho Oyu",
+            8188,
+            "Nepal/China"
+          ],
+          [
+            "Dhaulagiri I",
+            8167,
+            "Nepal"
+          ],
+          [
+            "Manaslu",
+            8163,
+            "Nepal"
+          ],
+          [
+            "Nanga Parbat",
+            8126,
+            "Pakistan"
+          ],
+          [
+            "Annapurna I",
+            8091,
+            "Nepal"
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    },
+    {
+      "id": "1751617959952",
+      "timestamp": 1751617959952,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 7,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617943966",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 7,
+            "i": "grid_bfjk1yqb0",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617961916",
+      "timestamp": 1751617961916,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 7,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617943966",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 3,
+            "h": 8,
+            "x": 4,
+            "y": 0,
+            "i": "grid_bfjk1yqb0",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617966998",
+      "timestamp": 1751617966998,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "5",
+        "range": {
+          "columns": [
+            "Mountain",
+            "Height__m_"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      }
+    },
+    {
+      "id": "1751617966999",
+      "timestamp": 1751617966999,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "bar-chart-1751617966999",
+          "x": 0,
+          "y": 8,
+          "w": 12,
+          "h": 4,
+          "type": "bar-chart",
+          "chartData": [
+            {
+              "category": "Mount Everest",
+              "Height__m_": 8848
+            },
+            {
+              "category": "K2",
+              "Height__m_": 8611
+            },
+            {
+              "category": "Kangchenjunga",
+              "Height__m_": 8586
+            },
+            {
+              "category": "Lhotse",
+              "Height__m_": 8516
+            },
+            {
+              "category": "Makalu",
+              "Height__m_": 8485
+            },
+            {
+              "category": "Cho Oyu",
+              "Height__m_": 8188
+            },
+            {
+              "category": "Dhaulagiri I",
+              "Height__m_": 8167
+            },
+            {
+              "category": "Manaslu",
+              "Height__m_": 8163
+            },
+            {
+              "category": "Nanga Parbat",
+              "Height__m_": 8126
+            },
+            {
+              "category": "Annapurna I",
+              "Height__m_": 8091
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Height__m_",
+                "name": "Height__m_"
+              }
+            ]
+          },
+          "sourceGridId": "5",
+          "selectedRange": {
+            "columns": [
+              "Mountain",
+              "Height__m_"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      }
+    },
+    {
+      "id": "1751617969054",
+      "timestamp": 1751617969054,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_bfjk1yqb0"
+      }
+    },
+    {
+      "id": "1751617970681",
+      "timestamp": 1751617970681,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 7,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617943966",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 5,
+            "h": 6,
+            "x": 0,
+            "y": 8,
+            "i": "bar-chart-1751617966999",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617973073",
+      "timestamp": 1751617973073,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 4,
+            "h": 7,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617943966",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 5,
+            "h": 6,
+            "x": 4,
+            "y": 0,
+            "i": "bar-chart-1751617966999",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751617975037",
+      "timestamp": 1751617975037,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 7,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1751617943966",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 7,
+            "x": 6,
+            "y": 0,
+            "i": "bar-chart-1751617966999",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      }
+    }
+  ]
+}

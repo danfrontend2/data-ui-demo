@@ -1,0 +1,109 @@
+filename,prompt
+macro_2025-07-04T07-41-08-898Z.json,"create a table with data for ten countries, population, GDP, area"
+macro_2025-07-04T07-42-06-264Z.json,create a table with data on chemical elements
+macro_2025-07-04T07-42-45-416Z.json,need data on the world's highest mountains
+macro_2025-07-04T07-43-22-914Z.json,planet data of the solar system
+macro_2025-07-04T07-44-51-272Z.json,"find planet data of the solar system, display their sizes in a pie chart"
+macro_2025-07-04T07-45-55-472Z.json,need a bar chart showing masses of solar system planets
+macro_2025-07-04T07-47-14-815Z.json,"need a line chart with masses and distance from sun for solar system planets, meaning need to show two data series. do not close the data table"
+macro_2025-07-04T08-09-52-251Z.json,"on a pie chart show planet data of the solar system - mass, diameter, distance from sun - all at once"
+macro_2025-07-04T08-13-30-069Z.json,"for planets give two bar charts - with mass and with diameter. you can remove the data table, and arrange the charts side by side, align them"
+macro_2025-07-04T08-15-10-367Z.json,arrange existing windows three per row
+macro_2025-07-04T08-22-47-623Z.json,"arrange existing windows neatly, two per row. if the last one remains alone on the line, align it by width with the entire row."
+macro_2025-07-04T08-25-39-964Z.json,close all windows
+macro_2025-07-04T08-30-09-004Z.json,"find data on largest countries, create charts - pie chart by population, line chart by GDP, bar chart by area. arrange them nicely, and hide the data table"
+macro_2025-07-04T08-33-31-657Z.json,"show side by side charts - pie chart for top countries by population, bars for largest mountains in the world"
+macro_2025-07-04T08-37-14-877Z.json,"need the following layout - two rows, two columns, total four windows. following content - 
+[element data][chart with atomic weights]
+[data on largest mountains][pie chart - with heights]"
+macro_atoms_basic.json,"give atom data, several elements"
+macro_close_all1.json,close all
+macro_close_all2.json,close widgets
+macro_close_all3.json,clear desktop
+macro_close_all4.json,start from clean
+macro_combined_countries_mountains1.json,"chart top countries by population (pie), heights of big mountains (bars), both charts side by side, in one row"
+macro_combined_countries_mountains2.json,"create charts side by side - countries by population (pie), mountain heights (bars)"
+macro_combined_countries_mountains3.json,"side by side charts - population data for countries, height data for mountains"
+macro_combined_countries_mountains4.json,countries and mountains comparison charts
+macro_combined_elements_mountains1.json,"give data on chemical elements - to the right of it a chart with their weights. below mountains on the same principle - table on the left, chart with height on the right"
+macro_combined_elements_mountains2.json,data and chart with element masses. data and chart with heights of tall mountains
+macro_combined_elements_mountains3.json,needed data and charts on periodic table and highest mountains in the world
+macro_combined_elements_mountains4.json,"make windows 2 by 2 - in the first row chemical elements and their weights (chart), in the second row - high mountains and their heights (chart). let the chart types be different"
+macro_countries_basic.json,country data
+macro_countries_detailed.json,"data on largest countries - GDP, population, and more"
+macro_countries_main.json,main country data
+macro_countries_stats.json,give GDP population and area of large countries
+macro_countries_top10.json,top 10 countries data
+macro_countries_triple_charts1.json,"countries - pie chart by population, line chart by GDP, bar chart by area"
+macro_countries_triple_charts2.json,"countries data with three chart types - population, GDP, area"
+macro_countries_triple_charts3.json,"show countries with pie chart for population, line for GDP, bars for area"
+macro_countries_triple_charts4.json,major countries data visualization with multiple chart types
+macro_countries_triple_charts5.json,display country statistics with different chart formats
+macro_elements_basic.json,"give data on periodic table, several elements"
+macro_elements_details.json,"give data on periodic table, well there number in table and atomic weight"
+macro_elements_few.json,"give data on chemical elements, not all needed, just a little"
+macro_elements_short.json,"give data on periodic table, not all needed, just a little"
+macro_elements_three_cols.json,"give data on periodic table, decide yourself which ones, but should be three columns"
+macro_layout_arrange1.json,make widgets three per row
+macro_layout_arrange2.json,three per row
+macro_layout_arrange3.json,windows three per row
+macro_layout_arrange4.json,organize windows
+macro_layout_two_columns1.json,arrange windows two per row neatly
+macro_layout_two_columns2.json,"widgets two per line, align"
+macro_layout_two_columns3.json,"windows in two columns, nicely"
+macro_layout_two_columns4.json,"two windows per row, last one by width"
+macro_layout_two_columns5.json,arrange in pairs in rows
+macro_mountains_basic.json,highest mountains in the world
+macro_mountains_height.json,data on the highest mountains - height first of all
+macro_mountains_minimal.json,high mountains
+macro_mountains_short.json,give the highest mountains
+macro_mountains_simple.json,high mountains - height
+macro_planets_all1.json,"show all planet data - mass, diameter and distance from sun"
+macro_planets_all2.json,"make three charts for planets - mass, size and distance"
+macro_planets_all3.json,draw charts for all planet characteristics
+macro_planets_all4.json,visualize all planet parameters
+macro_planets_bar1.json,bar chart with planet masses
+macro_planets_bar2.json,bar chart with planet masses
+macro_planets_bar4.json,"give planet mass chart, with bars"
+macro_planets_bars1.json,two charts for planets - with mass and diameter. bar charts. no table needed
+macro_planets_bars2.json,"charts for planets - mass, diameter"
+macro_planets_bars3.json,"draw bars for planets - mass, diameter"
+macro_planets_bars4.json,"need images for planets, mass, size"
+macro_planets_basic.json,show planet data of the solar system
+macro_planets_data1.json,planet data
+macro_planets_data2.json,"give for planets mass, size, distance"
+macro_planets_data3.json,three numerical indicators for planets
+macro_planets_data4.json,table for planets
+macro_planets_dual_bars1.json,two bar charts for planets - mass and diameter side by side
+macro_planets_dual_bars2.json,planets: two bar charts with mass and size
+macro_planets_dual_bars3.json,"planet bars by mass and diameter, remove table"
+macro_planets_dual_bars4.json,two bar charts - planet masses and diameters
+macro_planets_dual_bars5.json,planet bar charts side by side - mass and size
+macro_planets_line1.json,need table and line chart with masses and distance for planets
+macro_planets_line2.json,data and chart with masses and distance for planets
+macro_planets_line3.json,give chart of planet distances and masses
+macro_planets_line4.json,line chart of planet data
+macro_planets_line_dual1.json,line chart of planets with mass and distance from sun
+macro_planets_line_dual2.json,planet data and line chart with two series - mass and distance
+macro_planets_line_dual3.json,planet table and line chart of mass and distance
+macro_planets_line_dual4.json,planets: two data series on line chart
+macro_planets_line_dual5.json,planet masses and their distance from sun with lines
+macro_planets_mass_bars1.json,bars for planet masses
+macro_planets_mass_bars2.json,planet data and bar chart with their masses
+macro_planets_mass_bars3.json,planet table and bar chart by mass
+macro_planets_mass_bars4.json,planet masses in bar chart
+macro_planets_mass_bars5.json,planets and their masses with bars
+macro_planets_pie_multi1.json,pie chart of planets with three indicators at once
+macro_planets_pie_multi2.json,"planet data and pie chart with mass, diameter and distance"
+macro_planets_pie_multi3.json,planet table and pie chart with three data series
+macro_planets_pie_multi4.json,"planets: mass, size and distance on pie chart"
+macro_planets_pie_multi5.json,all planet parameters in one pie chart
+macro_planets_pie_size1.json,pie chart by planet sizes
+macro_planets_pie_size2.json,table with planet sizes and chart
+macro_planets_pie_size3.json,table with planet sizes and chart pie
+macro_planets_pie_size4.json,planet sizes and pie chart for them
+macro_planets_pie_size5.json,planets and their sizes in pie chart
+macro_planets_size1.json,pie chart for solar system planet sizes
+macro_planets_size2.json,chart for planet sizes
+macro_planets_size3.json,chart for sizes of solar system planets
+macro_planets_size4.json,pie for our planet sizes

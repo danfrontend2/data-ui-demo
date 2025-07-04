@@ -1,0 +1,1038 @@
+{
+  "prompt": "build a four-panel layout: element information with weight chart above, mountain details with height visualization below",
+  "steps": [
+    {
+      "id": "1751618032195",
+      "timestamp": 1751618032195,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_jdwn5adw6",
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 12,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "1751618041736",
+      "timestamp": 1751618041736,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_jdwn5adw6",
+        "excelData": [
+          [
+            "Element",
+            "Symbol",
+            "Atomic Number",
+            "Atomic Mass (u)"
+          ],
+          [
+            "Hydrogen",
+            "H",
+            1,
+            1.008
+          ],
+          [
+            "Helium",
+            "He",
+            2,
+            4.0026
+          ],
+          [
+            "Carbon",
+            "C",
+            6,
+            12.011
+          ],
+          [
+            "Nitrogen",
+            "N",
+            7,
+            14.007
+          ],
+          [
+            "Oxygen",
+            "O",
+            8,
+            15.999
+          ],
+          [
+            "Sodium",
+            "Na",
+            11,
+            22.99
+          ],
+          [
+            "Magnesium",
+            "Mg",
+            12,
+            24.305
+          ],
+          [
+            "Aluminum",
+            "Al",
+            13,
+            26.982
+          ],
+          [
+            "Silicon",
+            "Si",
+            14,
+            28.085
+          ],
+          [
+            "Iron",
+            "Fe",
+            26,
+            55.845
+          ],
+          [
+            "Copper",
+            "Cu",
+            29,
+            63.546
+          ],
+          [
+            "Silver",
+            "Ag",
+            47,
+            107.87
+          ],
+          [
+            "Gold",
+            "Au",
+            79,
+            196.97
+          ],
+          [
+            "Uranium",
+            "U",
+            92,
+            238.03
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    },
+    {
+      "id": "1751618045325",
+      "timestamp": 1751618045325,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 12,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618054914",
+      "timestamp": 1751618054914,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "3",
+        "range": {
+          "columns": [
+            "Element",
+            "Atomic_Mass__u_"
+          ],
+          "startRow": 0,
+          "endRow": 7
+        }
+      }
+    },
+    {
+      "id": "1751618054914",
+      "timestamp": 1751618054914,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "pie-chart-1751618054914",
+          "x": 0,
+          "y": 12,
+          "w": 12,
+          "h": 4,
+          "type": "pie-chart",
+          "chartData": [
+            {
+              "category": "Hydrogen",
+              "Atomic_Mass__u_": 1.008
+            },
+            {
+              "category": "Helium",
+              "Atomic_Mass__u_": 4.0026
+            },
+            {
+              "category": "Carbon",
+              "Atomic_Mass__u_": 12.011
+            },
+            {
+              "category": "Nitrogen",
+              "Atomic_Mass__u_": 14.007
+            },
+            {
+              "category": "Oxygen",
+              "Atomic_Mass__u_": 15.999
+            },
+            {
+              "category": "Sodium",
+              "Atomic_Mass__u_": 22.99
+            },
+            {
+              "category": "Magnesium",
+              "Atomic_Mass__u_": 24.305
+            },
+            {
+              "category": "Aluminum",
+              "Atomic_Mass__u_": 26.982
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Atomic_Mass__u_",
+                "name": "Atomic_Mass__u_"
+              }
+            ]
+          },
+          "sourceGridId": "3",
+          "selectedRange": {
+            "columns": [
+              "Element",
+              "Atomic_Mass__u_"
+            ],
+            "startRow": 0,
+            "endRow": 7
+          }
+        }
+      }
+    },
+    {
+      "id": "1751618057548",
+      "timestamp": 1751618057548,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 12,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 4,
+            "h": 5,
+            "x": 0,
+            "y": 12,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618061562",
+      "timestamp": 1751618061562,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 12,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 4,
+            "h": 5,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618063884",
+      "timestamp": 1751618063884,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 12,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 6,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618071350",
+      "timestamp": 1751618071350,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 12,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 12,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618073761",
+      "timestamp": 1751618073761,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_m4i75ci71",
+          "x": 0,
+          "y": 12,
+          "w": 12,
+          "h": 12,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "1751618080175",
+      "timestamp": 1751618080175,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_m4i75ci71",
+        "excelData": [
+          [
+            "Mountain",
+            "Height (m)",
+            "Location"
+          ],
+          [
+            "Mount Everest",
+            8848,
+            "Nepal/China"
+          ],
+          [
+            "K2",
+            8611,
+            "Pakistan/China"
+          ],
+          [
+            "Kangchenjunga",
+            8586,
+            "Nepal/India"
+          ],
+          [
+            "Lhotse",
+            8516,
+            "Nepal/China"
+          ],
+          [
+            "Makalu",
+            8485,
+            "Nepal/China"
+          ],
+          [
+            "Cho Oyu",
+            8188,
+            "Nepal/China"
+          ],
+          [
+            "Dhaulagiri I",
+            8167,
+            "Nepal"
+          ],
+          [
+            "Manaslu",
+            8163,
+            "Nepal"
+          ],
+          [
+            "Nanga Parbat",
+            8126,
+            "Pakistan"
+          ],
+          [
+            "Annapurna I",
+            8091,
+            "Nepal"
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    },
+    {
+      "id": "1751618084596",
+      "timestamp": 1751618084596,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 12,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 12,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 0,
+            "y": 12,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618088718",
+      "timestamp": 1751618088718,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "4",
+        "range": {
+          "columns": [
+            "Mountain",
+            "Height__m_"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      }
+    },
+    {
+      "id": "1751618088718",
+      "timestamp": 1751618088718,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "pie-chart-1751618088718",
+          "x": 0,
+          "y": 23,
+          "w": 12,
+          "h": 4,
+          "type": "pie-chart",
+          "chartData": [
+            {
+              "category": "Mount Everest",
+              "Height__m_": 8848
+            },
+            {
+              "category": "K2",
+              "Height__m_": 8611
+            },
+            {
+              "category": "Kangchenjunga",
+              "Height__m_": 8586
+            },
+            {
+              "category": "Lhotse",
+              "Height__m_": 8516
+            },
+            {
+              "category": "Makalu",
+              "Height__m_": 8485
+            },
+            {
+              "category": "Cho Oyu",
+              "Height__m_": 8188
+            },
+            {
+              "category": "Dhaulagiri I",
+              "Height__m_": 8167
+            },
+            {
+              "category": "Manaslu",
+              "Height__m_": 8163
+            },
+            {
+              "category": "Nanga Parbat",
+              "Height__m_": 8126
+            },
+            {
+              "category": "Annapurna I",
+              "Height__m_": 8091
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Height__m_",
+                "name": "Height__m_"
+              }
+            ]
+          },
+          "sourceGridId": "4",
+          "selectedRange": {
+            "columns": [
+              "Mountain",
+              "Height__m_"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      }
+    },
+    {
+      "id": "1751618092426",
+      "timestamp": 1751618092426,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 12,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 12,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 0,
+            "y": 12,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 13,
+            "x": 0,
+            "y": 23,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618096002",
+      "timestamp": 1751618096002,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 12,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 12,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 0,
+            "y": 12,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 13,
+            "x": 6,
+            "y": 12,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618098879",
+      "timestamp": 1751618098879,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 12,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 12,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 0,
+            "y": 12,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 6,
+            "y": 12,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618106419",
+      "timestamp": 1751618106419,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 12,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 0,
+            "y": 12,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 6,
+            "y": 12,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618110722",
+      "timestamp": 1751618110722,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 0,
+            "y": 12,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 6,
+            "y": 12,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618112987",
+      "timestamp": 1751618112987,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 0,
+            "y": 8,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 6,
+            "y": 12,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618115492",
+      "timestamp": 1751618115492,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 6,
+            "y": 12,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618117182",
+      "timestamp": 1751618117182,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 11,
+            "x": 6,
+            "y": 8,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618120454",
+      "timestamp": 1751618120454,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 7,
+            "x": 6,
+            "y": 8,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1751618125370",
+      "timestamp": 1751618125370,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_jdwn5adw6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1751618054914",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 7,
+            "x": 0,
+            "y": 8,
+            "i": "grid_m4i75ci71",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 7,
+            "x": 6,
+            "y": 8,
+            "i": "pie-chart-1751618088718",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      }
+    }
+  ]
+}
