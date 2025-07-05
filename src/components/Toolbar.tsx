@@ -205,7 +205,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           </Button>
         </Tooltip>
         <Tooltip 
-          title="Close all grids"
+          title="Close all items"
           {...tooltipProps}
         >
           <Button color="error" onClick={onCloseAll}>
