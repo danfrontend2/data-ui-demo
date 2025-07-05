@@ -8,7 +8,9 @@ export type ActionType =
   | 'ADD_CHART'
   | 'SELECT_RANGE'
   | 'DROP_FILE'
-  | 'UPDATE_CELL';
+  | 'UPDATE_CELL'
+  | 'ARRANGE'
+  | 'REMOVE_ALL_GRIDS';
 
 export interface Action {
   id: string;
@@ -87,6 +89,10 @@ export interface UpdateCellAction extends Action {
 export interface MacroStep {
   type: ActionType;
   details: any;
+}
+
+export interface ArrangeDetails {
+  columns: number;
 }
 
 export const DEMO_MACRO: Action[] = [

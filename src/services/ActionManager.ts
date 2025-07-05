@@ -16,13 +16,14 @@ type MessageCallback = (message: string | null) => void;
 
 export default class ActionManager {
   private static instance: ActionManager;
-  private actionHandlers: { [key in ActionType]?: (details: any) => void } = {};
+  private actionHandlers: Record<string, (details: any) => void> = {};
   private actionLog: Action[] = [];
-  private isRecording: boolean = false;
+  private recording = false;
   private recordedActions: Action[] = [];
-  private setItems: ((value: SetStateAction<GridItem[]>) => void) | null = null;
-  private selectedData: Record<string, any>[] = [];
-  private onMessage: MessageCallback | null = null;
+  private setItems: ((items: GridItem[]) => void) | null = null;
+  private items: GridItem[] = [];
+  private selectedData: any[] = [];
+  private onMessage: ((message: string | null) => void) | null = null;
 
   private constructor() {
     console.log('Initializing ActionManager...');
@@ -36,10 +37,14 @@ export default class ActionManager {
     return ActionManager.instance;
   }
 
-  setItemsHandler(handler: (value: SetStateAction<GridItem[]>) => void) {
+  setItemsHandler(handler: (items: GridItem[]) => void) {
     console.log('Setting items handler');
     this.setItems = handler;
     this.initializeHandlers();
+  }
+
+  updateItems(items: GridItem[]) {
+    this.items = items;
   }
 
   private initializeHandlers() {
@@ -51,34 +56,34 @@ export default class ActionManager {
     console.log('Initializing action handlers...');
 
     this.registerHandler('ADD_GRID', ({ item }) => {
-      this.setItems?.((prev: GridItem[]) => [...prev, item]);
+      if (!this.setItems) return;
+      const newItems = [...this.items, item];
+      this.setItems(newItems);
     });
 
     this.registerHandler('REMOVE_GRID', ({ itemId }) => {
-      this.setItems?.((prev: GridItem[]) => prev.filter(item => item.i !== itemId));
+      if (!this.setItems) return;
+      const newItems = this.items.filter(item => item.i !== itemId);
+      this.setItems(newItems);
+    });
+
+    this.registerHandler('REMOVE_ALL_GRIDS', () => {
+      if (!this.setItems) return;
+      this.setItems([]);
     });
 
     this.registerHandler('UPDATE_LAYOUT', ({ layout }) => {
-      this.setItems?.((prev: GridItem[]) => {
-        const currentItems = new Map(prev.map(item => [item.i, item]));
-        const updatedItems = layout.map((layoutItem: Layout) => {
-          const currentItem = currentItems.get(layoutItem.i);
-          if (!currentItem) {
-            return {
-              ...layoutItem,
-              type: 'grid'
-            } as GridItem;
-          }
-          return {
-            ...currentItem,
-            x: layoutItem.x,
-            y: layoutItem.y,
-            w: layoutItem.w,
-            h: layoutItem.h
-          };
-        });
-        return updatedItems.sort((a: GridItem, b: GridItem) => a.y - b.y);
+      if (!this.setItems) return;
+      const currentItems = new Map(this.items.map(item => [item.i, item]));
+      const updatedItems = layout.map((layoutItem: Layout) => {
+        const currentItem = currentItems.get(layoutItem.i);
+        if (!currentItem) return layoutItem as GridItem;
+        return {
+          ...currentItem,
+          ...layoutItem
+        };
       });
+      this.setItems(updatedItems);
     });
 
     this.registerHandler('UPDATE_CELL', ({ gridId, rowId, field, newValue }) => {
@@ -198,24 +203,28 @@ export default class ActionManager {
     });
 
     this.registerHandler('ADD_CHART', ({ item }) => {
-      if (!this.selectedData || !this.setItems) return;
+      if (!this.setItems) return;
+      const newItems = [...this.items];
+      const existingIndex = newItems.findIndex(i => i.i === item.i);
+      if (existingIndex >= 0) {
+        newItems[existingIndex] = item;
+      } else {
+        newItems.push(item);
+      }
+      this.setItems(newItems);
+    });
 
-      const chartItem: GridItem = {
+    this.registerHandler('ARRANGE', ({ columns }: { columns: number }) => {
+      if (!this.setItems) return;
+      const itemWidth = Math.floor(12 / columns);
+      const newItems = this.items.map((item: GridItem, index: number) => ({
         ...item,
-        data: this.selectedData
-      };
-
-      // Update items through the handler
-      this.setItems(prevItems => {
-        const newItems = [...prevItems];
-        const existingIndex = newItems.findIndex(i => i.i === item.i);
-        if (existingIndex >= 0) {
-          newItems[existingIndex] = chartItem;
-        } else {
-          newItems.push(chartItem);
-        }
-        return newItems;
-      });
+        w: itemWidth,
+        h: 9,
+        x: (index % columns) * itemWidth,
+        y: Math.floor(index / columns) * 9
+      }));
+      this.setItems(newItems);
     });
 
     console.log('Action handlers initialized');
@@ -244,7 +253,7 @@ export default class ActionManager {
     };
 
     // Add default messages when recording
-    if (this.isRecording) {
+    if (this.recording) {
       switch (type) {
         case 'ADD_GRID':
           action.message = 'Adding a new data grid';
@@ -285,7 +294,7 @@ export default class ActionManager {
 
     this.actionLog.push(action);
 
-    if (this.isRecording) {
+    if (this.recording) {
       this.recordedActions.push(action);
     }
 
@@ -300,12 +309,12 @@ export default class ActionManager {
   }
 
   startRecording() {
-    this.isRecording = true;
+    this.recording = true;
     this.recordedActions = [];
   }
 
   stopRecording(): Action[] {
-    this.isRecording = false;
+    this.recording = false;
     return this.recordedActions;
   }
 

@@ -127,6 +127,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           
           console.log('Macro prompt:', macroData.prompt);
           onRunCustomMacro(macroData.steps);
+          
+          // Reset input value so the same file can be selected again
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
         } catch (error) {
           console.error('Failed to parse macro file:', error);
           alert('Invalid macro file format. File must contain both prompt and steps.');

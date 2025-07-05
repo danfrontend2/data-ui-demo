@@ -23,6 +23,11 @@ function App() {
     actionManager.setMessageHandler(setMacroMessage);
   }, [actionManager]);
 
+  // Update ActionManager items when items change
+  useEffect(() => {
+    actionManager.updateItems(items);
+  }, [items, actionManager]);
+
   const handleAddItem = (newItem: Layout) => {
     // Calculate the maximum Y coordinate of existing items
     const maxY = items.reduce((max, item) => {
@@ -76,11 +81,7 @@ function App() {
   };
 
   const handleCloseAll = () => {
-    // Get all item IDs and remove them one by one
-    const itemIds = items.map(item => item.i);
-    itemIds.forEach(id => {
-      actionManager.logAction('REMOVE_GRID', { itemId: id });
-    });
+    actionManager.logAction('REMOVE_ALL_GRIDS', {});
   };
 
   const handleLayoutChange = (layout: Layout[]) => {
@@ -88,25 +89,7 @@ function App() {
   };
 
   const handleArrangeItems = (columns: number) => {
-    const itemWidth = Math.floor(12 / columns);
-    const newItems = items.map((item, index) => ({
-      ...item,
-      w: itemWidth,
-      h: 9,
-      x: (index % columns) * itemWidth,
-      y: Math.floor(index / columns) * 9
-    }));
-    
-    // Update items through action manager
-    actionManager.logAction('UPDATE_LAYOUT', { 
-      layout: newItems.map(item => ({
-        i: item.i,
-        w: item.w,
-        h: item.h,
-        x: item.x,
-        y: item.y
-      }))
-    });
+    actionManager.logAction('ARRANGE', { columns });
   };
 
   return (

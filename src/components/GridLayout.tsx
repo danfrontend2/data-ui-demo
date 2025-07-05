@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { WidthProvider, Responsive, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -68,22 +68,31 @@ const defaultData: GridData[] = [
 ];
 
 const GridLayout: React.FC<GridLayoutProps> = ({
-  items: propItems,
+  items: initialItems,
   onRemoveItem,
   onAddChart,
   onLayoutChange,
   onArrangeItems
 }) => {
-  const [localItems, setLocalItems] = useState<GridItem[]>(propItems);
+  const [localItems, setLocalItems] = useState<GridItem[]>(initialItems);
+  const [selectedData, setSelectedData] = useState<any[] | null>(null);
+  const [chartAnchorEl, setChartAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedGridId, setSelectedGridId] = useState<string | null>(null);
   const [gridData, setGridData] = useState<{ [key: string]: GridData[] }>({});
   const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
   const [columns, setColumns] = useState<number>(2);
   const [showArrangeControls, setShowArrangeControls] = useState<boolean>(false);
+  const onArrangeItemsRef = useRef(onArrangeItems);
+
+  // Update ref when prop changes
+  useEffect(() => {
+    onArrangeItemsRef.current = onArrangeItems;
+  }, [onArrangeItems]);
 
   // Update local items when props change
   useEffect(() => {
-    setLocalItems(propItems);
-  }, [propItems]);
+    setLocalItems(initialItems);
+  }, [initialItems]);
 
   // Initialize data for new grids
   useEffect(() => {
@@ -103,7 +112,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
       setGridData(newGridData);
       setColumnDefs(newColumnDefs);
     }
-  }, [localItems, gridData, columnDefs, defaultData, defaultColumns]);
+  }, [localItems, gridData, columnDefs]);
 
   const onCellValueChanged = (params: CellValueChangedEvent) => {
     console.log('Cell changed:', {
