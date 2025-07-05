@@ -5,7 +5,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import { AgGridReact } from 'ag-grid-react';
 import { 
   ColDef, 
-  GridOptions,
   CellValueChangedEvent,
   ModuleRegistry,
   AllCommunityModule,

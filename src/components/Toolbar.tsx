@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { 
-  Box, 
   Button,
   Dialog,
   DialogTitle,
@@ -9,10 +8,9 @@ import {
   TextField,
   AppBar,
   Toolbar as MuiToolbar,
-  IconButton
+  Tooltip
 } from '@mui/material';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import SaveIcon from '@mui/icons-material/Save';
 import UploadIcon from '@mui/icons-material/Upload';
@@ -28,6 +26,21 @@ interface ToolbarProps {
   onRunCustomMacro: (macro: any[]) => void;
   onCloseAll: () => void;
 }
+
+const tooltipProps = {
+  componentsProps: {
+    tooltip: {
+      sx: {
+        bgcolor: '#4caf50',
+        color: 'white',
+        fontSize: '1rem',
+        padding: '8px 16px',
+        borderRadius: '4px',
+        fontWeight: 500
+      }
+    }
+  }
+};
 
 const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -119,30 +132,55 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   return (
     <AppBar position="static" sx={{ backgroundColor: 'white', boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)' }}>
       <MuiToolbar>
-        <Button color="primary" onClick={handleAddItem}>
-          <AddIcon />
-        </Button>
-        <Button 
-          color="primary" 
-          onClick={isRecording ? handleStopRecording : handleStartRecording}
+        <Tooltip 
+          title="Add new grid" 
+          {...tooltipProps}
         >
-          {isRecording ? <FiberManualRecordIcon sx={{ color: 'red' }} /> : <FiberManualRecordIcon />}
-        </Button>
-        <Button
-          color="primary"
-          onClick={() => fileInputRef.current?.click()}
+          <Button color="primary" onClick={handleAddItem}>
+            <AddIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip 
+          title={isRecording ? "Stop recording" : "Start recording"}
+          {...tooltipProps}
         >
-          <UploadIcon />
-        </Button>
-        <Button
-          color="primary"
-          onClick={() => setIsChatOpen(true)}
+          <Button 
+            color="primary" 
+            onClick={isRecording ? handleStopRecording : handleStartRecording}
+          >
+            {isRecording ? <FiberManualRecordIcon sx={{ color: 'red' }} /> : <FiberManualRecordIcon />}
+          </Button>
+        </Tooltip>
+        <Tooltip 
+          title="Load macro from file"
+          {...tooltipProps}
         >
-          <SmartToyIcon />
-        </Button>
-        <Button color="error" onClick={onCloseAll}>
-          <CloseIcon />
-        </Button>
+          <Button
+            color="primary"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <UploadIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip 
+          title="Open AI Assistant"
+          {...tooltipProps}
+        >
+          <Button
+            color="primary"
+            onClick={() => setIsChatOpen(true)}
+          >
+            <SmartToyIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip 
+          title="Close all grids"
+          {...tooltipProps}
+        >
+          <Button color="error" onClick={onCloseAll}>
+            <CloseIcon />
+          </Button>
+        </Tooltip>
         <input
           type="file"
           ref={fileInputRef}

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, IconButton } from '@mui/material';
-import ChatIcon from '@mui/icons-material/Chat';
+import { Box } from '@mui/material';
 import Toolbar from './components/Toolbar';
 import GridLayout from './components/GridLayout';
 import Chat from './components/Chat';
@@ -34,7 +33,7 @@ function App() {
       data: undefined,
       x: 0,
       y: maxY,
-      w: 12,  // Always full width
+      w: 6,  // Half width
       h: 12   // Fixed height
     };
 
@@ -100,23 +99,6 @@ function App() {
           onLayoutChange={handleLayoutChange}
         />
         
-        {/* Chat toggle button */}
-        <IconButton
-          onClick={() => setIsChatOpen(true)}
-          sx={{
-            position: 'fixed',
-            bottom: 20,
-            right: 20,
-            backgroundColor: 'primary.main',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'primary.dark',
-            },
-          }}
-        >
-          <ChatIcon />
-        </IconButton>
-
         {/* Chat component */}
         {isChatOpen && (
           <Chat
