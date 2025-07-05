@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import Toolbar from './components/Toolbar';
 import GridLayout from './components/GridLayout';
 import Chat from './components/Chat';
+import MacroMessage from './components/MacroMessage';
 import { Layout } from 'react-grid-layout';
 import { GridItem } from './types';
 import ActionManager from './services/ActionManager';
@@ -12,11 +13,14 @@ import './App.css';
 function App() {
   const [items, setItems] = useState<GridItem[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [macroMessage, setMacroMessage] = useState<string | null>(null);
   const actionManager = ActionManager.getInstance();
 
   useEffect(() => {
     // Set items handler in ActionManager
     actionManager.setItemsHandler(setItems);
+    // Set message handler in ActionManager
+    actionManager.setMessageHandler(setMacroMessage);
   }, [actionManager]);
 
   const handleAddItem = (newItem: Layout) => {
@@ -129,6 +133,12 @@ function App() {
             onExecuteMacro={handleExecuteMacro}
           />
         )}
+
+        {/* Macro message component */}
+        <MacroMessage
+          message={macroMessage}
+          onClose={() => setMacroMessage(null)}
+        />
       </Box>
     </Box>
   );

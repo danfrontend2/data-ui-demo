@@ -15,6 +15,7 @@ export interface Action {
   timestamp: number;
   type: ActionType;
   details: any;
+  message?: string;
 }
 
 export interface AddGridAction extends Action {

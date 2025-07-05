@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { WidthProvider, Responsive, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import UploadIcon from '@mui/icons-material/Upload';
 import { AgGridReact } from 'ag-grid-react';
 import { 
   ColDef, 
@@ -18,12 +19,12 @@ import { GridData, GridItem, ChartDataPoint } from '../types';
 import PieChart from './PieChart';
 import LineChart from './LineChart';
 import BarChart from './BarChart';
+import * as XLSX from 'xlsx';
 import ActionManager from '../services/ActionManager';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
-import UploadIcon from '@mui/icons-material/Upload';
 
 // Register AG Grid Modules
 ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
@@ -175,6 +176,64 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    const files = e.dataTransfer.files;
+    console.log('Dropped files:', files);
+    console.log('Files length:', files.length);
+    
+    if (files.length) {
+      const file = files[0];
+      console.log('File type:', file.type);
+      console.log('File name:', file.name);
+      
+      if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+          file.type === 'text/csv' ||
+          file.name.endsWith('.xlsx') ||
+          file.name.endsWith('.csv')) {
+        console.log('Processing file...');
+        processFile(file, localItems[0].i);
+      } else {
+        console.warn('Unsupported file type:', file.type);
+      }
+    }
+  };
+
+  const processFile = async (file: File, gridId: string) => {
+    console.log('Starting file processing for grid:', gridId);
+    try {
+      console.log('Reading file as ArrayBuffer...');
+      const data = await file.arrayBuffer();
+      console.log('Creating XLSX workbook...');
+      const workbook = XLSX.read(data);
+      console.log('Available sheets:', workbook.SheetNames);
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      
+      // Get the raw Excel data in array format
+      const excelData = XLSX.utils.sheet_to_json(worksheet, {
+        header: 1, // Use array format instead of objects
+        raw: true, // Keep raw values
+        defval: null
+      });
+
+      console.log('Excel data raw:', excelData);
+      console.log('First row (headers):', excelData[0]);
+      console.log('Second row (first data row):', excelData[1]);
+
+      // Log the DROP_FILE action with Excel data
+      ActionManager.getInstance().logAction('DROP_FILE', {
+        gridId,
+        excelData,
+        fileType: file.type
+      });
+
+      console.log('Action logged with data:', {
+        gridId,
+        excelData,
+        fileType: file.type
+      });
+    } catch (error) {
+      console.error('Failed to process file:', error);
+    }
   };
 
   const handleRangeSelection = (params: GetContextMenuItemsParams) => {
@@ -443,6 +502,32 @@ const GridLayout: React.FC<GridLayoutProps> = ({
               pl: 1
             }}
           />
+          <input
+            type="file"
+            accept=".xlsx,.csv"
+            style={{ display: 'none' }}
+            id={`file-input-${item.i}`}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                processFile(file, item.i);
+              }
+              // Reset input value so the same file can be selected again
+              e.target.value = '';
+            }}
+          />
+          <IconButton
+            onClick={() => document.getElementById(`file-input-${item.i}`)?.click()}
+            size="small"
+            sx={{ 
+              mr: 0.5,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.1)'
+              }
+            }}
+          >
+            <UploadIcon fontSize="small" />
+          </IconButton>
           <IconButton
             onClick={(e) => handleRemoveItem(e, item.i)}
             size="small"
@@ -590,6 +675,32 @@ const GridLayout: React.FC<GridLayoutProps> = ({
               pl: 1
             }}
           />
+          <input
+            type="file"
+            accept=".xlsx,.csv"
+            style={{ display: 'none' }}
+            id={`file-input-${item.i}`}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                processFile(file, item.i);
+              }
+              // Reset input value so the same file can be selected again
+              e.target.value = '';
+            }}
+          />
+          <IconButton
+            onClick={() => document.getElementById(`file-input-${item.i}`)?.click()}
+            size="small"
+            sx={{ 
+              mr: 0.5,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.1)'
+              }
+            }}
+          >
+            <UploadIcon fontSize="small" />
+          </IconButton>
           <IconButton
             onClick={(e) => handleRemoveItem(e, item.i)}
             size="small"

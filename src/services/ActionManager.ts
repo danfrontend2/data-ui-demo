@@ -12,6 +12,8 @@ declare global {
   }
 }
 
+type MessageCallback = (message: string | null) => void;
+
 export default class ActionManager {
   private static instance: ActionManager;
   private actionHandlers: { [key in ActionType]?: (details: any) => void } = {};
@@ -20,9 +22,11 @@ export default class ActionManager {
   private recordedActions: Action[] = [];
   private setItems: ((value: SetStateAction<GridItem[]>) => void) | null = null;
   private selectedData: Record<string, any>[] = [];
+  private onMessage: MessageCallback | null = null;
 
   private constructor() {
     console.log('Initializing ActionManager...');
+    this.initializeHandlers();
   }
 
   static getInstance(): ActionManager {
@@ -239,6 +243,46 @@ export default class ActionManager {
       details
     };
 
+    // Add default messages when recording
+    if (this.isRecording) {
+      switch (type) {
+        case 'ADD_GRID':
+          action.message = 'Adding a new data grid';
+          break;
+        case 'REMOVE_GRID':
+          action.message = 'Removing the grid';
+          break;
+        case 'UPDATE_CELL':
+          action.message = 'Updating cell value';
+          break;
+        case 'UPDATE_LAYOUT':
+          action.message = 'Adjusting layout';
+          break;
+        case 'DROP_FILE':
+          action.message = 'Loading data from file';
+          break;
+        case 'SELECT_RANGE':
+          action.message = 'Selecting data range';
+          break;
+        case 'ADD_CHART':
+          const chartType = details.item.type;
+          switch (chartType) {
+            case 'pie-chart':
+              action.message = 'Adding a pie chart';
+              break;
+            case 'line-chart':
+              action.message = 'Adding a line chart';
+              break;
+            case 'bar-chart':
+              action.message = 'Adding a bar chart';
+              break;
+            default:
+              action.message = 'Adding a new chart';
+          }
+          break;
+      }
+    }
+
     this.actionLog.push(action);
 
     if (this.isRecording) {
@@ -270,7 +314,12 @@ export default class ActionManager {
     for (const action of actions) {
       console.log('Executing step:', action);
       
-      // Small delay between actions
+      // Show message immediately before action
+      if (this.onMessage && 'message' in action && action.message) {
+        this.onMessage(action.message as string);
+      }
+      
+      // Small delay before action
       await new Promise(resolve => setTimeout(resolve, 100));
       
       const handler = this.actionHandlers[action.type];
@@ -280,11 +329,23 @@ export default class ActionManager {
       } else {
         console.warn('No handler found for action:', action.type);
       }
+
+      // Pause for 2 seconds after action completion
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Clear message after the pause
+      if (this.onMessage) {
+        this.onMessage(null);
+      }
     }
   }
 
   // Utility function to normalize field names
   private normalizeFieldName(field: string): string {
     return field.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_');
+  }
+
+  setMessageHandler(handler: MessageCallback) {
+    this.onMessage = handler;
   }
 } 
