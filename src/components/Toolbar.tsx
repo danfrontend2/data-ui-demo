@@ -16,6 +16,7 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import SaveIcon from '@mui/icons-material/Save';
 import UploadIcon from '@mui/icons-material/Upload';
 import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 import { Layout } from 'react-grid-layout';
 import Chat from './Chat';
 import ActionManager from '../services/ActionManager';
@@ -115,24 +116,31 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ backgroundColor: 'white', boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)' }}>
       <MuiToolbar>
-        <Button color="inherit" onClick={handleAddItem}>
-          Add Grid
+        <Button color="primary" onClick={handleAddItem}>
+          <AddIcon />
         </Button>
         <Button 
-          color="inherit" 
+          color="primary" 
           onClick={isRecording ? handleStopRecording : handleStartRecording}
-          startIcon={isRecording ? <FiberManualRecordIcon sx={{ color: 'red' }} /> : <FiberManualRecordIcon />}
         >
-          {isRecording ? 'Stop Recording' : 'Start Recording'}
+          {isRecording ? <FiberManualRecordIcon sx={{ color: 'red' }} /> : <FiberManualRecordIcon />}
         </Button>
         <Button
-          color="inherit"
+          color="primary"
           onClick={() => fileInputRef.current?.click()}
-          startIcon={<UploadIcon />}
         >
-          Load Macro
+          <UploadIcon />
+        </Button>
+        <Button
+          color="primary"
+          onClick={() => setIsChatOpen(true)}
+        >
+          <SmartToyIcon />
+        </Button>
+        <Button color="error" onClick={onCloseAll}>
+          <CloseIcon />
         </Button>
         <input
           type="file"
@@ -141,16 +149,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           onChange={handleLoadMacro}
           accept=".json"
         />
-        <Button color="inherit" onClick={onCloseAll}>
-          Close All
-        </Button>
-        <Button
-          color="inherit"
-          onClick={() => setIsChatOpen(true)}
-          startIcon={<SmartToyIcon />}
-        >
-          AI Assistant
-        </Button>
 
         {/* Chat component */}
         {isChatOpen && (
