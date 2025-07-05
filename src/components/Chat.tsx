@@ -1,51 +1,65 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Paper, Typography } from '@mui/material';
+import { Box, TextField, Button, Paper, Typography, CircularProgress } from '@mui/material';
+import { OpenAIService } from '../services/OpenAIService';
 
 interface Message {
   text: string;
   isUser: boolean;
+  macro?: any;
+  error?: string;
 }
 
 interface ChatProps {
   onClose: () => void;
+  onExecuteMacro?: (macro: any) => Promise<void>;
 }
 
-const Chat: React.FC<ChatProps> = ({ onClose }) => {
+const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const openAIService = new OpenAIService();
 
-  const transliterate = (text: string): string => {
-    const letters: { [key: string]: string } = {
-      'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-      'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-      'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-      'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
-      'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
-      'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo',
-      'Ж': 'Zh', 'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M',
-      'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U',
-      'Ф': 'F', 'Х': 'H', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Sch', 'Ъ': '',
-      'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
-    };
-    
-    return text.split('').map(char => letters[char] || char).join('');
-  };
-
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       text: input,
       isUser: true
     };
 
-    const aiMessage: Message = {
-      text: transliterate(input),
-      isUser: false
-    };
-
-    setMessages([...messages, userMessage, aiMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setInput('');
+    setIsLoading(true);
+
+    try {
+      // Get macro from OpenAI
+      const macro = await openAIService.generateMacro(input);
+      
+      // Try to execute macro
+      if (onExecuteMacro) {
+        await onExecuteMacro(macro);
+      }
+
+      const aiMessage: Message = {
+        text: 'Macro generated and executed successfully!',
+        isUser: false,
+        macro: macro
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error: any) {
+      const errorMessage: Message = {
+        text: `Error: ${error.message}`,
+        isUser: false,
+        error: error.message
+      };
+
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -62,8 +76,8 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         position: 'absolute',
         top: '64px',
         right: '16px',
-        width: '300px',
-        height: '400px',
+        width: '400px', // Increased width
+        height: '500px', // Increased height
         display: 'flex',
         flexDirection: 'column',
         zIndex: 1000,
@@ -76,7 +90,7 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
         p: 1,
         borderBottom: '1px solid #ddd'
       }}>
-        <Typography variant="h6">AI Chat</Typography>
+        <Typography variant="h6">AI Assistant</Typography>
         <Button onClick={onClose} size="small">Close</Button>
       </Box>
       
@@ -93,13 +107,20 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
             key={index}
             sx={{
               alignSelf: message.isUser ? 'flex-end' : 'flex-start',
-              backgroundColor: message.isUser ? '#e3f2fd' : '#f5f5f5',
+              backgroundColor: message.isUser ? '#e3f2fd' : message.error ? '#ffebee' : '#f5f5f5',
               borderRadius: '8px',
               p: 1,
-              maxWidth: '80%'
+              maxWidth: '90%'
             }}
           >
             <Typography variant="body2">{message.text}</Typography>
+            {message.macro && (
+              <Box sx={{ mt: 1, p: 1, backgroundColor: 'rgba(0,0,0,0.04)', borderRadius: '4px' }}>
+                <Typography variant="caption" component="pre" sx={{ whiteSpace: 'pre-wrap' }}>
+                  {JSON.stringify(message.macro, null, 2)}
+                </Typography>
+              </Box>
+            )}
           </Box>
         ))}
       </Box>
@@ -111,10 +132,16 @@ const Chat: React.FC<ChatProps> = ({ onClose }) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your message..."
+          placeholder="Describe what you want to visualize..."
           multiline
           maxRows={3}
+          disabled={isLoading}
         />
+        {isLoading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+            <CircularProgress size={20} />
+          </Box>
+        )}
       </Box>
     </Paper>
   );

@@ -6,7 +6,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField
+  TextField,
+  AppBar,
+  Toolbar as MuiToolbar
 } from '@mui/material';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -33,16 +35,13 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   const [recordedMacro, setRecordedMacro] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const addItem = () => {
-    // Use UUID v4 for guaranteed uniqueness
-    const id = `grid_${Math.random().toString(36).substr(2, 9)}`;
-    
+  const handleAddItem = () => {
     onAddItem({
-      i: id,
+      i: `grid_${Math.random().toString(36).substr(2, 9)}`,
       x: 0,
-      y: Infinity, // Put it at the bottom
-      w: 12, // Full width
-      h: 8,
+      y: 0,
+      w: 12,
+      h: 12
     });
   };
 
@@ -116,105 +115,74 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   };
 
   return (
-    <>
-      <Box sx={{ 
-        padding: 2,
-        display: 'flex',
-        gap: 2,
-        position: 'relative'
-      }}>
-        <Button variant="contained" onClick={addItem}>
+    <AppBar position="static">
+      <MuiToolbar>
+        <Button color="inherit" onClick={handleAddItem}>
           Add Grid
         </Button>
         <Button 
-          variant="contained" 
-          color="secondary"
-          onClick={() => setIsChatOpen(!isChatOpen)}
-          startIcon={<SmartToyIcon />}
+          color="inherit" 
+          onClick={isRecording ? handleStopRecording : handleStartRecording}
+          startIcon={isRecording ? <FiberManualRecordIcon sx={{ color: 'red' }} /> : <FiberManualRecordIcon />}
         >
-          AI
+          {isRecording ? 'Stop Recording' : 'Start Recording'}
         </Button>
         <Button
-          variant="contained"
-          color="primary"
-          onClick={onRunMacro}
-          startIcon={<PlayArrowIcon />}
-        >
-          Run Demo
-        </Button>
-        {!isRecording ? (
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleStartRecording}
-            startIcon={<FiberManualRecordIcon />}
-          >
-            Record Macro
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleStopRecording}
-            startIcon={<SaveIcon />}
-          >
-            Save Macro
-          </Button>
-        )}
-        <input
-          type="file"
-          accept=".json"
-          style={{ display: 'none' }}
-          ref={fileInputRef}
-          onChange={handleLoadMacro}
-        />
-        <Button
-          variant="contained"
-          color="info"
+          color="inherit"
           onClick={() => fileInputRef.current?.click()}
           startIcon={<UploadIcon />}
         >
           Load Macro
         </Button>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={onCloseAll}
-          startIcon={<CloseIcon />}
-        >
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleLoadMacro}
+          accept=".json"
+        />
+        <Button color="inherit" onClick={onCloseAll}>
           Close All
         </Button>
-        {isChatOpen && <Chat onClose={() => setIsChatOpen(false)} />}
-      </Box>
+        <Button
+          color="inherit"
+          onClick={() => setIsChatOpen(true)}
+          startIcon={<SmartToyIcon />}
+        >
+          AI Assistant
+        </Button>
 
-      <Dialog 
-        open={isPromptDialogOpen} 
-        onClose={() => setIsPromptDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Macro Description</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            multiline
-            rows={3}
-            margin="dense"
-            label="What does this macro do?"
-            fullWidth
-            variant="outlined"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+        {/* Chat component */}
+        {isChatOpen && (
+          <Chat
+            onClose={() => setIsChatOpen(false)}
+            onExecuteMacro={async (macro: any) => onRunCustomMacro(macro.steps)}
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsPromptDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSaveMacro} variant="contained">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+        )}
+
+        {/* Prompt Dialog */}
+        <Dialog open={isPromptDialogOpen} onClose={() => setIsPromptDialogOpen(false)}>
+          <DialogTitle>Save Macro</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Prompt"
+              fullWidth
+              variant="outlined"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              multiline
+              rows={4}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsPromptDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveMacro} startIcon={<SaveIcon />}>Save</Button>
+          </DialogActions>
+        </Dialog>
+      </MuiToolbar>
+    </AppBar>
   );
 };
 

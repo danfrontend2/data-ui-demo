@@ -63,7 +63,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
         ];
         const color = am5.color(colors[index % colors.length]);
 
-        // Для каждой следующей серии уменьшаем внешний и внутренний радиус
+        // For each subsequent series, decrease outer and inner radius
         const outerRadius = am5.percent(90 - (index * (80 / totalSeries)));
         const innerRadius = am5.percent(45 - (index * (35 / totalSeries)));
 

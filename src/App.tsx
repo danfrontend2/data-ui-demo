@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Box } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
+import ChatIcon from '@mui/icons-material/Chat';
 import Toolbar from './components/Toolbar';
 import GridLayout from './components/GridLayout';
+import Chat from './components/Chat';
 import { Layout } from 'react-grid-layout';
-import { GridItem, ChartDataPoint } from './types';
+import { GridItem } from './types';
 import ActionManager from './services/ActionManager';
 import { DEMO_MACRO } from './types/actions';
 import './App.css';
 
 function App() {
   const [items, setItems] = useState<GridItem[]>([]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const actionManager = ActionManager.getInstance();
 
   useEffect(() => {
@@ -53,9 +56,20 @@ function App() {
     actionManager.executeMacro(DEMO_MACRO);
   };
 
-  const handleRunCustomMacro = (macro: any[]) => {
-    console.log('Running custom macro:', macro);
-    actionManager.executeMacro(macro);
+  const handleExecuteMacro = async (macro: any): Promise<void> => {
+    try {
+      // First close all existing elements
+      const itemIds = items.map(item => item.i);
+      itemIds.forEach(id => {
+        actionManager.logAction('REMOVE_GRID', { itemId: id });
+      });
+
+      // Then execute new macro
+      await actionManager.executeMacro(macro.steps);
+    } catch (error) {
+      console.error('Error executing macro:', error);
+      throw error;
+    }
   };
 
   const handleCloseAll = () => {
@@ -76,8 +90,8 @@ function App() {
         <Toolbar 
           onAddItem={handleAddItem} 
           onRunMacro={handleRunMacro}
-          onRunCustomMacro={handleRunCustomMacro}
           onCloseAll={handleCloseAll}
+          onRunCustomMacro={(steps: any[]) => actionManager.executeMacro(steps)}
         />
         <GridLayout 
           items={items}
@@ -85,6 +99,31 @@ function App() {
           onAddChart={handleAddChart}
           onLayoutChange={handleLayoutChange}
         />
+        
+        {/* Chat toggle button */}
+        <IconButton
+          onClick={() => setIsChatOpen(true)}
+          sx={{
+            position: 'fixed',
+            bottom: 20,
+            right: 20,
+            backgroundColor: 'primary.main',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+            },
+          }}
+        >
+          <ChatIcon />
+        </IconButton>
+
+        {/* Chat component */}
+        {isChatOpen && (
+          <Chat
+            onClose={() => setIsChatOpen(false)}
+            onExecuteMacro={handleExecuteMacro}
+          />
+        )}
       </Box>
     </Box>
   );
