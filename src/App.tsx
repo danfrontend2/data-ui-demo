@@ -34,7 +34,7 @@ function App() {
       x: 0,
       y: maxY,
       w: 6,  // Half width
-      h: 12   // Fixed height
+      h: 8   // Reduced height (33% less than 12)
     };
 
     // Log the action to add grid

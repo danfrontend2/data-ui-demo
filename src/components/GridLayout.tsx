@@ -34,7 +34,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 interface GridLayoutProps {
   items: GridItem[];
   onRemoveItem: (itemId: string) => void;
-  onAddChart: (chartItem: GridItem) => void;
+  onAddChart: (item: GridItem) => void;
   onLayoutChange: (layout: Layout[]) => void;
 }
 
@@ -46,36 +46,40 @@ declare global {
   }
 }
 
-const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart, onLayoutChange }) => {
-  const defaultData = useMemo(() => [
-    { id: '1', country: 'China', population: 1412, gdp: 17.7, area: 9597 },
-    { id: '2', country: 'India', population: 1400, gdp: 3.7, area: 3287 },
-    { id: '3', country: 'USA', population: 339, gdp: 28.8, area: 9834 },
-    { id: '4', country: 'Indonesia', population: 278, gdp: 1.5, area: 1905 },
-    { id: '5', country: 'Pakistan', population: 241, gdp: 0.4, area: 881 },
-    { id: '6', country: 'Nigeria', population: 223, gdp: 0.5, area: 924 },
-    { id: '7', country: 'Brazil', population: 216, gdp: 2.2, area: 8516 },
-    { id: '8', country: 'Bangladesh', population: 172, gdp: 0.5, area: 148 },
-    { id: '9', country: 'Russia', population: 144, gdp: 2.0, area: 17098 },
-    { id: '10', country: 'Mexico', population: 129, gdp: 1.8, area: 1964 }
-  ], []);
+const defaultColumns: ColDef[] = [
+  { field: 'country', headerName: 'Country', editable: true },
+  { field: 'population', headerName: 'Population (M)', editable: true, type: 'numericColumn' },
+  { field: 'gdp', headerName: 'GDP (T$)', editable: true, type: 'numericColumn' },
+  { field: 'area', headerName: 'Area (K km²)', editable: true, type: 'numericColumn' }
+];
 
-  // Default columns
-  const defaultColumns: ColDef[] = useMemo(() => [
-    { field: 'country', headerName: 'Country', editable: true },
-    { field: 'population', headerName: 'Population (M)', editable: true, type: 'numericColumn' },
-    { field: 'gdp', headerName: 'GDP (T$)', editable: true, type: 'numericColumn' },
-    { field: 'area', headerName: 'Area (K km²)', editable: true, type: 'numericColumn' }
-  ], []);
+const defaultData: GridData[] = [
+  { id: '1', country: 'China', population: 1412, gdp: 17.7, area: 9597 },
+  { id: '2', country: 'India', population: 1400, gdp: 3.7, area: 3287 },
+  { id: '3', country: 'USA', population: 339, gdp: 28.8, area: 9834 },
+  { id: '4', country: 'Indonesia', population: 278, gdp: 1.5, area: 1905 },
+  { id: '5', country: 'Pakistan', population: 241, gdp: 0.4, area: 881 },
+  { id: '6', country: 'Nigeria', population: 223, gdp: 0.5, area: 924 },
+  { id: '7', country: 'Brazil', population: 216, gdp: 2.2, area: 8516 },
+  { id: '8', country: 'Bangladesh', population: 172, gdp: 0.5, area: 148 },
+  { id: '9', country: 'Russia', population: 144, gdp: 2.0, area: 17098 },
+  { id: '10', country: 'Mexico', population: 129, gdp: 1.8, area: 1964 }
+];
 
-  const [localItems, setLocalItems] = useState<GridItem[]>(items);
+const GridLayout: React.FC<GridLayoutProps> = ({
+  items: propItems,
+  onRemoveItem,
+  onAddChart,
+  onLayoutChange
+}) => {
+  const [localItems, setLocalItems] = useState<GridItem[]>(propItems);
   const [gridData, setGridData] = useState<{ [key: string]: GridData[] }>({});
   const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
 
   // Update local items when props change
   useEffect(() => {
-    setLocalItems(items);
-  }, [items]);
+    setLocalItems(propItems);
+  }, [propItems]);
 
   // Initialize data for new grids
   useEffect(() => {
@@ -160,14 +164,12 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
     onRemoveItem(itemId);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    console.log('DragOver event triggered');
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
   };
 
-  const handleDrop = (e: React.DragEvent, gridId: string) => {
-    console.log('Drop event triggered for grid:', gridId);
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -185,7 +187,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
           file.name.endsWith('.xlsx') ||
           file.name.endsWith('.csv')) {
         console.log('Processing file...');
-        processFile(file, gridId);
+        processFile(file, localItems[0].i);
       } else {
         console.warn('Unsupported file type:', file.type);
       }
@@ -478,7 +480,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
           flexDirection: 'column'
         }}
         onDragOver={handleDragOver}
-        onDrop={(e) => handleDrop(e, item.i)}
+        onDrop={handleDrop}
       >
         <Box sx={{ 
           display: 'flex',
@@ -699,28 +701,35 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
   };
 
   return (
-    <ResponsiveGridLayout
-      className="layout"
-      layouts={layouts}
-      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-      rowHeight={30}
-      draggableHandle=".drag-handle"
-      onResizeStop={onResizeStop}
-      onDragStop={onDragStop}
-      compactType={null}
-      preventCollision={true}
-      isBounded={true}
-      isResizable={true}
-      isDraggable={true}
-      useCSSTransforms={true}
-      transformScale={1}
-      margin={[10, 10]}
-      autoSize={true}
-      verticalCompact={false}
+    <div
+      style={{
+        height: 'calc(100vh - 64px)',
+        overflow: 'auto',
+        padding: 16
+      }}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
     >
-      {localItems.map((item) => renderGrid(item))}
-    </ResponsiveGridLayout>
+      <ResponsiveGridLayout
+        className="layout"
+        layouts={layouts}
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        rowHeight={30}
+        compactType="vertical"
+        verticalCompact={true}
+        useCSSTransforms={true}
+        onLayoutChange={onLayoutChange}
+        onResizeStop={onResizeStop}
+        margin={[10, 10]}
+        containerPadding={[0, 0]}
+        isDraggable={true}
+        isResizable={true}
+        draggableHandle=".drag-handle"
+      >
+        {localItems.map(item => renderGrid(item))}
+      </ResponsiveGridLayout>
+    </div>
   );
 };
 
