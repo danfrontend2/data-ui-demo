@@ -8,7 +8,10 @@ import {
   TextField,
   AppBar,
   Toolbar as MuiToolbar,
-  Tooltip
+  Tooltip,
+  Slider,
+  Box,
+  Popover
 } from '@mui/material';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -16,6 +19,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import UploadIcon from '@mui/icons-material/Upload';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
+import GridViewIcon from '@mui/icons-material/GridView';
 import { Layout } from 'react-grid-layout';
 import Chat from './Chat';
 import ActionManager from '../services/ActionManager';
@@ -25,6 +29,7 @@ interface ToolbarProps {
   onRunMacro: () => void;
   onRunCustomMacro: (macro: any[]) => void;
   onCloseAll: () => void;
+  onArrangeItems: (columns: number) => void;
 }
 
 const tooltipProps = {
@@ -42,13 +47,15 @@ const tooltipProps = {
   }
 };
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onArrangeItems }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [recordedMacro, setRecordedMacro] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [columns, setColumns] = useState<number>(2);
+  const [arrangeAnchorEl, setArrangeAnchorEl] = useState<HTMLElement | null>(null);
 
   const handleAddItem = () => {
     onAddItem({
@@ -129,6 +136,19 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
     }
   };
 
+  const handleArrangeClick = (event: React.MouseEvent<HTMLElement>) => {
+    setArrangeAnchorEl(event.currentTarget);
+  };
+
+  const handleArrangeClose = () => {
+    setArrangeAnchorEl(null);
+  };
+
+  const handleArrange = () => {
+    onArrangeItems(columns);
+    handleArrangeClose();
+  };
+
   return (
     <AppBar position="static" sx={{ backgroundColor: 'white', boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)' }}>
       <MuiToolbar>
@@ -138,6 +158,17 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         >
           <Button color="primary" onClick={handleAddItem}>
             <AddIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip 
+          title="Arrange items"
+          {...tooltipProps}
+        >
+          <Button
+            color="primary"
+            onClick={handleArrangeClick}
+          >
+            <GridViewIcon />
           </Button>
         </Tooltip>
         <Tooltip 
@@ -188,6 +219,40 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           onChange={handleLoadMacro}
           accept=".json"
         />
+
+        <Popover
+          open={Boolean(arrangeAnchorEl)}
+          anchorEl={arrangeAnchorEl}
+          onClose={handleArrangeClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+        >
+          <Box sx={{ p: 2, width: 300 }}>
+            <Box sx={{ mb: 2 }}>
+              <Slider
+                value={columns}
+                min={1}
+                max={4}
+                step={1}
+                marks
+                onChange={(_, value) => setColumns(value as number)}
+              />
+            </Box>
+            <Button 
+              variant="contained" 
+              onClick={handleArrange}
+              fullWidth
+            >
+              Arrange ({columns} columns)
+            </Button>
+          </Box>
+        </Popover>
 
         {/* Chat component */}
         {isChatOpen && (

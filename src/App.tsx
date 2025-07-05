@@ -83,6 +83,28 @@ function App() {
     actionManager.logAction('UPDATE_LAYOUT', { layout });
   };
 
+  const handleArrangeItems = (columns: number) => {
+    const itemWidth = Math.floor(12 / columns);
+    const newItems = items.map((item, index) => ({
+      ...item,
+      w: itemWidth,
+      h: 9,
+      x: (index % columns) * itemWidth,
+      y: Math.floor(index / columns) * 9
+    }));
+    
+    // Update items through action manager
+    actionManager.logAction('UPDATE_LAYOUT', { 
+      layout: newItems.map(item => ({
+        i: item.i,
+        w: item.w,
+        h: item.h,
+        x: item.x,
+        y: item.y
+      }))
+    });
+  };
+
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
       <Box sx={{ flexGrow: 1 }}>
@@ -91,6 +113,7 @@ function App() {
           onRunMacro={handleRunMacro}
           onCloseAll={handleCloseAll}
           onRunCustomMacro={(steps: any[]) => actionManager.executeMacro(steps)}
+          onArrangeItems={handleArrangeItems}
         />
         <GridLayout 
           items={items}
