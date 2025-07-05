@@ -47,4 +47,43 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 # Data UI Demo
 
-Testing auto-push feature
+A React-based data visualization application with AI-powered macro generation.
+
+## Environment Setup
+
+1. Copy `public/env.example.js` to `public/env.js`:
+```bash
+cp public/env.example.js public/env.js
+```
+
+2. Edit `public/env.js` and set your environment variables:
+- `REACT_APP_OPENAI_API_KEY`: Your OpenAI API key
+- `REACT_APP_OPENAI_ORG_ID`: Your OpenAI organization ID
+- `REACT_APP_OPENAI_MODEL`: The model to use (e.g., "gpt-4")
+
+Note: `env.js` is ignored by git to keep your API keys secure. Never commit this file!
+
+## Available Scripts
+
+In the project directory, you can run:
+
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!

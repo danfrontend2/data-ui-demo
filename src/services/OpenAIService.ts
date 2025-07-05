@@ -10,25 +10,12 @@ declare global {
     }
 }
 
-export const reloadEnvVars = () => {
-    // Reload env.js script
-    const script = document.createElement('script');
-    script.src = `${process.env.PUBLIC_URL}/env.js?_=${Date.now()}`;
-    document.head.appendChild(script);
-    
-    // Return current values
-    return window._env_ || {};
-};
-
 export class OpenAIService {
     private static instance: OpenAIService;
     private openai: OpenAI;
     private model: string;
 
     private constructor() {
-        // Try to reload environment variables
-        reloadEnvVars();
-        
         const apiKey = window._env_?.REACT_APP_OPENAI_API_KEY;
         if (!apiKey) {
             throw new Error('OpenAI API key not found in environment variables');
