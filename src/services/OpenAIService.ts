@@ -1,17 +1,53 @@
 import OpenAI from 'openai';
 
+declare global {
+    interface Window {
+        _env_: {
+            REACT_APP_OPENAI_API_KEY: string;
+            REACT_APP_OPENAI_ORG_ID: string;
+            REACT_APP_OPENAI_MODEL: string;
+        }
+    }
+}
+
+export const reloadEnvVars = () => {
+    // Reload env.js script
+    const script = document.createElement('script');
+    script.src = `${process.env.PUBLIC_URL}/env.js?_=${Date.now()}`;
+    document.head.appendChild(script);
+    
+    // Return current values
+    return window._env_ || {};
+};
+
 export class OpenAIService {
+    private static instance: OpenAIService;
     private openai: OpenAI;
     private model: string;
 
-    constructor() {
+    private constructor() {
+        // Try to reload environment variables
+        reloadEnvVars();
+        
+        const apiKey = window._env_?.REACT_APP_OPENAI_API_KEY;
+        if (!apiKey) {
+            throw new Error('OpenAI API key not found in environment variables');
+        }
+
         this.openai = new OpenAI({
-            apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-            organization: process.env.REACT_APP_OPENAI_ORG_ID,
+            apiKey,
+            organization: window._env_?.REACT_APP_OPENAI_ORG_ID,
             dangerouslyAllowBrowser: true
         });
         // Model will be passed later
-        this.model = process.env.REACT_APP_OPENAI_MODEL || '';
+        this.model = window._env_?.REACT_APP_OPENAI_MODEL || '';
+    }
+
+    public static getInstance(): OpenAIService {
+        if (!OpenAIService.instance) {
+            OpenAIService.instance = new OpenAIService();
+        }
+        return OpenAIService.instance;
     }
 
     async generateMacro(prompt: string): Promise<any> {

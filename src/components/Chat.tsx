@@ -19,7 +19,7 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const openAIService = new OpenAIService();
+  const openAIService = OpenAIService.getInstance();
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;

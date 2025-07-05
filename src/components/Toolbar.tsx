@@ -8,7 +8,8 @@ import {
   DialogActions,
   TextField,
   AppBar,
-  Toolbar as MuiToolbar
+  Toolbar as MuiToolbar,
+  IconButton
 } from '@mui/material';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -20,6 +21,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { Layout } from 'react-grid-layout';
 import Chat from './Chat';
 import ActionManager from '../services/ActionManager';
+import { reloadEnvVars } from '../services/OpenAIService';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 interface ToolbarProps {
   onAddItem: (item: Layout) => void;
@@ -142,6 +145,15 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         <Button color="error" onClick={onCloseAll}>
           <CloseIcon />
         </Button>
+        <IconButton
+          onClick={() => {
+            const newVars = reloadEnvVars();
+            console.log('Updated environment variables:', newVars);
+          }}
+          title="Reload environment variables"
+        >
+          <RefreshIcon />
+        </IconButton>
         <input
           type="file"
           ref={fileInputRef}

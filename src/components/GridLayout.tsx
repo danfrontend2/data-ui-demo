@@ -318,8 +318,8 @@ const GridLayout: React.FC<GridLayoutProps> = ({ items, onRemoveItem, onAddChart
       i: `${type}-${Date.now()}`,
       x: 0,
       y: maxY,
-      w: 12,
-      h: sourceHeight,
+      w: 6,
+      h: sourceHeight * 2,
       type,
       chartData,
       chartConfig: {
