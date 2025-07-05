@@ -53,15 +53,17 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
         name: 'Value'
       }]).map((seriesConfig, index) => {
         const colors = [
-          0x6794dc,
-          0x67b7dc,
-          0x8067dc,
-          0xdc67ce,
-          0xdc6967,
-          0xa367dc,
-          0x67dcb0
+          0x67B7DC, // blue
+          0xDC6967, // coral
+          0x84DC67, // emerald
+          0x8067DC, // violet
+          0xDCAB67, // gold
+          0x67DC96, // teal
+          0xDC67CE, // rose
+          0xA5DC67, // green
+          0x6771DC, // purple
+          0xDC8C67  // orange
         ];
-        const color = am5.color(colors[index % colors.length]);
 
         // For each subsequent series, decrease outer and inner radius
         const outerRadius = am5.percent(90 - (index * (80 / totalSeries)));
@@ -77,10 +79,22 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
           })
         );
 
+        if (series.length <= 1) {
+          // For single series, each slice gets its own color
+          let currentIndex = 0;
+          pieSeries.slices.template.adapters.add("fill", function() {
+            return am5.color(colors[currentIndex++ % colors.length]);
+          });
+        } else {
+          // For multiple series, each series gets its own color
+          pieSeries.slices.template.setAll({
+            fill: am5.color(colors[index % colors.length])
+          });
+        }
+
         pieSeries.slices.template.setAll({
           stroke: am5.color(0xffffff),
           strokeWidth: 2,
-          fill: color,
           fillOpacity: 0.8,
           cornerRadius: 5
         });
@@ -98,7 +112,13 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
           forceHidden: true
         });
 
-        pieSeries.data.setAll(data);
+        // Add index to data for coloring
+        const dataWithIndex = data.map((item, idx) => ({
+          ...item,
+          sliceIndex: idx
+        }));
+
+        pieSeries.data.setAll(dataWithIndex);
         return pieSeries;
       });
 

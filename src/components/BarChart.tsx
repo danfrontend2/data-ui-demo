@@ -60,22 +60,24 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
     // Set data for X axis
     xAxis.data.setAll(data);
 
+    const colors = [
+      0x67B7DC, // blue
+      0xDC6967, // coral
+      0x84DC67, // emerald
+      0x8067DC, // violet
+      0xDCAB67, // gold
+      0x67DC96, // teal
+      0xDC67CE, // rose
+      0xA5DC67, // green
+      0x6771DC, // purple
+      0xDC8C67  // orange
+    ];
+
     // Create series for each field
     const chartSeries = (series.length ? series : [{
       field: Object.keys(data[0]).find(key => key !== 'category') || '',
       name: 'Value'
     }]).map((seriesConfig, index) => {
-      const colors = [
-        0x6794dc,
-        0x67b7dc,
-        0x8067dc,
-        0xdc67ce,
-        0xdc6967,
-        0xa367dc,
-        0x67dcb0
-      ];
-      const color = am5.color(colors[index % colors.length]);
-
       const barSeries = chart.series.push(
         am5xy.ColumnSeries.new(root, {
           name: seriesConfig.name,
@@ -89,20 +91,39 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
         })
       );
 
+      // Set base properties first
       barSeries.columns.template.setAll({
         tooltipY: 0,
         strokeOpacity: 0,
-        fill: color,
         width: am5.percent(90 / series.length), // Adjust width based on number of series
         tooltipText: "{name}: {valueY}"
       });
+
+      // Add index to data for coloring
+      const dataWithIndex = data.map((item, idx) => ({
+        ...item,
+        columnIndex: idx
+      }));
+
+      if (series.length <= 1) {
+        // For single series, set color based on data item index
+        barSeries.columns.template.adapters.add("fill", function(fill, target) {
+          const dataContext = target.dataItem?.dataContext as any;
+          return am5.color(colors[dataContext?.columnIndex % colors.length]);
+        });
+      } else {
+        // For multiple series, use series index for color
+        barSeries.columns.template.setAll({
+          fill: am5.color(colors[index % colors.length])
+        });
+      }
 
       // Set up hovering animation
       barSeries.columns.template.states.create("hover", {
         fillOpacity: 0.8
       });
 
-      barSeries.data.setAll(data);
+      barSeries.data.setAll(dataWithIndex);
 
       return barSeries;
     });

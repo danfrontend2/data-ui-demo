@@ -51,17 +51,21 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series }) => {
       })
     );
 
+    const colors = [
+      0x67B7DC, // blue
+      0xDC6967, // coral
+      0x84DC67, // emerald
+      0x8067DC, // violet
+      0xDCAB67, // gold
+      0x67DC96, // teal
+      0xDC67CE, // rose
+      0xA5DC67, // green
+      0x6771DC, // purple
+      0xDC8C67  // orange
+    ];
+
     // Create series for each field
     series.forEach((seriesConfig, index) => {
-      const colors = [
-        0x6794dc,
-        0x67b7dc,
-        0x8067dc,
-        0xdc67ce,
-        0xdc6967,
-        0xa367dc,
-        0x67dcb0
-      ];
       const color = am5.color(colors[index % colors.length]);
 
       const lineSeries = chart.series.push(
