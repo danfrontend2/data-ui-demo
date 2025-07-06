@@ -15,174 +15,155 @@ interface PieChartProps {
 
 const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
   const chartRef = useRef<am5.Root | null>(null);
-  const chartDivRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    // Wait for the next frame to ensure the div is mounted
-    const timer = requestAnimationFrame(() => {
-      // Cleanup previous root if exists
-      if (chartRef.current) {
-        chartRef.current.dispose();
-      }
+    if (chartRef.current) {
+      chartRef.current.dispose();
+    }
 
-      // Check if the div exists
-      if (!chartDivRef.current) {
-        return;
-      }
+    const root = am5.Root.new(chartId);
+    root.setThemes([am5themes_Animated.new(root)]);
 
-      // Create root element
-      const root = am5.Root.new(chartDivRef.current);
+    const chart = root.container.children.push(
+      am5percent.PieChart.new(root, {
+        layout: root.verticalLayout,
+        innerRadius: 0
+      })
+    );
 
-      // Create custom theme
-      const myTheme = am5.Theme.new(root);
-      myTheme.rule("Label").setAll({
-        fontSize: 12,
-        fontWeight: "400"
-      });
+    const colors = [
+      0x67B7DC, // blue
+      0xDC6967, // coral
+      0x84DC67, // emerald
+      0x8067DC, // violet
+      0xDCAB67, // gold
+      0x67DC96, // teal
+      0xDC67CE, // rose
+      0xA5DC67, // green
+      0x6771DC, // purple
+      0xDC8C67  // orange
+    ];
 
-      // Set themes
-      root.setThemes([
-        am5themes_Animated.new(root),
-        myTheme
-      ]);
-
-      // Create chart
-      const chart = root.container.children.push(
-        am5percent.PieChart.new(root, {
-          layout: root.verticalLayout,
-          radius: am5.percent(90)
+    if (series.length <= 1) {
+      // Single series - create one series with individual colors
+      const field = Object.keys(data[0]).find(key => key !== 'category') || '';
+      const pieSeries = chart.series.push(
+        am5percent.PieSeries.new(root, {
+          categoryField: "category",
+          valueField: field,
+          legendLabelText: "{category}: {value}",
+          legendValueText: ""
         })
       );
 
-      // Calculate total number of series for radius distribution
-      const totalSeries = series.length || 1;
+      // Set colors for individual slices
+      pieSeries.slices.template.setAll({
+        strokeWidth: 2,
+        stroke: am5.color(0xffffff),
+        templateField: "sliceSettings"
+      });
 
-      const colors = [
-        0x67B7DC, // blue
-        0xDC6967, // coral
-        0x84DC67, // emerald
-        0x8067DC, // violet
-        0xDCAB67, // gold
-        0x67DC96, // teal
-        0xDC67CE, // rose
-        0xA5DC67, // green
-        0x6771DC, // purple
-        0xDC8C67  // orange
-      ];
+      // Add hover state
+      pieSeries.slices.template.states.create("hover", {
+        scale: 1.05,
+        fillOpacity: 0.8
+      });
 
-      // Create series for each field
-      const chartSeries = (series.length ? series : [{
-        field: Object.keys(data[0] || {}).find(key => key !== 'category') || '',
-        name: 'Value'
-      }]).map((seriesConfig, index) => {
-        // For each subsequent series, decrease outer and inner radius
-        const outerRadius = am5.percent(90 - (index * (80 / totalSeries)));
-        const innerRadius = am5.percent(45 - (index * (35 / totalSeries)));
+      // Add click behavior
+      pieSeries.slices.template.set("toggleKey", "active");
+      pieSeries.slices.template.states.create("hidden", {
+        fillOpacity: 0.15,
+        stroke: am5.color(0xffffff),
+        strokeWidth: 2
+      });
 
+      // Prepare data with colors
+      const coloredData = data.map((item, index) => ({
+        ...item,
+        sliceSettings: {
+          fill: am5.color(colors[index % colors.length])
+        }
+      }));
+
+      pieSeries.data.setAll(coloredData);
+
+      // Create legend
+      const legend = chart.children.push(
+        am5.Legend.new(root, {
+          centerX: am5.percent(50),
+          x: am5.percent(50),
+          useDefaultMarker: true,
+          clickTarget: "itemContainer"
+        })
+      );
+
+      legend.data.setAll(pieSeries.dataItems);
+
+    } else {
+      // Multiple series - create separate series for each field
+      series.forEach((seriesConfig, index) => {
+        const color = am5.color(colors[index % colors.length]);
         const pieSeries = chart.series.push(
           am5percent.PieSeries.new(root, {
             name: seriesConfig.name,
-            valueField: seriesConfig.field,
             categoryField: "category",
-            radius: outerRadius,
-            innerRadius: innerRadius
+            valueField: seriesConfig.field,
+            legendLabelText: "{category}",
+            legendValueText: "{value}",
+            fill: color
           })
         );
 
-        if (series.length <= 1) {
-          // For single series, each slice gets its own color
-          let currentIndex = 0;
-          pieSeries.slices.template.adapters.add("fill", function(fill, target) {
-            const dataContext = target.dataItem?.dataContext as any;
-            return am5.color(colors[dataContext?.sliceIndex % colors.length]);
-          });
-        } else {
-          // For multiple series, each series gets its own color
-          const seriesColor = am5.color(colors[index % colors.length]);
-          pieSeries.set("fill", seriesColor);
-          pieSeries.slices.template.setAll({
-            fill: seriesColor
-          });
-        }
-
         pieSeries.slices.template.setAll({
-          stroke: am5.color(0xffffff),
           strokeWidth: 2,
-          fillOpacity: 0.8,
-          cornerRadius: 5
+          stroke: am5.color(0xffffff),
+          fill: color
         });
 
-        pieSeries.labels.template.setAll({
-          text: "{category}: {valuePercentTotal.formatNumber('0.0')}%",
-          textType: "circular",
-          radius: 10,
-          centerX: am5.percent(50),
-          centerY: am5.percent(50),
-          fill: am5.color(0x000000)
-        });
-
-        pieSeries.ticks.template.setAll({
-          forceHidden: true
-        });
-
-        // Add index to data for coloring
-        const dataWithIndex = data.map((item, idx) => ({
-          ...item,
-          sliceIndex: idx
-        }));
-
-        pieSeries.data.setAll(dataWithIndex);
-        return pieSeries;
+        pieSeries.data.setAll(data);
       });
 
       // Create legend
-      const legend = chart.children.push(am5.Legend.new(root, {
-        centerX: am5.percent(50),
-        x: am5.percent(50),
-        marginTop: 15,
-        marginBottom: 15,
-        layout: root.horizontalLayout
-      }));
+      const legend = chart.children.push(
+        am5.Legend.new(root, {
+          centerX: am5.percent(50),
+          x: am5.percent(50),
+          useDefaultMarker: true,
+          clickTarget: "itemContainer"
+        })
+      );
 
       // Configure legend markers
       legend.markers.template.setAll({
         width: 16,
-        height: 16,
-        layer: 10
+        height: 16
       });
 
-      // Configure legend marker rectangles
       legend.markerRectangles.template.setAll({
-        strokeWidth: 1,
-        stroke: am5.color(0x000000),
-        layer: 10
+        cornerRadiusTL: 0,
+        cornerRadiusTR: 0,
+        cornerRadiusBL: 0,
+        cornerRadiusBR: 0
       });
 
-      legend.data.setAll(chartSeries);
+      legend.data.setAll(chart.series.values);
+    }
 
-      // Save root for cleanup
-      chartRef.current = root;
-    });
+    chartRef.current = root;
 
     return () => {
-      cancelAnimationFrame(timer);
-      if (chartRef.current) {
-        chartRef.current.dispose();
-      }
+      root.dispose();
     };
   }, [data, chartId, series]);
 
   return (
-    <div 
-      ref={chartDivRef}
-      style={{ 
-        width: "100%", 
-        height: "100%",
-        position: "absolute",
-        top: 0,
-        left: 0
-      }}
-    />
+    <div id={chartId} style={{ 
+      width: "100%", 
+      height: "100%",
+      position: "absolute",
+      top: 0,
+      left: 0
+    }}></div>
   );
 };
 
