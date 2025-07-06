@@ -71,6 +71,18 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
       0xDC8C67  // orange
     ];
 
+    // Helper function to get stroke color (make it darker)
+    const getStrokeColor = (index: number): am5.Color => {
+      const baseColor = colors[index % colors.length];
+      // Extract RGB components and make them darker
+      const r = ((baseColor >> 16) & 0xFF) * 0.6; // Reduce red by 40%
+      const g = ((baseColor >> 8) & 0xFF) * 0.6;  // Reduce green by 40%
+      const b = (baseColor & 0xFF) * 0.6;         // Reduce blue by 40%
+      // Combine back into RGB color
+      const darkerColor = (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b);
+      return am5.color(darkerColor);
+    };
+
     const opacity = chartConfig?.opacity ?? 1;
     const strokeWidth = chartConfig?.strokeWidth ?? 2;
 
@@ -79,7 +91,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
       data.forEach((item, index) => {
         const field = Object.keys(item).find(key => key !== 'category') || '';
         const value = item[field];
-        const color = am5.color(colors[index % colors.length]);
+        const fillColor = am5.color(colors[index % colors.length]);
+        const strokeColor = getStrokeColor(index);
 
         const barSeries = chart.series.push(
           am5xy.ColumnSeries.new(root, {
@@ -96,9 +109,9 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
 
         barSeries.columns.template.setAll({
           fillOpacity: opacity,
-          fill: color,
+          fill: fillColor,
           strokeWidth: strokeWidth,
-          stroke: color
+          stroke: strokeColor
         });
 
         // Add hover state
@@ -111,7 +124,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
     } else {
       // Multiple series - create one series per field
       series.forEach((seriesConfig, index) => {
-        const color = am5.color(colors[index % colors.length]);
+        const fillColor = am5.color(colors[index % colors.length]);
+        const strokeColor = getStrokeColor(index);
 
         const barSeries = chart.series.push(
           am5xy.ColumnSeries.new(root, {
@@ -128,9 +142,9 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
 
         barSeries.columns.template.setAll({
           fillOpacity: opacity,
-          fill: color,
+          fill: fillColor,
           strokeWidth: strokeWidth,
-          stroke: color
+          stroke: strokeColor
         });
 
         barSeries.data.setAll(data);

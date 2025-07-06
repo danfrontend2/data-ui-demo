@@ -46,6 +46,17 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
       0xDC8C67  // orange
     ];
 
+    // Helper function to get stroke color (make it darker)
+    const getStrokeColor = (baseColor: number): am5.Color => {
+      // Extract RGB components and make them darker
+      const r = ((baseColor >> 16) & 0xFF) * 0.6; // Reduce red by 40%
+      const g = ((baseColor >> 8) & 0xFF) * 0.6;  // Reduce green by 40%
+      const b = (baseColor & 0xFF) * 0.6;         // Reduce blue by 40%
+      // Combine back into RGB color
+      const darkerColor = (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b);
+      return am5.color(darkerColor);
+    };
+
     if (series.length <= 1) {
       // Single series - create one series with individual colors
       const field = Object.keys(data[0]).find(key => key !== 'category') || '';
@@ -58,12 +69,23 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
         })
       );
 
+      // Prepare data with colors
+      const coloredData = data.map((item, index) => {
+        const fillColor = colors[index % colors.length];
+        return {
+          ...item,
+          sliceSettings: {
+            fill: am5.color(fillColor),
+            stroke: getStrokeColor(fillColor)
+          }
+        };
+      });
+
       // Set colors for individual slices
       pieSeries.slices.template.setAll({
-        stroke: am5.color(0xffffff),
-        templateField: "sliceSettings",
+        strokeWidth: chartConfig?.strokeWidth ?? 2,
         fillOpacity: chartConfig?.opacity ?? 1,
-        strokeWidth: chartConfig?.strokeWidth ?? 2
+        templateField: "sliceSettings"
       });
 
       // Add hover state
@@ -76,17 +98,9 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
       pieSeries.slices.template.set("toggleKey", "active");
       pieSeries.slices.template.states.create("hidden", {
         fillOpacity: 0.15,
-        stroke: am5.color(0xffffff),
+        stroke: getStrokeColor(colors[0]),
         strokeWidth: chartConfig?.strokeWidth ?? 2
       });
-
-      // Prepare data with colors
-      const coloredData = data.map((item, index) => ({
-        ...item,
-        sliceSettings: {
-          fill: am5.color(colors[index % colors.length])
-        }
-      }));
 
       pieSeries.data.setAll(coloredData);
 
@@ -105,7 +119,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
     } else {
       // Multiple series - create separate series for each field
       series.forEach((seriesConfig, index) => {
-        const color = am5.color(colors[index % colors.length]);
+        const fillColor = colors[index % colors.length];
         const pieSeries = chart.series.push(
           am5percent.PieSeries.new(root, {
             name: seriesConfig.name,
@@ -113,15 +127,15 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
             valueField: seriesConfig.field,
             legendLabelText: "[{fill}]{category}[/]: {value}",
             legendValueText: "",
-            fill: color
+            fill: am5.color(fillColor)
           })
         );
 
         pieSeries.slices.template.setAll({
-          stroke: am5.color(0xffffff),
-          fill: color,
+          strokeWidth: chartConfig?.strokeWidth ?? 2,
           fillOpacity: chartConfig?.opacity ?? 1,
-          strokeWidth: chartConfig?.strokeWidth ?? 2
+          fill: am5.color(fillColor),
+          stroke: getStrokeColor(fillColor)
         });
 
         pieSeries.data.setAll(data);
