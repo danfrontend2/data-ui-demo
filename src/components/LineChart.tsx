@@ -86,14 +86,16 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
       );
 
       lineSeries.strokes.template.setAll({
-        strokeWidth: 3
+        strokeWidth: chartConfig?.strokeWidth ?? 2
       });
 
       lineSeries.bullets.push(function() {
         return am5.Bullet.new(root, {
           sprite: am5.Circle.new(root, {
             radius: 5,
-            fill: lineSeries.get("fill")
+            fill: lineSeries.get("fill"),
+            stroke: am5.color(0xffffff),
+            strokeWidth: chartConfig?.strokeWidth ? Math.max(1, chartConfig.strokeWidth / 2) : 1
           })
         });
       });
@@ -123,7 +125,7 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series]);
+  }, [data, chartId, series, chartConfig?.strokeWidth]);
 
   return (
     <div id={chartId} style={{ 

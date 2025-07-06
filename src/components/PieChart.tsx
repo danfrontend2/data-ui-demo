@@ -63,7 +63,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
         stroke: am5.color(0xffffff),
         templateField: "sliceSettings",
         fillOpacity: chartConfig?.opacity ?? 1,
-        strokeWidth: 0
+        strokeWidth: chartConfig?.strokeWidth ?? 2
       });
 
       // Add hover state
@@ -77,7 +77,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
       pieSeries.slices.template.states.create("hidden", {
         fillOpacity: 0.15,
         stroke: am5.color(0xffffff),
-        strokeWidth: 2
+        strokeWidth: chartConfig?.strokeWidth ?? 2
       });
 
       // Prepare data with colors
@@ -121,7 +121,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
           stroke: am5.color(0xffffff),
           fill: color,
           fillOpacity: chartConfig?.opacity ?? 1,
-          strokeWidth: 0
+          strokeWidth: chartConfig?.strokeWidth ?? 2
         });
 
         pieSeries.data.setAll(data);
@@ -158,7 +158,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series, chartConfig?.opacity]);
+  }, [data, chartId, series, chartConfig?.opacity, chartConfig?.strokeWidth]);
 
   return (
     <div id={chartId} style={{ 

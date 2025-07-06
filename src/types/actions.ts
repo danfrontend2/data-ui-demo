@@ -11,7 +11,8 @@ export type ActionType =
   | 'SELECT_RANGE'
   | 'ADD_CHART'
   | 'ARRANGE'
-  | 'UPDATE_CHART_OPACITY';
+  | 'UPDATE_CHART_OPACITY'
+  | 'UPDATE_CHART_STROKE_WIDTH';
 
 export interface Action {
   id: string;

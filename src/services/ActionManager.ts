@@ -246,6 +246,25 @@ export default class ActionManager {
       this.setItems(newItems);
     });
 
+    this.registerHandler('UPDATE_CHART_STROKE_WIDTH', ({ strokeWidth }) => {
+      if (!this.setItems || !this.items) return;
+      
+      const newItems = this.items.map(item => {
+        if (item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart') {
+          return {
+            ...item,
+            chartConfig: {
+              ...item.chartConfig,
+              strokeWidth
+            }
+          };
+        }
+        return item;
+      });
+      
+      this.setItems(newItems);
+    });
+
     console.log('Action handlers initialized');
   }
 

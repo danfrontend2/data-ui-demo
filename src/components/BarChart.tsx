@@ -72,6 +72,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
     ];
 
     const opacity = chartConfig?.opacity ?? 1;
+    const strokeWidth = chartConfig?.strokeWidth ?? 2;
 
     if (series.length <= 1) {
       // Single series - create separate series for each data point
@@ -96,7 +97,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
         barSeries.columns.template.setAll({
           fillOpacity: opacity,
           fill: color,
-          strokeWidth: 0
+          strokeWidth: strokeWidth,
+          stroke: color
         });
 
         // Add hover state
@@ -127,7 +129,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
         barSeries.columns.template.setAll({
           fillOpacity: opacity,
           fill: color,
-          strokeWidth: 0
+          strokeWidth: strokeWidth,
+          stroke: color
         });
 
         barSeries.data.setAll(data);
@@ -162,7 +165,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
     return () => {
       root.dispose();
     };
-  }, [chartId, data, series, chartConfig?.opacity]);
+  }, [chartId, data, series, chartConfig?.opacity, chartConfig?.strokeWidth]);
 
   return (
     <div id={chartId} style={{ 
