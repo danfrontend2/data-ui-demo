@@ -33,6 +33,7 @@ export interface ChartConfig {
   }>;
   opacity?: number;
   strokeWidth?: number;
+  colorSet?: string;
 }
 
 export interface GridItem extends Layout {

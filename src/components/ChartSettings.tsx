@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Typography, Slider, Button } from '@mui/material';
+import { Box, Paper, Typography, Slider, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import ActionManager from '../services/ActionManager';
 import { GridItem } from '../types';
 
@@ -9,9 +9,21 @@ interface ChartSettingsProps {
   selectedChartId?: string;
 }
 
+// Available color sets in amCharts 5
+const COLOR_SETS = {
+  'Default': 'default',
+  'Kelly': 'kelly',
+  'Material': 'material',
+  'Vividark': 'vividark',
+  'Dataviz': 'dataviz',
+  'Moonrisekingdom': 'moonrisekingdom',
+  'Spirited': 'spirited'
+};
+
 const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedChartId }) => {
   const [opacity, setOpacity] = useState(1);
   const [strokeWidth, setStrokeWidth] = useState(2);
+  const [colorSet, setColorSet] = useState('kelly');
   const actionManager = ActionManager.getInstance();
 
   // Get current settings from the selected chart
@@ -24,6 +36,7 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
     if (selectedChart) {
       setOpacity(selectedChart.chartConfig?.opacity ?? 1);
       setStrokeWidth(selectedChart.chartConfig?.strokeWidth ?? 2);
+      setColorSet(selectedChart.chartConfig?.colorSet ?? 'kelly');
     }
   }, [items, selectedChartId]);
 
@@ -41,6 +54,15 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
     setStrokeWidth(newStrokeWidth);
     actionManager.logAction('UPDATE_CHART_STROKE_WIDTH', { 
       strokeWidth: newStrokeWidth,
+      chartId: selectedChartId
+    });
+  };
+
+  const handleColorSetChange = (event: any) => {
+    const newColorSet = event.target.value;
+    setColorSet(newColorSet);
+    actionManager.logAction('UPDATE_CHART_COLOR_SET', { 
+      colorSet: newColorSet,
       chartId: selectedChartId
     });
   };
@@ -105,6 +127,21 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
         flexDirection: 'column',
         gap: 3
       }}>
+        <FormControl fullWidth>
+          <InputLabel id="color-set-label">Color Set</InputLabel>
+          <Select
+            labelId="color-set-label"
+            value={colorSet}
+            label="Color Set"
+            onChange={handleColorSetChange}
+            disabled={!isChartSelected}
+          >
+            {Object.entries(COLOR_SETS).map(([label, value]) => (
+              <MenuItem key={value} value={value}>{label}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <Box>
           <Typography gutterBottom>Fill Opacity</Typography>
           <Slider

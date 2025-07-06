@@ -2,6 +2,12 @@ import React, { useLayoutEffect, useRef } from 'react';
 import * as am5 from "@amcharts/amcharts5";
 import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_Kelly from "@amcharts/amcharts5/themes/Kelly";
+import am5themes_Material from "@amcharts/amcharts5/themes/Material";
+import am5themes_Dataviz from "@amcharts/amcharts5/themes/Dataviz";
+import am5themes_Moonrise from "@amcharts/amcharts5/themes/Moonrise";
+import am5themes_Spirited from "@amcharts/amcharts5/themes/Spirited";
+import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
 import { ChartDataPoint } from '../types';
 import { ChartConfig } from '../types';
 
@@ -19,17 +25,57 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
   const chartRef = useRef<am5.Root | null>(null);
 
   useLayoutEffect(() => {
+    // Clean up any existing root
     if (chartRef.current) {
       chartRef.current.dispose();
     }
 
+    // Create root element
     const root = am5.Root.new(chartId);
-    root.setThemes([am5themes_Animated.new(root)]);
 
+    // Get the selected theme
+    const getTheme = (themeName?: string) => {
+      switch (themeName) {
+        case 'kelly':
+          return am5themes_Kelly.new(root);
+        case 'material':
+          return am5themes_Material.new(root);
+        case 'dataviz':
+          return am5themes_Dataviz.new(root);
+        case 'moonrisekingdom':
+          return am5themes_Moonrise.new(root);
+        case 'spirited':
+          return am5themes_Spirited.new(root);
+        case 'vividark':
+          root.setThemes([
+            am5themes_Animated.new(root),
+            am5themes_Dark.new(root)
+          ]);
+          root.container.set("background", am5.Rectangle.new(root, {
+            fill: am5.color(0x000000),
+            fillOpacity: 1
+          }));
+          return am5themes_Dark.new(root);
+        default:
+          return am5themes_Kelly.new(root);
+      }
+    };
+
+    // Set themes
+    if (chartConfig?.colorSet !== 'vividark') {
+      root.setThemes([
+        am5themes_Animated.new(root),
+        getTheme(chartConfig?.colorSet)
+      ]);
+    } else {
+      getTheme('vividark');
+    }
+
+    // Create chart
     const chart = root.container.children.push(
       am5percent.PieChart.new(root, {
         layout: root.verticalLayout,
-        innerRadius: 0
+        innerRadius: am5.percent(50)
       })
     );
 
@@ -58,34 +104,25 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
     };
 
     if (series.length <= 1) {
-      // Single series - create one series with individual colors
+      // Single series - create one series
       const field = Object.keys(data[0]).find(key => key !== 'category') || '';
       const pieSeries = chart.series.push(
         am5percent.PieSeries.new(root, {
           categoryField: "category",
           valueField: field,
           legendLabelText: "[{fill}]{category}[/]: {value}",
-          legendValueText: ""
+          legendValueText: "",
+          radius: am5.percent(90)
         })
       );
 
-      // Prepare data with colors
-      const coloredData = data.map((item, index) => {
-        const fillColor = colors[index % colors.length];
-        return {
-          ...item,
-          sliceSettings: {
-            fill: am5.color(fillColor),
-            stroke: getStrokeColor(fillColor)
-          }
-        };
-      });
-
-      // Set colors for individual slices
+      // Configure slices
       pieSeries.slices.template.setAll({
         strokeWidth: chartConfig?.strokeWidth ?? 2,
         fillOpacity: chartConfig?.opacity ?? 1,
-        templateField: "sliceSettings"
+        stroke: am5.color(0xffffff),
+        templateField: "sliceSettings",
+        cornerRadius: 5
       });
 
       // Add hover state
@@ -98,11 +135,10 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
       pieSeries.slices.template.set("toggleKey", "active");
       pieSeries.slices.template.states.create("hidden", {
         fillOpacity: 0.15,
-        stroke: getStrokeColor(colors[0]),
         strokeWidth: chartConfig?.strokeWidth ?? 2
       });
 
-      pieSeries.data.setAll(coloredData);
+      pieSeries.data.setAll(data);
 
       // Create legend
       const legend = chart.children.push(
@@ -115,11 +151,9 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
       );
 
       legend.data.setAll(pieSeries.dataItems);
-
     } else {
       // Multiple series - create separate series for each field
-      series.forEach((seriesConfig, index) => {
-        const fillColor = colors[index % colors.length];
+      series.forEach((seriesConfig) => {
         const pieSeries = chart.series.push(
           am5percent.PieSeries.new(root, {
             name: seriesConfig.name,
@@ -127,15 +161,22 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
             valueField: seriesConfig.field,
             legendLabelText: "[{fill}]{category}[/]: {value}",
             legendValueText: "",
-            fill: am5.color(fillColor)
+            radius: am5.percent(90)
           })
         );
 
+        // Configure slices
         pieSeries.slices.template.setAll({
           strokeWidth: chartConfig?.strokeWidth ?? 2,
           fillOpacity: chartConfig?.opacity ?? 1,
-          fill: am5.color(fillColor),
-          stroke: getStrokeColor(fillColor)
+          stroke: am5.color(0xffffff),
+          cornerRadius: 5
+        });
+
+        // Add hover state
+        pieSeries.slices.template.states.create("hover", {
+          scale: 1.05,
+          fillOpacity: 0.8
         });
 
         pieSeries.data.setAll(data);
@@ -157,22 +198,16 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
         height: 16
       });
 
-      legend.markerRectangles.template.setAll({
-        cornerRadiusTL: 0,
-        cornerRadiusTR: 0,
-        cornerRadiusBL: 0,
-        cornerRadiusBR: 0
-      });
-
       legend.data.setAll(chart.series.values);
     }
 
+    // Save root for cleanup
     chartRef.current = root;
 
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series, chartConfig?.opacity, chartConfig?.strokeWidth]);
+  }, [data, chartId, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet]);
 
   return (
     <div id={chartId} style={{ 

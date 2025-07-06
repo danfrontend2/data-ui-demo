@@ -2,6 +2,12 @@ import React, { useLayoutEffect, useRef } from 'react';
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_Kelly from "@amcharts/amcharts5/themes/Kelly";
+import am5themes_Material from "@amcharts/amcharts5/themes/Material";
+import am5themes_Dataviz from "@amcharts/amcharts5/themes/Dataviz";
+import am5themes_Moonrise from "@amcharts/amcharts5/themes/Moonrise";
+import am5themes_Spirited from "@amcharts/amcharts5/themes/Spirited";
+import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
 import { ChartDataPoint } from '../types';
 import { ChartConfig } from '../types';
 
@@ -22,8 +28,43 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
     // Create root element
     const root = am5.Root.new(chartId);
 
+    // Get the selected theme
+    const getTheme = (themeName?: string) => {
+      switch (themeName) {
+        case 'kelly':
+          return am5themes_Kelly.new(root);
+        case 'material':
+          return am5themes_Material.new(root);
+        case 'dataviz':
+          return am5themes_Dataviz.new(root);
+        case 'moonrisekingdom':
+          return am5themes_Moonrise.new(root);
+        case 'spirited':
+          return am5themes_Spirited.new(root);
+        case 'vividark':
+          root.setThemes([
+            am5themes_Animated.new(root),
+            am5themes_Dark.new(root)
+          ]);
+          root.container.set("background", am5.Rectangle.new(root, {
+            fill: am5.color(0x000000),
+            fillOpacity: 1
+          }));
+          return am5themes_Dark.new(root);
+        default:
+          return am5themes_Kelly.new(root);
+      }
+    };
+
     // Set themes
-    root.setThemes([am5themes_Animated.new(root)]);
+    if (chartConfig?.colorSet !== 'vividark') {
+      root.setThemes([
+        am5themes_Animated.new(root),
+        getTheme(chartConfig?.colorSet)
+      ]);
+    } else {
+      getTheme('vividark');
+    }
 
     // Create chart
     const chart = root.container.children.push(
@@ -53,23 +94,8 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
       })
     );
 
-    const colors = [
-      0x67B7DC, // blue
-      0xDC6967, // coral
-      0x84DC67, // emerald
-      0x8067DC, // violet
-      0xDCAB67, // gold
-      0x67DC96, // teal
-      0xDC67CE, // rose
-      0xA5DC67, // green
-      0x6771DC, // purple
-      0xDC8C67  // orange
-    ];
-
     // Create series for each field
-    series.forEach((seriesConfig, index) => {
-      const color = am5.color(colors[index % colors.length]);
-
+    series.forEach((seriesConfig) => {
       const lineSeries = chart.series.push(
         am5xy.LineSeries.new(root, {
           name: seriesConfig.name,
@@ -77,8 +103,6 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
           yAxis: yAxis,
           valueYField: seriesConfig.field,
           categoryXField: "category",
-          stroke: color,
-          fill: color,
           tooltip: am5.Tooltip.new(root, {
             labelText: `${seriesConfig.name}: {valueY}`
           })
@@ -125,7 +149,7 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series, chartConfig?.strokeWidth]);
+  }, [data, chartId, series, chartConfig?.strokeWidth, chartConfig?.colorSet]);
 
   return (
     <div id={chartId} style={{ 
