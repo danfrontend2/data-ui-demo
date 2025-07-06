@@ -30,13 +30,19 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
   const handleOpacityChange = (_event: Event, value: number | number[]) => {
     const newOpacity = value as number;
     setOpacity(newOpacity);
-    actionManager.logAction('UPDATE_CHART_OPACITY', { opacity: newOpacity });
+    actionManager.logAction('UPDATE_CHART_OPACITY', { 
+      opacity: newOpacity,
+      chartId: selectedChartId 
+    });
   };
 
   const handleStrokeWidthChange = (_event: Event, value: number | number[]) => {
     const newStrokeWidth = value as number;
     setStrokeWidth(newStrokeWidth);
-    actionManager.logAction('UPDATE_CHART_STROKE_WIDTH', { strokeWidth: newStrokeWidth });
+    actionManager.logAction('UPDATE_CHART_STROKE_WIDTH', { 
+      strokeWidth: newStrokeWidth,
+      chartId: selectedChartId
+    });
   };
 
   // Get the selected chart's name

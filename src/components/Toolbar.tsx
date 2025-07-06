@@ -190,8 +190,8 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   useEffect(() => {
     if (!isSettingsOpen) {
       setSelectedChartId(undefined);
-    } else {
-      // Select first chart when opening settings
+    } else if (!selectedChartId) {
+      // Only select first chart if no chart is currently selected
       const firstChart = items.find(item => 
         item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart'
       );
@@ -199,7 +199,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         setSelectedChartId(firstChart.i);
       }
     }
-  }, [isSettingsOpen, items]);
+  }, [isSettingsOpen]); // Remove items dependency
 
   return (
     <AppBar position="static" sx={{ backgroundColor: 'white', boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)' }}>
