@@ -460,12 +460,17 @@ const GridLayout: React.FC<GridLayoutProps> = ({
 
   const renderGrid = (item: GridItem) => {
     if (item.type === 'pie-chart') {
-      return renderChart(item, PieChart);
+      return renderChart(item, PieChart, 'Pie Chart');
     } else if (item.type === 'line-chart') {
-      return renderChart(item, LineChart);
+      return renderChart(item, LineChart, 'Line Chart');
     } else if (item.type === 'bar-chart') {
-      return renderChart(item, BarChart);
+      return renderChart(item, BarChart, 'Bar Chart');
     }
+
+    // Get grid number from existing grids
+    const gridNumber = localItems
+      .filter(i => i.type === 'grid')
+      .findIndex(i => i.i === item.i) + 1;
 
     // Combine base options with item-specific options
     const gridOptions = {
@@ -508,9 +513,14 @@ const GridLayout: React.FC<GridLayoutProps> = ({
               flex: 1,
               height: '100%',
               cursor: 'move',
-              pl: 1
+              pl: 1,
+              fontSize: '12px',
+              display: 'flex',
+              alignItems: 'center'
             }}
-          />
+          >
+            Grid #{gridNumber}
+          </Box>
           <input
             type="file"
             accept=".xlsx,.csv"
@@ -550,13 +560,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
             <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
-        <Box
-          className="ag-theme-balham"
-          sx={{
-            flex: 1,
-            minHeight: 0
-          }}
-        >
+        <Box sx={{ flex: 1, overflow: 'hidden' }} className="ag-theme-balham">
           <AgGridReact {...gridOptions} />
         </Box>
       </Box>
@@ -653,7 +657,12 @@ const GridLayout: React.FC<GridLayoutProps> = ({
     });
   };
 
-  const renderChart = (item: GridItem, ChartComponent: React.ComponentType<any>) => {
+  const renderChart = (item: GridItem, ChartComponent: React.ComponentType<any>, chartType: string) => {
+    // Get chart number from existing charts of the same type
+    const chartNumber = localItems
+      .filter(i => i.type === item.type)
+      .findIndex(i => i.i === item.i) + 1;
+
     return (
       <Box
         key={item.i}
@@ -664,7 +673,11 @@ const GridLayout: React.FC<GridLayoutProps> = ({
           overflow: 'hidden',
           position: 'relative',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          cursor: 'pointer',
+          '&:hover': {
+            boxShadow: '0 0 0 2px #2196f3'
+          }
         }}
       >
         <Box sx={{ 
@@ -681,9 +694,14 @@ const GridLayout: React.FC<GridLayoutProps> = ({
               flex: 1,
               height: '100%',
               cursor: 'move',
-              pl: 1
+              pl: 1,
+              fontSize: '12px',
+              display: 'flex',
+              alignItems: 'center'
             }}
-          />
+          >
+            {chartType} #{chartNumber}
+          </Box>
           <IconButton
             onClick={(e) => handleRemoveItem(e, item.i)}
             size="small"

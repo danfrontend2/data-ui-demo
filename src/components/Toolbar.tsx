@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Button,
   Dialog,
@@ -61,6 +61,8 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   const [columns, setColumns] = useState<number>(2);
   const [arrangeAnchorEl, setArrangeAnchorEl] = useState<HTMLElement | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedChartId, setSelectedChartId] = useState<string | undefined>();
+  const actionManager = ActionManager.getInstance();
 
   const handleAddItem = () => {
     onAddItem({
@@ -74,12 +76,12 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
 
   const handleStartRecording = () => {
     setIsRecording(true);
-    ActionManager.getInstance().startRecording();
+    actionManager.startRecording();
   };
 
   const handleStopRecording = () => {
     setIsRecording(false);
-    const macro = ActionManager.getInstance().stopRecording();
+    const macro = actionManager.stopRecording();
     setRecordedMacro(macro);
     setIsPromptDialogOpen(true);
   };
@@ -158,6 +160,46 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
     onArrangeItems(columns);
     handleArrangeClose();
   };
+
+  // Add click handler for charts
+  const handleChartClick = (chartId: string) => {
+    if (isSettingsOpen) {
+      setSelectedChartId(chartId);
+    }
+  };
+
+  useEffect(() => {
+    // Add click event listener to chart containers
+    const handleClick = (event: MouseEvent) => {
+      const chartContainer = (event.target as HTMLElement).closest('.react-grid-item');
+      if (chartContainer) {
+        const chartId = chartContainer.querySelector('[id^="chart-"]')?.id;
+        if (chartId) {
+          handleChartClick(chartId.replace('chart-', ''));
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+    return () => {
+      document.removeEventListener('click', handleClick);
+    };
+  }, [isSettingsOpen]);
+
+  // When settings panel is closed, reset selected chart
+  useEffect(() => {
+    if (!isSettingsOpen) {
+      setSelectedChartId(undefined);
+    } else {
+      // Select first chart when opening settings
+      const firstChart = items.find(item => 
+        item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart'
+      );
+      if (firstChart) {
+        setSelectedChartId(firstChart.i);
+      }
+    }
+  }, [isSettingsOpen, items]);
 
   return (
     <AppBar position="static" sx={{ backgroundColor: 'white', boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)' }}>
@@ -324,6 +366,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           <ChartSettings
             onClose={() => setIsSettingsOpen(false)}
             items={items}
+            selectedChartId={selectedChartId}
           />
         )}
       </MuiToolbar>

@@ -6,47 +6,66 @@ import { GridItem } from '../types';
 interface ChartSettingsProps {
   onClose: () => void;
   items: GridItem[];
+  selectedChartId?: string;
 }
 
-const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items }) => {
+const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedChartId }) => {
   const [opacity, setOpacity] = useState(1);
   const [strokeWidth, setStrokeWidth] = useState(2);
   const actionManager = ActionManager.getInstance();
 
-  // Get current settings from the first chart if only one exists
+  // Get current settings from the selected chart
   useEffect(() => {
-    const charts = items.filter(item => item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart');
-    if (charts.length === 1) {
-      setOpacity(charts[0].chartConfig?.opacity ?? 1);
-      setStrokeWidth(charts[0].chartConfig?.strokeWidth ?? 2);
+    const selectedChart = items.find(item => 
+      (item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart') &&
+      (selectedChartId ? item.i === selectedChartId : true)
+    );
+    
+    if (selectedChart) {
+      setOpacity(selectedChart.chartConfig?.opacity ?? 1);
+      setStrokeWidth(selectedChart.chartConfig?.strokeWidth ?? 2);
     }
-  }, [items]);
+  }, [items, selectedChartId]);
 
   const handleOpacityChange = (_event: Event, value: number | number[]) => {
     const newOpacity = value as number;
     setOpacity(newOpacity);
-
-    // Only update if there's exactly one chart
-    const charts = items.filter(item => item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart');
-    if (charts.length === 1) {
-      actionManager.logAction('UPDATE_CHART_OPACITY', { opacity: newOpacity });
-    }
+    actionManager.logAction('UPDATE_CHART_OPACITY', { opacity: newOpacity });
   };
 
   const handleStrokeWidthChange = (_event: Event, value: number | number[]) => {
     const newStrokeWidth = value as number;
     setStrokeWidth(newStrokeWidth);
-
-    // Only update if there's exactly one chart
-    const charts = items.filter(item => item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart');
-    if (charts.length === 1) {
-      actionManager.logAction('UPDATE_CHART_STROKE_WIDTH', { strokeWidth: newStrokeWidth });
-    }
+    actionManager.logAction('UPDATE_CHART_STROKE_WIDTH', { strokeWidth: newStrokeWidth });
   };
 
-  const isChartSelected = items.filter(item => 
-    item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart'
-  ).length === 1;
+  // Get the selected chart's name
+  const getSelectedChartName = () => {
+    const selectedChart = items.find(item => 
+      (item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart') &&
+      (selectedChartId ? item.i === selectedChartId : true)
+    );
+
+    if (!selectedChart) return '';
+
+    const chartTypeNames = {
+      'bar-chart': 'Bar Chart',
+      'pie-chart': 'Pie Chart',
+      'line-chart': 'Line Chart'
+    };
+
+    const chartType = chartTypeNames[selectedChart.type as keyof typeof chartTypeNames];
+    const chartNumber = items
+      .filter(i => i.type === selectedChart.type)
+      .findIndex(i => i.i === selectedChart.i) + 1;
+
+    return `${chartType} #${chartNumber}`;
+  };
+
+  const isChartSelected = items.some(item => 
+    (item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart') &&
+    (selectedChartId ? item.i === selectedChartId : true)
+  );
 
   return (
     <Paper 
@@ -69,7 +88,7 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items }) => {
         p: 1,
         borderBottom: '1px solid #ddd'
       }}>
-        <Typography variant="h6">Chart Settings</Typography>
+        <Typography variant="h6">{getSelectedChartName()}</Typography>
         <Button onClick={onClose} size="small">Close</Button>
       </Box>
       
