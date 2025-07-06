@@ -227,6 +227,25 @@ export default class ActionManager {
       this.setItems(newItems);
     });
 
+    this.registerHandler('UPDATE_CHART_OPACITY', ({ opacity }) => {
+      if (!this.setItems || !this.items) return;
+      
+      const newItems = this.items.map(item => {
+        if (item.type === 'bar-chart' || item.type === 'pie-chart') {
+          return {
+            ...item,
+            chartConfig: {
+              ...item.chartConfig,
+              opacity
+            }
+          };
+        }
+        return item;
+      });
+      
+      this.setItems(newItems);
+    });
+
     console.log('Action handlers initialized');
   }
 

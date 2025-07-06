@@ -4,13 +4,14 @@ import { GridItem } from '../types';
 export type ActionType = 
   | 'ADD_GRID'
   | 'REMOVE_GRID'
+  | 'REMOVE_ALL_GRIDS'
   | 'UPDATE_LAYOUT'
-  | 'ADD_CHART'
-  | 'SELECT_RANGE'
-  | 'DROP_FILE'
   | 'UPDATE_CELL'
+  | 'DROP_FILE'
+  | 'SELECT_RANGE'
+  | 'ADD_CHART'
   | 'ARRANGE'
-  | 'REMOVE_ALL_GRIDS';
+  | 'UPDATE_CHART_OPACITY';
 
 export interface Action {
   id: string;

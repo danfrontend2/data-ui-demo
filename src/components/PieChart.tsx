@@ -3,17 +3,19 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { ChartDataPoint } from '../types';
+import { ChartConfig } from '../types';
 
 interface PieChartProps {
   data: ChartDataPoint[];
   chartId: string;
-  series?: Array<{
+  series: Array<{
     field: string;
     name: string;
   }>;
+  chartConfig?: ChartConfig;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
+const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig }) => {
   const chartRef = useRef<am5.Root | null>(null);
 
   useLayoutEffect(() => {
@@ -51,16 +53,17 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
         am5percent.PieSeries.new(root, {
           categoryField: "category",
           valueField: field,
-          legendLabelText: "{category}: {value}",
+          legendLabelText: "[{fill}]{category}[/]: {value}",
           legendValueText: ""
         })
       );
 
       // Set colors for individual slices
       pieSeries.slices.template.setAll({
-        strokeWidth: 2,
         stroke: am5.color(0xffffff),
-        templateField: "sliceSettings"
+        templateField: "sliceSettings",
+        fillOpacity: chartConfig?.opacity ?? 1,
+        strokeWidth: 0
       });
 
       // Add hover state
@@ -108,16 +111,17 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
             name: seriesConfig.name,
             categoryField: "category",
             valueField: seriesConfig.field,
-            legendLabelText: "{category}",
-            legendValueText: "{value}",
+            legendLabelText: "[{fill}]{category}[/]: {value}",
+            legendValueText: "",
             fill: color
           })
         );
 
         pieSeries.slices.template.setAll({
-          strokeWidth: 2,
           stroke: am5.color(0xffffff),
-          fill: color
+          fill: color,
+          fillOpacity: chartConfig?.opacity ?? 1,
+          strokeWidth: 0
         });
 
         pieSeries.data.setAll(data);
@@ -154,7 +158,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series = [] }) => {
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series]);
+  }, [data, chartId, series, chartConfig?.opacity]);
 
   return (
     <div id={chartId} style={{ 

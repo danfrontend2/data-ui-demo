@@ -26,16 +26,19 @@ export interface ChartDataPoint {
   [key: string]: string | number;
 }
 
+export interface ChartConfig {
+  series?: Array<{
+    field: string;
+    name: string;
+  }>;
+  opacity?: number;
+}
+
 export interface GridItem extends Layout {
   data?: GridData[];
   type?: 'grid' | 'pie-chart' | 'line-chart' | 'bar-chart';
   chartData?: Array<ChartDataPoint>;
-  chartConfig?: {
-    series?: Array<{
-      field: string;
-      name: string;
-    }>;
-  };
+  chartConfig?: ChartConfig;
   sourceGridId?: string;
   selectedRange?: {
     columns: string[];

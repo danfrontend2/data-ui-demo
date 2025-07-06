@@ -20,8 +20,11 @@ import UploadIcon from '@mui/icons-material/Upload';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import GridViewIcon from '@mui/icons-material/GridView';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { Layout } from 'react-grid-layout';
+import { GridItem } from '../types';
 import Chat from './Chat';
+import ChartSettings from './ChartSettings';
 import ActionManager from '../services/ActionManager';
 
 interface ToolbarProps {
@@ -30,6 +33,7 @@ interface ToolbarProps {
   onRunCustomMacro: (macro: any[]) => void;
   onCloseAll: () => void;
   onArrangeItems: (columns: number) => void;
+  items: GridItem[];
 }
 
 const tooltipProps = {
@@ -47,7 +51,7 @@ const tooltipProps = {
   }
 };
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onArrangeItems }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onArrangeItems, items }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
@@ -56,6 +60,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [columns, setColumns] = useState<number>(2);
   const [arrangeAnchorEl, setArrangeAnchorEl] = useState<HTMLElement | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleAddItem = () => {
     onAddItem({
@@ -166,6 +171,24 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           </Button>
         </Tooltip>
         <Tooltip 
+          title="Chart Settings"
+          {...tooltipProps}
+        >
+          <Button
+            color="primary"
+            onClick={() => {
+              if (isSettingsOpen) {
+                setIsSettingsOpen(false);
+              } else {
+                setIsChatOpen(false);
+                setIsSettingsOpen(true);
+              }
+            }}
+          >
+            <SettingsIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip 
           title="Arrange items"
           {...tooltipProps}
         >
@@ -204,7 +227,14 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         >
           <Button
             color="primary"
-            onClick={() => setIsChatOpen(true)}
+            onClick={() => {
+              if (isChatOpen) {
+                setIsChatOpen(false);
+              } else {
+                setIsSettingsOpen(false);
+                setIsChatOpen(true);
+              }
+            }}
           >
             <SmartToyIcon />
           </Button>
@@ -288,6 +318,14 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
             <Button onClick={handleSaveMacro} startIcon={<SaveIcon />}>Save</Button>
           </DialogActions>
         </Dialog>
+
+        {/* Chart Settings component */}
+        {isSettingsOpen && (
+          <ChartSettings
+            onClose={() => setIsSettingsOpen(false)}
+            items={items}
+          />
+        )}
       </MuiToolbar>
     </AppBar>
   );

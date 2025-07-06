@@ -101,6 +101,7 @@ function App() {
           onCloseAll={handleCloseAll}
           onRunCustomMacro={(steps: any[]) => actionManager.executeMacro(steps)}
           onArrangeItems={handleArrangeItems}
+          items={items}
         />
         <GridLayout 
           items={items}

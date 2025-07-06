@@ -3,17 +3,19 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { ChartDataPoint } from '../types';
+import { ChartConfig } from '../types';
 
 interface BarChartProps {
   data: ChartDataPoint[];
   chartId: string;
-  series?: Array<{
+  series: Array<{
     field: string;
     name: string;
   }>;
+  chartConfig?: ChartConfig;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
+const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig }) => {
   const chartRef = useRef<am5.Root | null>(null);
 
   useLayoutEffect(() => {
@@ -69,12 +71,14 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
       0xDC8C67  // orange
     ];
 
+    const opacity = chartConfig?.opacity ?? 1;
+
     if (series.length <= 1) {
       // Single series - create separate series for each data point
       data.forEach((item, index) => {
         const field = Object.keys(item).find(key => key !== 'category') || '';
         const value = item[field];
-        const color = colors[index % colors.length];
+        const color = am5.color(colors[index % colors.length]);
 
         const barSeries = chart.series.push(
           am5xy.ColumnSeries.new(root, {
@@ -83,12 +87,17 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
             yAxis: yAxis,
             valueYField: field,
             categoryXField: "category",
-            fill: am5.color(color),
             tooltip: am5.Tooltip.new(root, {
               labelText: "{categoryX}: {valueY}"
             })
           })
         );
+
+        barSeries.columns.template.setAll({
+          fillOpacity: opacity,
+          fill: color,
+          strokeWidth: 0
+        });
 
         // Add hover state
         barSeries.columns.template.states.create("hover", {
@@ -100,6 +109,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
     } else {
       // Multiple series - create one series per field
       series.forEach((seriesConfig, index) => {
+        const color = am5.color(colors[index % colors.length]);
+
         const barSeries = chart.series.push(
           am5xy.ColumnSeries.new(root, {
             name: seriesConfig.name,
@@ -107,9 +118,17 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
             yAxis: yAxis,
             valueYField: seriesConfig.field,
             categoryXField: "category",
-            fill: am5.color(colors[index % colors.length])
+            tooltip: am5.Tooltip.new(root, {
+              labelText: `${seriesConfig.name}: {valueY}`
+            })
           })
         );
+
+        barSeries.columns.template.setAll({
+          fillOpacity: opacity,
+          fill: color,
+          strokeWidth: 0
+        });
 
         barSeries.data.setAll(data);
       });
@@ -143,7 +162,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series]);
+  }, [chartId, data, series, chartConfig?.opacity]);
 
   return (
     <div id={chartId} style={{ 

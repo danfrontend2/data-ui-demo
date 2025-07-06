@@ -706,6 +706,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
             data={item.chartData || []} 
             chartId={`chart-${item.i}`}
             series={item.chartConfig?.series || []}
+            chartConfig={item.chartConfig}
           />
         </Box>
       </Box>

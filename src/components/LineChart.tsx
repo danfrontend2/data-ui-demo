@@ -3,6 +3,7 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { ChartDataPoint } from '../types';
+import { ChartConfig } from '../types';
 
 interface LineChartProps {
   data: ChartDataPoint[];
@@ -11,9 +12,10 @@ interface LineChartProps {
     field: string;
     name: string;
   }>;
+  chartConfig?: ChartConfig;
 }
 
-const LineChart: React.FC<LineChartProps> = ({ data, chartId, series }) => {
+const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfig }) => {
   const chartRef = useRef<am5.Root | null>(null);
 
   useLayoutEffect(() => {
