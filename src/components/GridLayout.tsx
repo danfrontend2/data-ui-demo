@@ -684,32 +684,6 @@ const GridLayout: React.FC<GridLayoutProps> = ({
               pl: 1
             }}
           />
-          <input
-            type="file"
-            accept=".xlsx,.csv"
-            style={{ display: 'none' }}
-            id={`file-input-${item.i}`}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                processFile(file, item.i);
-              }
-              // Reset input value so the same file can be selected again
-              e.target.value = '';
-            }}
-          />
-          <IconButton
-            onClick={() => document.getElementById(`file-input-${item.i}`)?.click()}
-            size="small"
-            sx={{ 
-              mr: 0.5,
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)'
-              }
-            }}
-          >
-            <UploadIcon fontSize="small" />
-          </IconButton>
           <IconButton
             onClick={(e) => handleRemoveItem(e, item.i)}
             size="small"

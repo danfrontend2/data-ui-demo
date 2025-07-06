@@ -46,8 +46,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
         categoryField: "category",
         renderer: am5xy.AxisRendererX.new(root, {
           minGridDistance: 30
-        }),
-        tooltip: am5.Tooltip.new(root, {})
+        })
       })
     );
 
@@ -56,9 +55,6 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
         renderer: am5xy.AxisRendererY.new(root, {})
       })
     );
-
-    // Set data for X axis
-    xAxis.data.setAll(data);
 
     const colors = [
       0x67B7DC, // blue
@@ -73,70 +69,66 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series = [] }) => {
       0xDC8C67  // orange
     ];
 
-    // Create series for each field
-    const chartSeries = (series.length ? series : [{
-      field: Object.keys(data[0]).find(key => key !== 'category') || '',
-      name: 'Value'
-    }]).map((seriesConfig, index) => {
-      const barSeries = chart.series.push(
-        am5xy.ColumnSeries.new(root, {
-          name: seriesConfig.name,
-          xAxis: xAxis,
-          yAxis: yAxis,
-          valueYField: seriesConfig.field,
-          categoryXField: "category",
-          tooltip: am5.Tooltip.new(root, {
-            labelText: "{name}: {valueY}"
+    if (series.length <= 1) {
+      // Single series - create separate series for each data point
+      data.forEach((item, index) => {
+        const field = Object.keys(item).find(key => key !== 'category') || '';
+        const value = item[field];
+        const color = colors[index % colors.length];
+
+        const barSeries = chart.series.push(
+          am5xy.ColumnSeries.new(root, {
+            name: `${item.category}: ${value}`,
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueYField: field,
+            categoryXField: "category",
+            fill: am5.color(color),
+            tooltip: am5.Tooltip.new(root, {
+              labelText: "{categoryX}: {valueY}"
+            })
           })
-        })
-      );
+        );
 
-      // Set base properties first
-      barSeries.columns.template.setAll({
-        tooltipY: 0,
-        strokeOpacity: 0,
-        width: am5.percent(90 / series.length), // Adjust width based on number of series
-        tooltipText: "{name}: {valueY}"
-      });
-
-      // Add index to data for coloring
-      const dataWithIndex = data.map((item, idx) => ({
-        ...item,
-        columnIndex: idx
-      }));
-
-      if (series.length <= 1) {
-        // For single series, set color based on data item index
-        barSeries.columns.template.adapters.add("fill", function(fill, target) {
-          const dataContext = target.dataItem?.dataContext as any;
-          return am5.color(colors[dataContext?.columnIndex % colors.length]);
+        // Add hover state
+        barSeries.columns.template.states.create("hover", {
+          fillOpacity: 0.8
         });
-      } else {
-        // For multiple series, use series index for color
-        barSeries.columns.template.setAll({
-          fill: am5.color(colors[index % colors.length])
-        });
-      }
 
-      // Set up hovering animation
-      barSeries.columns.template.states.create("hover", {
-        fillOpacity: 0.8
+        barSeries.data.setAll([item]);
       });
+    } else {
+      // Multiple series - create one series per field
+      series.forEach((seriesConfig, index) => {
+        const barSeries = chart.series.push(
+          am5xy.ColumnSeries.new(root, {
+            name: seriesConfig.name,
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueYField: seriesConfig.field,
+            categoryXField: "category",
+            fill: am5.color(colors[index % colors.length])
+          })
+        );
 
-      barSeries.data.setAll(dataWithIndex);
-
-      return barSeries;
-    });
+        barSeries.data.setAll(data);
+      });
+    }
 
     // Create legend
-    const legend = chart.children.push(am5.Legend.new(root, {
-      centerX: am5.percent(50),
-      x: am5.percent(50),
-      marginTop: 15,
-      marginBottom: 15
-    }));
+    const legend = chart.children.push(
+      am5.Legend.new(root, {
+        centerX: am5.percent(50),
+        x: am5.percent(50),
+        useDefaultMarker: true,
+        clickTarget: "itemContainer"
+      })
+    );
 
-    legend.data.setAll(chartSeries);
+    legend.data.setAll(chart.series.values);
+
+    // Set data for X axis
+    xAxis.data.setAll(data);
 
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
