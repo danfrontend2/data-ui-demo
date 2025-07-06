@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, Paper, Typography, CircularProgress } from '@mui/material';
 import { OpenAIService } from '../services/OpenAIService';
+import ActionManager from '../services/ActionManager';
 
 interface Message {
   text: string;
@@ -40,6 +41,8 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro }) => {
       // Try to execute macro
       if (onExecuteMacro) {
         await onExecuteMacro(macro);
+        // After AI-generated macro execution, arrange in 2 columns
+        ActionManager.getInstance().logAction('ARRANGE', { columns: 2 });
       }
 
       const aiMessage: Message = {
