@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, IconButton, Typography, Paper } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -9,9 +9,10 @@ interface MacroPanelProps {
     prompt: string;
     steps: any[];
   };
+  currentStepIndex?: number;
 }
 
-const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData }) => {
+const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, currentStepIndex = -1 }) => {
   if (!isOpen || !macroData) return null;
 
   return (
@@ -44,7 +45,16 @@ const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData }) =
         <Typography variant="subtitle1" sx={{ mb: 1 }}>Steps:</Typography>
         <Box sx={{ pl: 2 }}>
           {macroData.steps.map((step, index) => (
-            <Typography key={index} variant="body2" sx={{ mb: 1 }}>
+            <Typography 
+              key={index} 
+              variant="body2" 
+              sx={{ 
+                mb: 1,
+                opacity: index <= currentStepIndex ? 1 : 0.5,
+                transition: 'opacity 0.3s ease-in-out',
+                fontWeight: index === currentStepIndex ? 'bold' : 'normal',
+              }}
+            >
               {index + 1}. {step.type}
             </Typography>
           ))}

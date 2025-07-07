@@ -17,6 +17,7 @@ function App() {
   const [macroMessage, setMacroMessage] = useState<string | null>(null);
   const [isMacroPanelOpen, setIsMacroPanelOpen] = useState(false);
   const [currentMacro, setCurrentMacro] = useState<{ prompt: string; steps: any[] } | undefined>(undefined);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1);
   const actionManager = ActionManager.getInstance();
 
   useEffect(() => {
@@ -24,6 +25,8 @@ function App() {
     actionManager.setItemsHandler(setItems);
     // Set message handler in ActionManager
     actionManager.setMessageHandler(setMacroMessage);
+    // Set step change handler in ActionManager
+    actionManager.setStepChangeHandler(setCurrentStepIndex);
   }, [actionManager]);
 
   // Update ActionManager items when items change
@@ -69,6 +72,9 @@ function App() {
 
   const handleExecuteMacro = async (macro: any): Promise<void> => {
     try {
+      // Reset step index
+      setCurrentStepIndex(-1);
+      
       // First close all existing elements
       const itemIds = items.map(item => item.i);
       itemIds.forEach(id => {
@@ -98,6 +104,7 @@ function App() {
   const handleMacroLoad = (macroData: { prompt: string; steps: any[] }) => {
     setCurrentMacro(macroData);
     setIsMacroPanelOpen(true);
+    setCurrentStepIndex(-1); // Reset step index when loading new macro
   };
 
   return (
@@ -106,6 +113,7 @@ function App() {
         isOpen={isMacroPanelOpen}
         onClose={() => setIsMacroPanelOpen(false)}
         macroData={currentMacro}
+        currentStepIndex={currentStepIndex}
       />
       <Box 
         sx={{ 

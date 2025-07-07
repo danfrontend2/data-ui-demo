@@ -24,6 +24,7 @@ export default class ActionManager {
   private items: GridItem[] = [];
   private selectedData: any[] = [];
   private onMessage: ((message: string | null) => void) | null = null;
+  private onStepChange?: (stepIndex: number) => void;
 
   private constructor() {
     console.log('Initializing ActionManager...');
@@ -380,8 +381,23 @@ export default class ActionManager {
 
   async executeMacro(actions: Action[]) {
     console.log('Starting macro execution with actions:', actions);
-    for (const action of actions) {
+    
+    // Reset step index at start
+    if (this.onStepChange) {
+      this.onStepChange(-1);
+    }
+    
+    // Small delay before starting
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    for (let i = 0; i < actions.length; i++) {
+      const action = actions[i];
       console.log('Executing step:', action);
+      
+      // Update step index before executing
+      if (this.onStepChange) {
+        this.onStepChange(i);
+      }
       
       // Show message immediately before action
       if (this.onMessage && 'message' in action && action.message) {
@@ -407,6 +423,12 @@ export default class ActionManager {
         this.onMessage(null);
       }
     }
+    
+    // Reset step index after completion
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (this.onStepChange) {
+      this.onStepChange(-1);
+    }
   }
 
   // Utility function to normalize field names
@@ -416,5 +438,9 @@ export default class ActionManager {
 
   setMessageHandler(handler: MessageCallback) {
     this.onMessage = handler;
+  }
+
+  setStepChangeHandler(handler: (stepIndex: number) => void) {
+    this.onStepChange = handler;
   }
 } 
