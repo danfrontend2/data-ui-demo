@@ -23,6 +23,7 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { Layout } from 'react-grid-layout';
 import { GridItem } from '../types';
+import { Action } from '../types/actions';
 import Chat from './Chat';
 import ChartSettings from './ChartSettings';
 import ActionManager from '../services/ActionManager';
@@ -31,9 +32,9 @@ interface ToolbarProps {
   onAddItem: (item: Layout) => void;
   onRunMacro: () => void;
   onCloseAll: () => void;
-  onRunCustomMacro: (steps: any[]) => void;
+  onRunCustomMacro: (steps: Action[]) => void;
   onArrangeItems: (columns: number) => void;
-  onMacroLoad: (macroData: { prompt: string; steps: any[] }) => void;
+  onMacroLoad: (macroData: { prompt: string; steps: Action[] }) => void;
   items: GridItem[];
 }
 
@@ -57,7 +58,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   const [isRecording, setIsRecording] = useState(false);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
   const [prompt, setPrompt] = useState('');
-  const [recordedMacro, setRecordedMacro] = useState<any[]>([]);
+  const [recordedMacro, setRecordedMacro] = useState<Action[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [columns, setColumns] = useState<number>(2);
   const [arrangeAnchorEl, setArrangeAnchorEl] = useState<HTMLElement | null>(null);
@@ -337,7 +338,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         {isChatOpen && (
           <Chat
             onClose={() => setIsChatOpen(false)}
-            onExecuteMacro={async (macro: any) => onRunCustomMacro(macro.steps)}
+            onExecuteMacro={async (macro: Action[]) => onRunCustomMacro(macro)}
           />
         )}
 

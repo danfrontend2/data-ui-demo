@@ -1,16 +1,33 @@
 import React, { useEffect, useRef } from 'react';
 import { Box, IconButton, Typography, Paper } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { ActionType, Action } from '../types/actions';
 
 interface MacroPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  macroData?: {
+  macroData: {
     prompt: string;
-    steps: any[];
-  };
+    steps: Action[];
+  } | null;
   currentStepIndex?: number;
 }
+
+// Kelly colors for different action types
+const ACTION_COLORS: Record<ActionType, string> = {
+  'ADD_GRID': '#FFB300', // vivid yellow
+  'REMOVE_GRID': '#C10020', // vivid red
+  'REMOVE_ALL_GRIDS': '#F13A13', // vivid reddish orange
+  'UPDATE_LAYOUT': '#A6BDD7', // very light blue
+  'UPDATE_CELL': '#CEA262', // grayish yellow
+  'DROP_FILE': '#007D34', // vivid green
+  'SELECT_RANGE': '#00538A', // strong blue
+  'ADD_CHART': '#803E75', // strong purple
+  'ARRANGE': '#93AA00', // vivid yellowish green
+  'UPDATE_CHART_OPACITY': '#FF7A5C', // strong yellowish pink
+  'UPDATE_CHART_STROKE_WIDTH': '#53377A', // strong violet
+  'UPDATE_CHART_COLOR_SET': '#F6768E', // strong purplish pink
+};
 
 const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, currentStepIndex = -1 }) => {
   const stepsContainerRef = useRef<HTMLDivElement>(null);
@@ -81,42 +98,56 @@ const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, cur
         
         <Typography variant="subtitle1" sx={{ mb: 1 }}>Steps:</Typography>
         <Box sx={{ pl: 1, pr: 1 }}>
-          {macroData.steps.map((step, index) => (
-            <Box
-              key={index}
-              ref={index === currentStepIndex ? currentStepRef : null}
-              sx={{
-                mb: 2,
-                opacity: index <= currentStepIndex ? 1 : 0.5,
-                transition: 'all 0.3s ease-in-out',
-              }}
-            >
-              <Paper
-                elevation={1}
+          {macroData.steps.map((step, index) => {
+            const isActive = index === currentStepIndex;
+            const stepColor = ACTION_COLORS[step.type] || '#817066'; // medium gray as fallback
+            
+            return (
+              <Box
+                key={index}
+                ref={isActive ? currentStepRef : null}
                 sx={{
-                  p: 1.5,
-                  backgroundColor: index === currentStepIndex ? 'secondary.main' : 'grey.100',
-                  color: index === currentStepIndex ? 'secondary.contrastText' : 'text.primary',
-                  borderRadius: 2,
-                  position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    width: '10px',
-                    height: '10px',
-                    backgroundColor: index === currentStepIndex ? 'secondary.main' : 'grey.100',
-                    left: '-5px',
-                    top: '50%',
-                    transform: 'translateY(-50%) rotate(45deg)',
-                  }
+                  mb: 2,
+                  opacity: index <= currentStepIndex ? 1 : 0.5,
+                  transition: 'all 0.3s ease-in-out',
                 }}
               >
-                <Typography variant="body2" sx={{ wordBreak: 'break-word', fontSize: '1.25rem' }}>
-                  {step.message || `Executing ${step.type}`}
-                </Typography>
-              </Paper>
-            </Box>
-          ))}
+                <Paper
+                  elevation={1}
+                  sx={{
+                    p: 1.5,
+                    backgroundColor: isActive ? 'secondary.main' : stepColor,
+                    opacity: isActive ? 1 : 0.8,
+                    color: isActive ? 'secondary.contrastText' : '#000000',
+                    borderRadius: 2,
+                    position: 'relative',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      width: '10px',
+                      height: '10px',
+                      backgroundColor: isActive ? 'secondary.main' : stepColor,
+                      opacity: isActive ? 1 : 0.8,
+                      left: '-5px',
+                      top: '50%',
+                      transform: 'translateY(-50%) rotate(45deg)',
+                    }
+                  }}
+                >
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      wordBreak: 'break-word', 
+                      fontSize: '1.25rem',
+                      textShadow: isActive ? 'none' : '0 1px 1px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {step.message || `Executing ${step.type}`}
+                  </Typography>
+                </Paper>
+              </Box>
+            );
+          })}
         </Box>
       </Box>
     </Paper>

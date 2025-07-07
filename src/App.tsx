@@ -7,14 +7,14 @@ import MacroPanel from './components/MacroPanel';
 import { Layout } from 'react-grid-layout';
 import { GridItem } from './types';
 import ActionManager from './services/ActionManager';
-import { DEMO_MACRO } from './types/actions';
+import { DEMO_MACRO, Action } from './types/actions';
 import './App.css';
 
 function App() {
   const [items, setItems] = useState<GridItem[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isMacroPanelOpen, setIsMacroPanelOpen] = useState(false);
-  const [currentMacro, setCurrentMacro] = useState<{ prompt: string; steps: any[] } | undefined>(undefined);
+  const [currentMacro, setCurrentMacro] = useState<{ prompt: string; steps: Action[] } | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1);
   const actionManager = ActionManager.getInstance();
 
@@ -97,7 +97,7 @@ function App() {
     actionManager.logAction('ARRANGE', { columns });
   };
 
-  const handleMacroLoad = (macroData: { prompt: string; steps: any[] }) => {
+  const handleMacroLoad = (macroData: { prompt: string; steps: Action[] }) => {
     setCurrentMacro(macroData);
     setIsMacroPanelOpen(true);
     setCurrentStepIndex(-1); // Reset step index when loading new macro
