@@ -3,7 +3,6 @@ import { Box } from '@mui/material';
 import Toolbar from './components/Toolbar';
 import GridLayout from './components/GridLayout';
 import Chat from './components/Chat';
-import MacroMessage from './components/MacroMessage';
 import MacroPanel from './components/MacroPanel';
 import { Layout } from 'react-grid-layout';
 import { GridItem } from './types';
@@ -14,7 +13,6 @@ import './App.css';
 function App() {
   const [items, setItems] = useState<GridItem[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [macroMessage, setMacroMessage] = useState<string | null>(null);
   const [isMacroPanelOpen, setIsMacroPanelOpen] = useState(false);
   const [currentMacro, setCurrentMacro] = useState<{ prompt: string; steps: any[] } | undefined>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1);
@@ -23,8 +21,6 @@ function App() {
   useEffect(() => {
     // Set items handler in ActionManager
     actionManager.setItemsHandler(setItems);
-    // Set message handler in ActionManager
-    actionManager.setMessageHandler(setMacroMessage);
     // Set step change handler in ActionManager
     actionManager.setStepChangeHandler(setCurrentStepIndex);
   }, [actionManager]);
@@ -145,12 +141,6 @@ function App() {
             onExecuteMacro={handleExecuteMacro}
           />
         )}
-
-        {/* Macro message component */}
-        <MacroMessage
-          message={macroMessage}
-          onClose={() => setMacroMessage(null)}
-        />
       </Box>
     </Box>
   );

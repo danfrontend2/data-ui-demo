@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Box, IconButton, Typography, Paper } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -40,23 +40,55 @@ const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, cur
         </Box>
         
         <Typography variant="subtitle1" sx={{ mb: 1 }}>Prompt:</Typography>
-        <Typography variant="body2" sx={{ mb: 2 }}>{macroData.prompt}</Typography>
+        <Paper 
+          elevation={1} 
+          sx={{ 
+            p: 1.5, 
+            mb: 2, 
+            backgroundColor: 'primary.main',
+            color: 'primary.contrastText',
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="body2" sx={{ fontSize: '1.5rem' }}>{macroData.prompt}</Typography>
+        </Paper>
         
         <Typography variant="subtitle1" sx={{ mb: 1 }}>Steps:</Typography>
-        <Box sx={{ pl: 2 }}>
+        <Box sx={{ pl: 1, pr: 1 }}>
           {macroData.steps.map((step, index) => (
-            <Typography 
-              key={index} 
-              variant="body2" 
-              sx={{ 
-                mb: 1,
+            <Box
+              key={index}
+              sx={{
+                mb: 2,
                 opacity: index <= currentStepIndex ? 1 : 0.5,
-                transition: 'opacity 0.3s ease-in-out',
-                fontWeight: index === currentStepIndex ? 'bold' : 'normal',
+                transition: 'all 0.3s ease-in-out',
               }}
             >
-              {index + 1}. {step.type}
-            </Typography>
+              <Paper
+                elevation={1}
+                sx={{
+                  p: 1.5,
+                  backgroundColor: index === currentStepIndex ? 'secondary.main' : 'grey.100',
+                  color: index === currentStepIndex ? 'secondary.contrastText' : 'text.primary',
+                  borderRadius: 2,
+                  position: 'relative',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    width: '10px',
+                    height: '10px',
+                    backgroundColor: index === currentStepIndex ? 'secondary.main' : 'grey.100',
+                    left: '-5px',
+                    top: '50%',
+                    transform: 'translateY(-50%) rotate(45deg)',
+                  }
+                }}
+              >
+                <Typography variant="body2" sx={{ wordBreak: 'break-word', fontSize: '1.25rem' }}>
+                  {step.message || `Executing ${step.type}`}
+                </Typography>
+              </Paper>
+            </Box>
           ))}
         </Box>
       </Box>

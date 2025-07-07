@@ -26,6 +26,29 @@ export default class ActionManager {
   private onMessage: ((message: string | null) => void) | null = null;
   private onStepChange?: (stepIndex: number) => void;
 
+  private getActionMessage(action: Action): string {
+    switch (action.type) {
+      case 'ADD_GRID':
+        return 'Adding new grid panel...';
+      case 'REMOVE_GRID':
+        return 'Removing grid panel...';
+      case 'REMOVE_ALL_GRIDS':
+        return 'Clearing all panels...';
+      case 'UPDATE_LAYOUT':
+        return 'Updating layout arrangement...';
+      case 'DROP_FILE':
+        return 'Loading data into grid...';
+      case 'SELECT_RANGE':
+        return 'Selecting data range...';
+      case 'ADD_CHART':
+        return 'Creating chart visualization...';
+      case 'ARRANGE':
+        return `Arranging panels in ${action.details.columns} columns...`;
+      default:
+        return `Executing ${action.type}...`;
+    }
+  }
+
   private constructor() {
     console.log('Initializing ActionManager...');
     this.initializeHandlers();
@@ -399,11 +422,6 @@ export default class ActionManager {
         this.onStepChange(i);
       }
       
-      // Show message immediately before action
-      if (this.onMessage && 'message' in action && action.message) {
-        this.onMessage(action.message as string);
-      }
-      
       // Small delay before action
       await new Promise(resolve => setTimeout(resolve, 100));
       
@@ -417,11 +435,6 @@ export default class ActionManager {
 
       // Pause for 2 seconds after action completion
       await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Clear message after the pause
-      if (this.onMessage) {
-        this.onMessage(null);
-      }
     }
     
     // Reset step index after completion
