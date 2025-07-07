@@ -2,7 +2,7 @@
   "name": "data-ui-demo",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://danfrontend2.github.io/data-ui-demo",
+  "homepage": "/",
   "dependencies": {
     "@ag-grid-community/all-modules": "^27.3.0",
     "@ag-grid-community/client-side-row-model": "^32.3.5",
