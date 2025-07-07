@@ -17,6 +17,7 @@ interface MacroPanelProps {
   isPlaying?: boolean;
   onPlayPause?: () => void;
   onNextStep?: () => void;
+  onStepClick?: (stepIndex: number) => void;
 }
 
 // Kelly colors for different action types
@@ -42,7 +43,8 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
   currentStepIndex = -1,
   isPlaying = false,
   onPlayPause,
-  onNextStep
+  onNextStep,
+  onStepClick
 }) => {
   const stepsContainerRef = useRef<HTMLDivElement>(null);
   const currentStepRef = useRef<HTMLDivElement>(null);
@@ -162,6 +164,11 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
                     color: isActive ? 'secondary.contrastText' : '#000000',
                     borderRadius: 2,
                     position: 'relative',
+                    cursor: (onStepClick && !isPlaying) ? 'pointer' : 'default',
+                    '&:hover': (onStepClick && !isPlaying) ? {
+                      boxShadow: 3,
+                      opacity: 0.9
+                    } : {},
                     '&::before': {
                       content: '""',
                       position: 'absolute',
@@ -174,6 +181,7 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
                       transform: 'translateY(-50%) rotate(45deg)',
                     }
                   }}
+                  onClick={() => !isPlaying && onStepClick && onStepClick(index)}
                 >
                   <Typography 
                     variant="body2" 

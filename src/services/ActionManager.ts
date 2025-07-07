@@ -529,4 +529,47 @@ export default class ActionManager {
       console.warn('No handler found for action:', step.type);
     }
   }
+
+  async executeUpToStep(steps: Action[], targetStepIndex: number) {
+    if (this.isExecuting) {
+      // Stop current execution
+      this.pauseMacroExecution();
+    }
+    
+    // Only clear workspace if we're going to a step before the current one
+    if (targetStepIndex < this.currentStepIndex) {
+      this.actionHandlers['REMOVE_ALL_GRIDS']({});
+      // Reset execution state completely
+      this.currentStepIndex = -1;
+    }
+    
+    // Set execution state
+    this.isExecuting = true;
+    this.isPaused = false;
+    this.currentSteps = [...steps];
+    this.notifyPlayStateChange(true); // Notify that macro is playing
+
+    try {
+      // If we're going back, start from the beginning
+      const startIndex = targetStepIndex < this.currentStepIndex ? 0 : this.currentStepIndex + 1;
+      
+      // Execute steps up to and including the target step
+      for (let i = startIndex; i <= Math.min(targetStepIndex, steps.length - 1); i++) {
+        const step = steps[i];
+        this.currentStepIndex = i;
+        this.notifyMacroUpdate();
+        await this.executeStep(step);
+        
+        // Add a small delay between steps
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+    } catch (error) {
+      console.error('Error executing macro steps:', error);
+    } finally {
+      // Pause after reaching the target step
+      this.isPaused = true;
+      this.isExecuting = true; // Keep execution state active
+      this.notifyPlayStateChange(false); // Update UI to show paused state
+    }
+  }
 } 

@@ -126,6 +126,13 @@ function App() {
     actionManager.executeNextStep();
   };
 
+  const handleStepClick = (stepIndex: number) => {
+    // Only allow step clicks when macro is paused or not running
+    if (currentMacro && !isMacroPlaying) {
+      actionManager.executeUpToStep(currentMacro.steps, stepIndex);
+    }
+  };
+
   return (
     <Box sx={{ 
       height: '100vh',
@@ -141,6 +148,7 @@ function App() {
         isPlaying={isMacroPlaying}
         onPlayPause={handlePlayPauseMacro}
         onNextStep={handleNextStep}
+        onStepClick={handleStepClick}
       />
       <Box 
         sx={{ 
