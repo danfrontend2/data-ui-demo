@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Paper, Typography, CircularProgress } from '@mui/material';
+import { Box, TextField, Button, Paper, Typography, CircularProgress, IconButton, Tooltip } from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { OpenAIService } from '../services/OpenAIService';
 import ActionManager from '../services/ActionManager';
 
@@ -74,6 +75,18 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro }) => {
     }
   };
 
+  const handleCopyMessage = async (message: Message) => {
+    try {
+      let textToCopy = message.text;
+      if (message.macro) {
+        textToCopy += '\n\n' + JSON.stringify(message.macro, null, 2);
+      }
+      await navigator.clipboard.writeText(textToCopy);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
   return (
     <Paper 
       elevation={3}
@@ -115,10 +128,33 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro }) => {
               backgroundColor: message.isUser ? '#e3f2fd' : message.error ? '#ffebee' : '#f5f5f5',
               borderRadius: '8px',
               p: 1,
-              maxWidth: '90%'
+              maxWidth: '90%',
+              position: 'relative',
+              '&:hover .copy-button': {
+                opacity: 1
+              }
             }}
           >
-            <Typography variant="body2">{message.text}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+              <Typography variant="body2" sx={{ flex: 1 }}>{message.text}</Typography>
+              <Tooltip title="Copy message">
+                <IconButton
+                  className="copy-button"
+                  size="small"
+                  onClick={() => handleCopyMessage(message)}
+                  sx={{
+                    opacity: 0,
+                    transition: 'opacity 0.2s',
+                    minWidth: 24,
+                    height: 24,
+                    p: 0.25,
+                    ml: 0.5
+                  }}
+                >
+                  <ContentCopyIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
             {message.macro && (
               <Box sx={{ mt: 1, p: 1, backgroundColor: 'rgba(0,0,0,0.04)', borderRadius: '4px' }}>
                 <Typography variant="caption" component="pre" sx={{ whiteSpace: 'pre-wrap' }}>
