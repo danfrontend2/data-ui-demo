@@ -36,6 +36,8 @@ export default class ActionManager {
 
   private getActionMessage(action: Action): string {
     switch (action.type) {
+      case 'START':
+        return 'Starting macro execution...';
       case 'ADD_GRID':
         return 'Adding new grid panel...';
       case 'REMOVE_GRID':
@@ -86,6 +88,13 @@ export default class ActionManager {
     }
 
     console.log('Initializing action handlers...');
+
+    this.registerHandler('START', () => {
+      // Clear all grids when starting a macro
+      if (this.actionHandlers['REMOVE_ALL_GRIDS']) {
+        this.actionHandlers['REMOVE_ALL_GRIDS']({});
+      }
+    });
 
     this.registerHandler('ADD_GRID', ({ item }) => {
       if (!this.setItems) return;
@@ -436,14 +445,27 @@ export default class ActionManager {
       return;
     }
 
+    // Add START action if it doesn't exist at the beginning
+    const stepsToExecute = [...steps];
+    if (stepsToExecute.length > 0 && stepsToExecute[0].type !== 'START') {
+      const startAction: Action = {
+        id: `start_${Date.now()}`,
+        timestamp: Date.now(),
+        type: 'START',
+        details: {},
+        message: 'Starting macro execution...'
+      };
+      stepsToExecute.unshift(startAction);
+    }
+
     this.isExecuting = true;
     this.isPaused = false;
     this.currentStepIndex = -1;
-    this.currentSteps = [...steps]; // Store steps for next step execution
+    this.currentSteps = [...stepsToExecute]; // Store steps for next step execution
     this.notifyPlayStateChange(true); // Notify that macro is playing
 
     try {
-      for (let i = 0; i < steps.length; i++) {
+      for (let i = 0; i < stepsToExecute.length; i++) {
         if (this.isPaused) {
           // Create a promise that will be resolved when resuming
           this.executionPromise = new Promise((resolve) => {
@@ -454,7 +476,7 @@ export default class ActionManager {
           this.executionResolve = null;
         }
 
-        const step = steps[i];
+        const step = stepsToExecute[i];
         this.currentStepIndex = i;
         this.notifyMacroUpdate();
         await this.executeStep(step);
@@ -521,6 +543,15 @@ export default class ActionManager {
   }
 
   private async executeStep(step: Action) {
+    console.log('Executing step:', step);
+    
+    // Update message if provided
+    if (this.onMessage && step.message) {
+      this.onMessage(step.message);
+    } else if (this.onMessage) {
+      this.onMessage(this.getActionMessage(step));
+    }
+    
     const handler = this.actionHandlers[step.type];
     if (handler) {
       console.log('Handler found for action:', step.type);
@@ -536,9 +567,27 @@ export default class ActionManager {
       this.pauseMacroExecution();
     }
     
+    // Add START action if it doesn't exist at the beginning
+    const stepsToExecute = [...steps];
+    let adjustedTargetIndex = targetStepIndex;
+    
+    if (stepsToExecute.length > 0 && stepsToExecute[0].type !== 'START') {
+      const startAction: Action = {
+        id: `start_${Date.now()}`,
+        timestamp: Date.now(),
+        type: 'START',
+        details: {},
+        message: 'Starting macro execution...'
+      };
+      stepsToExecute.unshift(startAction);
+      
+      // Adjust target step index to account for the added START action
+      adjustedTargetIndex++;
+    }
+    
     // Only clear workspace if we're going to a step before the current one
-    if (targetStepIndex < this.currentStepIndex) {
-      this.actionHandlers['REMOVE_ALL_GRIDS']({});
+    // (this is handled by the START action now)
+    if (adjustedTargetIndex < this.currentStepIndex) {
       // Reset execution state completely
       this.currentStepIndex = -1;
     }
@@ -546,16 +595,19 @@ export default class ActionManager {
     // Set execution state
     this.isExecuting = true;
     this.isPaused = false;
-    this.currentSteps = [...steps];
+    this.currentSteps = [...stepsToExecute];
     this.notifyPlayStateChange(true); // Notify that macro is playing
 
     try {
       // If we're going back, start from the beginning
-      const startIndex = targetStepIndex < this.currentStepIndex ? 0 : this.currentStepIndex + 1;
+      const startIndex = adjustedTargetIndex < this.currentStepIndex ? 0 : this.currentStepIndex + 1;
       
-      // Execute steps up to and including the target step
-      for (let i = startIndex; i <= Math.min(targetStepIndex, steps.length - 1); i++) {
-        const step = steps[i];
+      // Execute steps up to and including the target step (not beyond)
+      for (let i = startIndex; i <= adjustedTargetIndex; i++) {
+        // Skip execution if we've gone beyond the available steps
+        if (i >= stepsToExecute.length) break;
+        
+        const step = stepsToExecute[i];
         this.currentStepIndex = i;
         this.notifyMacroUpdate();
         await this.executeStep(step);

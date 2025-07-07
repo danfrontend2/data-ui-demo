@@ -22,6 +22,7 @@ interface MacroPanelProps {
 
 // Kelly colors for different action types
 const ACTION_COLORS: Record<ActionType, string> = {
+  'START': '#4CAF50', // vibrant green
   'ADD_GRID': '#FFB300', // vivid yellow
   'REMOVE_GRID': '#C10020', // vivid red
   'REMOVE_ALL_GRIDS': '#F13A13', // vivid reddish orange

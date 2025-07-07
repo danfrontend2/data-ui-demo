@@ -2,6 +2,7 @@ import { Layout } from 'react-grid-layout';
 import { GridItem } from '../types';
 
 export type ActionType = 
+  | 'START'
   | 'ADD_GRID'
   | 'REMOVE_GRID'
   | 'REMOVE_ALL_GRIDS'
@@ -96,6 +97,12 @@ export interface MacroStep {
 
 export interface ArrangeDetails {
   columns: number;
+}
+
+export interface StartAction extends Action {
+  type: 'START';
+  details: {};
+  message: string;
 }
 
 export const DEMO_MACRO: Action[] = [

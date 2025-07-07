@@ -101,7 +101,25 @@ function App() {
   };
 
   const handleMacroLoad = (macroData: { prompt: string; steps: Action[] }) => {
-    setCurrentMacro(macroData);
+    // Check if START action exists at the beginning, if not add it
+    const updatedSteps = [...macroData.steps];
+    if (updatedSteps.length > 0 && updatedSteps[0].type !== 'START') {
+      const startAction: Action = {
+        id: `start_${Date.now()}`,
+        timestamp: Date.now(),
+        type: 'START',
+        details: {},
+        message: 'Starting macro execution...'
+      };
+      updatedSteps.unshift(startAction);
+    }
+    
+    const updatedMacroData = {
+      ...macroData,
+      steps: updatedSteps
+    };
+    
+    setCurrentMacro(updatedMacroData);
     setIsMacroPanelOpen(true);
     setCurrentStepIndex(-1); // Reset step index when loading new macro
   };
@@ -129,6 +147,7 @@ function App() {
   const handleStepClick = (stepIndex: number) => {
     // Only allow step clicks when macro is paused or not running
     if (currentMacro && !isMacroPlaying) {
+      console.log(`Executing up to step ${stepIndex}`);
       actionManager.executeUpToStep(currentMacro.steps, stepIndex);
     }
   };
@@ -155,7 +174,7 @@ function App() {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          mr: isMacroPanelOpen ? '300px' : 0,
+          mr: isMacroPanelOpen ? '400px' : 0,
           transition: 'margin-right 0.3s ease-in-out',
           overflow: 'hidden'
         }}
