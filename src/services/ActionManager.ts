@@ -28,6 +28,10 @@ export default class ActionManager {
   private isExecuting = false;
   private currentStepIndex = -1;
   private currentMacro: { prompt: string; steps: Action[] } | null = null;
+  private isPaused = false;
+  private executionPromise: Promise<void> | null = null;
+  private executionResolve: (() => void) | null = null;
+  private onPlayStateChange?: (isPlaying: boolean) => void;
 
   private getActionMessage(action: Action): string {
     switch (action.type) {
@@ -405,27 +409,79 @@ export default class ActionManager {
     return this.recordedActions;
   }
 
+  setStepChangeHandler(handler: (stepIndex: number) => void) {
+    this.onStepChange = handler;
+  }
+
+  setPlayStateHandler(handler: (isPlaying: boolean) => void) {
+    this.onPlayStateChange = handler;
+  }
+
+  private notifyMacroUpdate() {
+    if (this.onStepChange) {
+      this.onStepChange(this.currentStepIndex);
+    }
+  }
+
+  private notifyPlayStateChange(isPlaying: boolean) {
+    if (this.onPlayStateChange) {
+      this.onPlayStateChange(isPlaying);
+    }
+  }
+
   async executeMacro(steps: Action[]) {
+    if (this.isExecuting) {
+      console.log('Already executing a macro');
+      return;
+    }
+
     this.isExecuting = true;
+    this.isPaused = false;
     this.currentStepIndex = -1;
-    this.currentMacro = { prompt: '', steps };
-    this.notifyMacroUpdate();
+    this.notifyPlayStateChange(true); // Notify that macro is playing
 
     try {
       for (let i = 0; i < steps.length; i++) {
-        // Add delay before each step
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
+        if (this.isPaused) {
+          // Create a promise that will be resolved when resuming
+          this.executionPromise = new Promise((resolve) => {
+            this.executionResolve = resolve;
+          });
+          await this.executionPromise;
+          this.executionPromise = null;
+          this.executionResolve = null;
+        }
+
+        const step = steps[i];
         this.currentStepIndex = i;
         this.notifyMacroUpdate();
-        await this.executeStep(steps[i]);
+        await this.executeStep(step);
+        await new Promise(resolve => setTimeout(resolve, 500)); // Delay between steps
       }
     } catch (error) {
       console.error('Error executing macro:', error);
+      throw error;
     } finally {
       this.isExecuting = false;
-      this.currentStepIndex = -1;
-      this.notifyMacroUpdate();
+      this.isPaused = false;
+      this.executionPromise = null;
+      this.executionResolve = null;
+      this.notifyPlayStateChange(false); // Notify that macro is not playing
+    }
+  }
+
+  pauseMacroExecution() {
+    if (this.isExecuting) {
+      this.isPaused = true;
+      this.notifyPlayStateChange(false);
+    }
+  }
+
+  resumeMacroExecution() {
+    if (this.isPaused && this.executionResolve) {
+      this.isPaused = false;
+      this.notifyPlayStateChange(true);
+      this.executionResolve();
     }
   }
 
@@ -436,16 +492,6 @@ export default class ActionManager {
 
   setMessageHandler(handler: MessageCallback) {
     this.onMessage = handler;
-  }
-
-  setStepChangeHandler(handler: (stepIndex: number) => void) {
-    this.onStepChange = handler;
-  }
-
-  private notifyMacroUpdate() {
-    if (this.onStepChange) {
-      this.onStepChange(this.currentStepIndex);
-    }
   }
 
   private async executeStep(step: Action) {

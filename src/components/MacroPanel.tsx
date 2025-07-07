@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Box, IconButton, Typography, Paper } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import { ActionType, Action } from '../types/actions';
 
 interface MacroPanelProps {
@@ -11,6 +13,8 @@ interface MacroPanelProps {
     steps: Action[];
   } | null;
   currentStepIndex?: number;
+  isPlaying?: boolean;
+  onPlayPause?: () => void;
 }
 
 // Kelly colors for different action types
@@ -29,7 +33,14 @@ const ACTION_COLORS: Record<ActionType, string> = {
   'UPDATE_CHART_COLOR_SET': '#F6768E', // strong purplish pink
 };
 
-const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, currentStepIndex = -1 }) => {
+const MacroPanel: React.FC<MacroPanelProps> = ({ 
+  isOpen, 
+  onClose, 
+  macroData, 
+  currentStepIndex = -1,
+  isPlaying = false,
+  onPlayPause
+}) => {
   const stepsContainerRef = useRef<HTMLDivElement>(null);
   const currentStepRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +62,7 @@ const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, cur
         right: 0,
         top: 0,
         bottom: 0,
-        width: '300px',
+        width: '400px',
         backgroundColor: 'background.paper',
         boxShadow: -3,
         zIndex: 1200,
@@ -64,14 +75,32 @@ const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, cur
       <Box sx={{ 
         p: 2, 
         display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
+        flexDirection: 'column',
+        gap: 1,
         borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
       }}>
-        <Typography variant="h6">Macro Details</Typography>
-        <IconButton onClick={onClose} size="small">
-          <CloseIcon />
-        </IconButton>
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <Typography variant="h6">Macro Details</Typography>
+          <Box>
+            {onPlayPause && (
+              <IconButton 
+                onClick={onPlayPause} 
+                size="small" 
+                color="primary"
+                sx={{ mr: 1 }}
+              >
+                {!isPlaying ? <PlayArrowIcon /> : <PauseIcon />}
+              </IconButton>
+            )}
+            <IconButton onClick={onClose} size="small">
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </Box>
       </Box>
       
       <Box 

@@ -16,6 +16,7 @@ function App() {
   const [isMacroPanelOpen, setIsMacroPanelOpen] = useState(false);
   const [currentMacro, setCurrentMacro] = useState<{ prompt: string; steps: Action[] } | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1);
+  const [isMacroPlaying, setIsMacroPlaying] = useState(false);
   const actionManager = ActionManager.getInstance();
 
   useEffect(() => {
@@ -23,6 +24,8 @@ function App() {
     actionManager.setItemsHandler(setItems);
     // Set step change handler in ActionManager
     actionManager.setStepChangeHandler(setCurrentStepIndex);
+    // Set play state handler
+    actionManager.setPlayStateHandler(setIsMacroPlaying);
   }, [actionManager]);
 
   // Update ActionManager items when items change
@@ -103,6 +106,22 @@ function App() {
     setCurrentStepIndex(-1); // Reset step index when loading new macro
   };
 
+  const handlePlayPauseMacro = () => {
+    if (isMacroPlaying) {
+      // Pause execution
+      actionManager.pauseMacroExecution();
+    } else {
+      // Resume or start execution
+      if (currentStepIndex === -1 && currentMacro) {
+        // Start from beginning
+        handleExecuteMacro(currentMacro);
+      } else {
+        // Resume from current position
+        actionManager.resumeMacroExecution();
+      }
+    }
+  };
+
   return (
     <Box sx={{ 
       height: '100vh',
@@ -115,6 +134,8 @@ function App() {
         onClose={() => setIsMacroPanelOpen(false)}
         macroData={currentMacro}
         currentStepIndex={currentStepIndex}
+        isPlaying={isMacroPlaying}
+        onPlayPause={handlePlayPauseMacro}
       />
       <Box 
         sx={{ 
