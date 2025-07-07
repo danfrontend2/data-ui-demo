@@ -30,9 +30,10 @@ import ActionManager from '../services/ActionManager';
 interface ToolbarProps {
   onAddItem: (item: Layout) => void;
   onRunMacro: () => void;
-  onRunCustomMacro: (macro: any[]) => void;
   onCloseAll: () => void;
+  onRunCustomMacro: (steps: any[]) => void;
   onArrangeItems: (columns: number) => void;
+  onMacroLoad: (macroData: { prompt: string; steps: any[] }) => void;
   items: GridItem[];
 }
 
@@ -51,7 +52,7 @@ const tooltipProps = {
   }
 };
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onArrangeItems, items }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onArrangeItems, onMacroLoad, items }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
@@ -134,6 +135,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           
           console.log('Macro prompt:', macroData.prompt);
           onRunCustomMacro(macroData.steps);
+          onMacroLoad(macroData);
           
           // Reset input value so the same file can be selected again
           if (fileInputRef.current) {

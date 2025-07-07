@@ -4,6 +4,7 @@ import Toolbar from './components/Toolbar';
 import GridLayout from './components/GridLayout';
 import Chat from './components/Chat';
 import MacroMessage from './components/MacroMessage';
+import MacroPanel from './components/MacroPanel';
 import { Layout } from 'react-grid-layout';
 import { GridItem } from './types';
 import ActionManager from './services/ActionManager';
@@ -14,6 +15,8 @@ function App() {
   const [items, setItems] = useState<GridItem[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [macroMessage, setMacroMessage] = useState<string | null>(null);
+  const [isMacroPanelOpen, setIsMacroPanelOpen] = useState(false);
+  const [currentMacro, setCurrentMacro] = useState<{ prompt: string; steps: any[] } | undefined>(undefined);
   const actionManager = ActionManager.getInstance();
 
   useEffect(() => {
@@ -92,15 +95,32 @@ function App() {
     actionManager.logAction('ARRANGE', { columns });
   };
 
+  const handleMacroLoad = (macroData: { prompt: string; steps: any[] }) => {
+    setCurrentMacro(macroData);
+    setIsMacroPanelOpen(true);
+  };
+
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
-      <Box sx={{ flexGrow: 1 }}>
+      <MacroPanel
+        isOpen={isMacroPanelOpen}
+        onClose={() => setIsMacroPanelOpen(false)}
+        macroData={currentMacro}
+      />
+      <Box 
+        sx={{ 
+          flexGrow: 1,
+          mr: isMacroPanelOpen ? '300px' : 0,
+          transition: 'margin-right 0.3s ease-in-out'
+        }}
+      >
         <Toolbar 
           onAddItem={handleAddItem} 
           onRunMacro={handleRunMacro}
           onCloseAll={handleCloseAll}
           onRunCustomMacro={(steps: any[]) => actionManager.executeMacro(steps)}
           onArrangeItems={handleArrangeItems}
+          onMacroLoad={handleMacroLoad}
           items={items}
         />
         <GridLayout 
