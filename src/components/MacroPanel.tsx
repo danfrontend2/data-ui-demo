@@ -82,7 +82,7 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
         p: 2, 
         display: 'flex', 
         borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-        justifyContent: 'space-between',
+        justifyContent: 'space-between', 
         alignItems: 'center'
       }}>
         <Box>
