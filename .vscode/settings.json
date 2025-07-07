@@ -1,0 +1,4 @@
+{
+    "git.pushOnCommit": true,
+    "git.enableSmartCommit": true
+} 
