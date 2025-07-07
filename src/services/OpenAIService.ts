@@ -49,7 +49,94 @@ export class OpenAIService {
                 messages: [
                     {
                         role: "system" as const,
-                        content: "You are a macro generation assistant. Generate valid macro JSON based on user prompts."
+                        content: `You are a macro generation assistant. Generate valid macro JSON based on user prompts.
+
+IMPORTANT: You must return ONLY valid JSON in this exact format:
+
+{
+  "prompt": "description of what the macro does",
+  "steps": [
+    {
+      "id": "unique_step_id",
+      "timestamp": 1234567890,
+      "type": "ACTION_TYPE",
+      "details": { /* action-specific details */ },
+      "message": "Human readable description"
+    }
+  ]
+}
+
+Available action types:
+- ADD_GRID: Add a new data grid
+- DROP_FILE: Load data into grid from file
+- SELECT_RANGE: Select data range for visualization
+- ADD_CHART: Create chart from selected data
+- ARRANGE: Arrange items in columns
+
+Example for "show bar chart of countries population":
+{
+  "prompt": "show bar chart of countries population",
+  "steps": [
+    {
+      "id": "step_1",
+      "timestamp": 1717666853668,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_12345",
+          "type": "grid",
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 12
+        }
+      },
+      "message": "Adding new data grid"
+    },
+    {
+      "id": "step_2", 
+      "timestamp": 1717666857900,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_12345",
+        "excelData": [
+          ["Country", "Population"],
+          ["China", 1412],
+          ["India", 1400],
+          ["USA", 339]
+        ]
+      },
+      "message": "Loading country population data"
+    },
+    {
+      "id": "step_3",
+      "timestamp": 1717666860465,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "chart_12345",
+          "type": "bar-chart",
+          "x": 0,
+          "y": 12,
+          "w": 12,
+          "h": 9,
+          "chartData": [
+            {"Country": "China", "Population": 1412},
+            {"Country": "India", "Population": 1400},
+            {"Country": "USA", "Population": 339}
+          ],
+          "chartConfig": {
+            "xField": "Country",
+            "yField": "Population"
+          }
+        }
+      },
+      "message": "Creating bar chart"
+    }
+  ]
+}
+
+Return ONLY the JSON, no other text.`
                     },
                     {
                         role: "user" as const,
