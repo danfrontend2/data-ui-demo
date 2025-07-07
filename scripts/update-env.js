@@ -5,9 +5,19 @@ const dotenv = require('dotenv');
 // Load .env file
 const envConfig = dotenv.config().parsed || {};
 
+// Function to mask sensitive values
+const maskSensitiveValue = (key, value) => {
+  if (!value) return '';
+  if (key.includes('API_KEY')) {
+    // Return only the last 4 characters of API keys
+    return value.length > 4 ? `sk-...${value.slice(-4)}` : '****';
+  }
+  return value;
+};
+
 // Combine with process.env (for Netlify environment variables)
 const envVars = {
-  REACT_APP_OPENAI_API_KEY: process.env.REACT_APP_OPENAI_API_KEY || envConfig.REACT_APP_OPENAI_API_KEY || '',
+  REACT_APP_OPENAI_API_KEY: maskSensitiveValue('REACT_APP_OPENAI_API_KEY', process.env.REACT_APP_OPENAI_API_KEY || envConfig.REACT_APP_OPENAI_API_KEY || ''),
   REACT_APP_OPENAI_ORG_ID: process.env.REACT_APP_OPENAI_ORG_ID || envConfig.REACT_APP_OPENAI_ORG_ID || '',
   REACT_APP_OPENAI_MODEL: process.env.REACT_APP_OPENAI_MODEL || envConfig.REACT_APP_OPENAI_MODEL || '',
   REACT_APP_OPENAI_MODEL_S: process.env.REACT_APP_OPENAI_MODEL_S || envConfig.REACT_APP_OPENAI_MODEL_S || ''
@@ -22,4 +32,4 @@ fs.writeFileSync(
   envJsContent
 );
 
-console.log('env.js has been updated with current environment values'); 
+console.log('env.js has been updated with current environment values (sensitive values masked)'); 

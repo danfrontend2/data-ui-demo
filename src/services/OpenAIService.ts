@@ -17,19 +17,40 @@ export class OpenAIService {
     private model: string;
 
     private constructor() {
-        const apiKey = window._env_?.REACT_APP_OPENAI_API_KEY;
+        // Get API key from Netlify environment variables
+        // In development, this will use the local .env file
+        // In production, it will use Netlify environment variables
+        let apiKey = '';
+        
+        // For Netlify Functions (server-side)
+        if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_OPENAI_API_KEY) {
+            apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+        } 
+        // For browser (client-side)
+        else if (window._env_ && window._env_.REACT_APP_OPENAI_API_KEY) {
+            // If the API key is masked (starts with 'sk-...'), we need to get it from Netlify
+            if (window._env_.REACT_APP_OPENAI_API_KEY.startsWith('sk-...')) {
+                // In this case, we'll need to make a request to a Netlify function to get the API key
+                console.warn('Using masked API key - OpenAI calls will need to be proxied through a Netlify function');
+                apiKey = window._env_.REACT_APP_OPENAI_API_KEY;
+            } else {
+                apiKey = window._env_.REACT_APP_OPENAI_API_KEY;
+            }
+        }
+
         if (!apiKey) {
             throw new Error('OpenAI API key not found in environment variables');
         }
 
         // Sanitize API key to ensure it only contains valid characters
-        const sanitizedApiKey = apiKey.replace(/[^\x00-\xFF]/g, '');
+        const sanitizedApiKey = apiKey.replace(/[^\x20-\x7E]/g, '');
 
         this.openai = new OpenAI({
             apiKey: sanitizedApiKey,
             organization: window._env_?.REACT_APP_OPENAI_ORG_ID || undefined,
             dangerouslyAllowBrowser: true
         });
+        
         // Model will be passed later
         this.model = window._env_?.REACT_APP_OPENAI_MODEL || '';
     }

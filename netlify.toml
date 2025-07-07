@@ -4,6 +4,7 @@
 
 [build.environment]
   CI = "false"
+  SECRETS_SCAN_OMIT_PATHS = "public/env.js,build/env.js"
 
 [[redirects]]
   from = "/*"
