@@ -130,12 +130,16 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           console.log('File content:', e.target?.result);
           const macroData = JSON.parse(e.target?.result as string);
           console.log('Parsed macro:', macroData);
+          console.log('macroData.steps type:', typeof macroData.steps);
+          console.log('macroData.steps is Array:', Array.isArray(macroData.steps));
+          console.log('macroData.steps:', macroData.steps);
           
           if (!macroData.steps || !macroData.prompt) {
             throw new Error('Invalid macro format: file must contain both prompt and steps');
           }
           
           console.log('Macro prompt:', macroData.prompt);
+          console.log('About to call onRunCustomMacro with:', macroData.steps);
           onRunCustomMacro(macroData.steps);
           onMacroLoad(macroData);
           

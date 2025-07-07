@@ -444,7 +444,20 @@ export default class ActionManager {
       console.log('Already executing a macro');
       return;
     }
-
+    
+    console.log('ExecuteMacro called with steps:', steps);
+    console.log('Steps type:', typeof steps);
+    console.log('Steps is Array:', Array.isArray(steps));
+    console.log('Steps length:', steps?.length);
+          if (typeof steps === 'object' && steps !== null) {
+        // If this is an object with steps field, take only the steps
+        if ('steps' in steps && Array.isArray(steps.steps)) {
+          steps = steps.steps;
+        } else {
+          // Otherwise convert object to array
+          steps = Object.values(steps);
+        }
+      }
     // Add START action if it doesn't exist at the beginning
     const stepsToExecute = [...steps];
     if (stepsToExecute.length > 0 && stepsToExecute[0].type !== 'START') {
@@ -544,31 +557,77 @@ export default class ActionManager {
 
   private async executeStep(step: Action) {
     console.log('Executing step:', step);
+    console.log('Step type:', step.type);
+    console.log('Step details:', step.details);
+    console.log('Available handlers:', Object.keys(this.actionHandlers));
+    
+    // Fix grid ID mismatches - replace generic IDs with actual grid IDs
+    const fixedStep = this.fixGridIds(step);
+    console.log('Fixed step:', fixedStep);
     
     // Update message if provided
-    if (this.onMessage && step.message) {
-      this.onMessage(step.message);
+    if (this.onMessage && fixedStep.message) {
+      this.onMessage(fixedStep.message);
     } else if (this.onMessage) {
-      this.onMessage(this.getActionMessage(step));
+      this.onMessage(this.getActionMessage(fixedStep));
     }
     
-    const handler = this.actionHandlers[step.type];
+    const handler = this.actionHandlers[fixedStep.type];
     if (handler) {
-      console.log('Handler found for action:', step.type);
-      await handler(step.details);
+      console.log('Handler found for action:', fixedStep.type);
+      await handler(fixedStep.details);
     } else {
-      console.warn('No handler found for action:', step.type);
+      console.warn('No handler found for action:', fixedStep.type);
+      console.warn('Step with missing handler:', JSON.stringify(fixedStep, null, 2));
     }
   }
 
-  async executeUpToStep(steps: Action[], targetStepIndex: number) {
+  private fixGridIds(step: Action): Action {
+    // Get the first (and usually only) grid ID from current items
+    const currentGridId = this.items.find(item => item.type === 'grid')?.i;
+    
+    if (!currentGridId) {
+      return step; // No grid to fix
+    }
+    
+    // Create a copy of the step to avoid modifying the original
+    const fixedStep = JSON.parse(JSON.stringify(step));
+    
+    // Fix gridId references in SELECT_RANGE and other actions
+    if (fixedStep.details.gridId && 
+        (fixedStep.details.gridId === "1" || fixedStep.details.gridId === "2")) {
+      console.log(`Fixing gridId from ${fixedStep.details.gridId} to ${currentGridId}`);
+      fixedStep.details.gridId = currentGridId;
+    }
+    
+    // Fix sourceGridId in ADD_CHART
+    if (fixedStep.details.item?.sourceGridId && 
+        (fixedStep.details.item.sourceGridId === "1" || fixedStep.details.item.sourceGridId === "2")) {
+      console.log(`Fixing sourceGridId from ${fixedStep.details.item.sourceGridId} to ${currentGridId}`);
+      fixedStep.details.item.sourceGridId = currentGridId;
+    }
+    
+    return fixedStep;
+  }
+
+  async executeUpToStep(steps: Action[] | Record<string, Action>, targetStepIndex: number) {
     if (this.isExecuting) {
       // Stop current execution
       this.pauseMacroExecution();
     }
     
+    // Convert steps to array if it's an object with numeric keys
+    let stepsArray: Action[];
+    if (Array.isArray(steps)) {
+      stepsArray = steps;
+    } else if (typeof steps === 'object' && steps !== null) {
+      stepsArray = Object.values(steps);
+    } else {
+      throw new Error('Steps must be an array or object');
+    }
+    
     // Add START action if it doesn't exist at the beginning
-    const stepsToExecute = [...steps];
+    const stepsToExecute = [...stepsArray];
     let adjustedTargetIndex = targetStepIndex;
     
     if (stepsToExecute.length > 0 && stepsToExecute[0].type !== 'START') {

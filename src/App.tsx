@@ -74,6 +74,11 @@ function App() {
       // Reset step index
       setCurrentStepIndex(-1);
       
+      console.log('handleExecuteMacro received macro:', macro);
+      console.log('macro.steps:', macro.steps);
+      console.log('macro.steps type:', typeof macro.steps);
+      console.log('macro.steps is Array:', Array.isArray(macro.steps));
+      
       // First close all existing elements
       const itemIds = items.map(item => item.i);
       itemIds.forEach(id => {

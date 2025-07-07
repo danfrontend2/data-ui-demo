@@ -40,7 +40,9 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro }) => {
       
       // Try to execute macro
       if (onExecuteMacro) {
-        await onExecuteMacro(macro);
+        // Ensure we pass the macro in the same format as file macros
+        const macroToExecute = macro.steps ? macro : { steps: macro };
+        await onExecuteMacro(macroToExecute);
         // After AI-generated macro execution, arrange in 2 columns
         ActionManager.getInstance().logAction('ARRANGE', { columns: 2 });
       }
