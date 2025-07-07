@@ -38,27 +38,39 @@ export class OpenAIService {
             const sanitizedPrompt = prompt.replace(/[^\x20-\x7E\n\r\t]/g, '');
             
             console.log(`Sending request to model: ${this.model}`);
+            console.log(`API Key length: ${process.env.REACT_APP_OPENAI_API_KEY?.length}`);
+            console.log(`API Key (first 20 chars): ${process.env.REACT_APP_OPENAI_API_KEY?.substring(0, 20)}...`);
+            console.log(`API Key (last 10 chars): ...${process.env.REACT_APP_OPENAI_API_KEY?.slice(-10)}`);
+            console.log(`API Key contains asterisks: ${process.env.REACT_APP_OPENAI_API_KEY?.includes('*')}`);
+            console.log(`Full prompt: ${sanitizedPrompt}`);
             
-            const completion = await this.openai.chat.completions.create({
+            const requestBody = {
                 model: this.model,
                 messages: [
                     {
-                        role: "system",
+                        role: "system" as const,
                         content: "You are a macro generation assistant. Generate valid macro JSON based on user prompts."
                     },
                     {
-                        role: "user",
+                        role: "user" as const,
                         content: sanitizedPrompt
                     }
                 ],
                 temperature: 0.7,
                 max_tokens: 2000,
-            });
+            };
+            
+            console.log('Request body:', JSON.stringify(requestBody, null, 2));
+            
+            const completion = await this.openai.chat.completions.create(requestBody);
 
             const response = completion.choices[0]?.message?.content;
             if (!response) {
                 throw new Error('No response from OpenAI');
             }
+
+            console.log('Successful response received');
+            console.log('Response length:', response.length);
 
             // Try to parse JSON
             try {
@@ -69,7 +81,14 @@ export class OpenAIService {
                 throw new Error('Invalid JSON in response');
             }
         } catch (error: any) {
-            console.error('OpenAI API Error:', error);
+            console.error('OpenAI API Error Details:', {
+                message: error.message,
+                status: error.status,
+                error: error.error,
+                code: error.code,
+                param: error.param,
+                type: error.type
+            });
             throw new Error(`Failed to generate macro: ${error.message}`);
         }
     }

@@ -1,10 +1,9 @@
 [build]
-  command = "node scripts/prepare-netlify.js && npm run build"
+  command = "npm run build"
   publish = "build"
 
 [build.environment]
   CI = "false"
-  SECRETS_SCAN_OMIT_PATHS = "public/env.js,build/env.js"
 
 [[redirects]]
   from = "/*"
