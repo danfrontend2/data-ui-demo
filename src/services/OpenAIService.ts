@@ -6,6 +6,7 @@ declare global {
             REACT_APP_OPENAI_API_KEY: string;
             REACT_APP_OPENAI_ORG_ID: string;
             REACT_APP_OPENAI_MODEL: string;
+            REACT_APP_OPENAI_MODEL_S: string;
         }
     }
 }
@@ -21,9 +22,12 @@ export class OpenAIService {
             throw new Error('OpenAI API key not found in environment variables');
         }
 
+        // Sanitize API key to ensure it only contains valid characters
+        const sanitizedApiKey = apiKey.replace(/[^\x00-\xFF]/g, '');
+
         this.openai = new OpenAI({
-            apiKey,
-            organization: window._env_?.REACT_APP_OPENAI_ORG_ID,
+            apiKey: sanitizedApiKey,
+            organization: window._env_?.REACT_APP_OPENAI_ORG_ID || undefined,
             dangerouslyAllowBrowser: true
         });
         // Model will be passed later
@@ -39,6 +43,9 @@ export class OpenAIService {
 
     async generateMacro(prompt: string): Promise<any> {
         try {
+            // Sanitize prompt to ensure it only contains valid characters
+            const sanitizedPrompt = prompt.replace(/[^\x20-\x7E\n\r\t]/g, '');
+            
             const completion = await this.openai.chat.completions.create({
                 model: this.model,
                 messages: [
@@ -48,7 +55,7 @@ export class OpenAIService {
                     },
                     {
                         role: "user",
-                        content: prompt
+                        content: sanitizedPrompt
                     }
                 ],
                 temperature: 0.7, // Can be configured
@@ -64,6 +71,8 @@ export class OpenAIService {
             try {
                 return JSON.parse(response);
             } catch (e) {
+                console.error('JSON parsing error:', e);
+                console.log('Raw response:', response);
                 throw new Error('Invalid JSON in response');
             }
         } catch (error: any) {
