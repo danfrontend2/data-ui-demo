@@ -21,6 +21,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import GridViewIcon from '@mui/icons-material/GridView';
 import SettingsIcon from '@mui/icons-material/Settings';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Layout } from 'react-grid-layout';
 import { GridItem } from '../types';
 import { Action } from '../types/actions';
@@ -256,14 +257,14 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           </Button>
         </Tooltip>
         <Tooltip 
-          title="Load macro from file"
+          title="Run macro from file"
           {...tooltipProps}
         >
           <Button
             color="primary"
             onClick={() => fileInputRef.current?.click()}
           >
-            <UploadIcon />
+            <PlayArrowIcon />
           </Button>
         </Tooltip>
         <Tooltip 

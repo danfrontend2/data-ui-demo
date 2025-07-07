@@ -139,7 +139,8 @@ const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, cur
                     sx={{ 
                       wordBreak: 'break-word', 
                       fontSize: '1.25rem',
-                      textShadow: isActive ? 'none' : '0 1px 1px rgba(0,0,0,0.1)'
+                      textShadow: isActive ? 'none' : '0 1px 1px rgba(0,0,0,0.1)',
+                      fontWeight: isActive ? 700 : 400
                     }}
                   >
                     {step.message || `Executing ${step.type}`}
