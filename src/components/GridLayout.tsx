@@ -764,7 +764,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   return (
     <div
       style={{
-        height: 'calc(100vh - 64px)',
+        height: '100%',
         overflow: 'auto',
         padding: 16
       }}

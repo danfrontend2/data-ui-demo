@@ -104,7 +104,12 @@ function App() {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh' }}>
+    <Box sx={{ 
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
       <MacroPanel
         isOpen={isMacroPanelOpen}
         onClose={() => setIsMacroPanelOpen(false)}
@@ -113,9 +118,12 @@ function App() {
       />
       <Box 
         sx={{ 
-          flexGrow: 1,
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
           mr: isMacroPanelOpen ? '300px' : 0,
-          transition: 'margin-right 0.3s ease-in-out'
+          transition: 'margin-right 0.3s ease-in-out',
+          overflow: 'hidden'
         }}
       >
         <Toolbar 
@@ -127,12 +135,14 @@ function App() {
           onMacroLoad={handleMacroLoad}
           items={items}
         />
-        <GridLayout 
-          items={items}
-          onRemoveItem={handleRemoveItem}
-          onAddChart={handleAddChart}
-          onLayoutChange={handleLayoutChange}
-        />
+        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+          <GridLayout 
+            items={items}
+            onRemoveItem={handleRemoveItem}
+            onAddChart={handleAddChart}
+            onLayoutChange={handleLayoutChange}
+          />
+        </Box>
         
         {/* Chat component */}
         {isChatOpen && (

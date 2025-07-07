@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, IconButton, Typography, Paper } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -13,6 +13,18 @@ interface MacroPanelProps {
 }
 
 const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, currentStepIndex = -1 }) => {
+  const stepsContainerRef = useRef<HTMLDivElement>(null);
+  const currentStepRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (currentStepRef.current && stepsContainerRef.current) {
+      currentStepRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'nearest'
+      });
+    }
+  }, [currentStepIndex]);
+
   if (!isOpen || !macroData) return null;
 
   return (
@@ -26,19 +38,33 @@ const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, cur
         backgroundColor: 'background.paper',
         boxShadow: -3,
         zIndex: 1200,
-        overflow: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
         transition: 'transform 0.3s ease-in-out',
         transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
       }}
     >
-      <Box sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6">Macro Details</Typography>
-          <IconButton onClick={onClose} size="small">
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        
+      <Box sx={{ 
+        p: 2, 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
+      }}>
+        <Typography variant="h6">Macro Details</Typography>
+        <IconButton onClick={onClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      
+      <Box 
+        ref={stepsContainerRef}
+        sx={{ 
+          flex: 1,
+          overflow: 'auto',
+          p: 2
+        }}
+      >
         <Typography variant="subtitle1" sx={{ mb: 1 }}>Prompt:</Typography>
         <Paper 
           elevation={1} 
@@ -58,6 +84,7 @@ const MacroPanel: React.FC<MacroPanelProps> = ({ isOpen, onClose, macroData, cur
           {macroData.steps.map((step, index) => (
             <Box
               key={index}
+              ref={index === currentStepIndex ? currentStepRef : null}
               sx={{
                 mb: 2,
                 opacity: index <= currentStepIndex ? 1 : 0.5,

@@ -25,6 +25,9 @@ export default class ActionManager {
   private selectedData: any[] = [];
   private onMessage: ((message: string | null) => void) | null = null;
   private onStepChange?: (stepIndex: number) => void;
+  private isExecuting = false;
+  private currentStepIndex = -1;
+  private currentMacro: { prompt: string; steps: Action[] } | null = null;
 
   private getActionMessage(action: Action): string {
     switch (action.type) {
@@ -402,45 +405,27 @@ export default class ActionManager {
     return this.recordedActions;
   }
 
-  async executeMacro(actions: Action[]) {
-    console.log('Starting macro execution with actions:', actions);
-    
-    // Reset step index at start
-    if (this.onStepChange) {
-      this.onStepChange(-1);
-    }
-    
-    // Small delay before starting
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    for (let i = 0; i < actions.length; i++) {
-      const action = actions[i];
-      console.log('Executing step:', action);
-      
-      // Update step index before executing
-      if (this.onStepChange) {
-        this.onStepChange(i);
-      }
-      
-      // Small delay before action
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const handler = this.actionHandlers[action.type];
-      if (handler) {
-        console.log('Handler found for action:', action.type);
-        await handler(action.details);
-      } else {
-        console.warn('No handler found for action:', action.type);
-      }
+  async executeMacro(steps: Action[]) {
+    this.isExecuting = true;
+    this.currentStepIndex = -1;
+    this.currentMacro = { prompt: '', steps };
+    this.notifyMacroUpdate();
 
-      // Pause for 2 seconds after action completion
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-    
-    // Reset step index after completion
-    await new Promise(resolve => setTimeout(resolve, 500));
-    if (this.onStepChange) {
-      this.onStepChange(-1);
+    try {
+      for (let i = 0; i < steps.length; i++) {
+        // Add delay before each step
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        this.currentStepIndex = i;
+        this.notifyMacroUpdate();
+        await this.executeStep(steps[i]);
+      }
+    } catch (error) {
+      console.error('Error executing macro:', error);
+    } finally {
+      this.isExecuting = false;
+      this.currentStepIndex = -1;
+      this.notifyMacroUpdate();
     }
   }
 
@@ -455,5 +440,21 @@ export default class ActionManager {
 
   setStepChangeHandler(handler: (stepIndex: number) => void) {
     this.onStepChange = handler;
+  }
+
+  private notifyMacroUpdate() {
+    if (this.onStepChange) {
+      this.onStepChange(this.currentStepIndex);
+    }
+  }
+
+  private async executeStep(step: Action) {
+    const handler = this.actionHandlers[step.type];
+    if (handler) {
+      console.log('Handler found for action:', step.type);
+      await handler(step.details);
+    } else {
+      console.warn('No handler found for action:', step.type);
+    }
   }
 } 
