@@ -122,6 +122,10 @@ function App() {
     }
   };
 
+  const handleNextStep = () => {
+    actionManager.executeNextStep();
+  };
+
   return (
     <Box sx={{ 
       height: '100vh',
@@ -136,6 +140,7 @@ function App() {
         currentStepIndex={currentStepIndex}
         isPlaying={isMacroPlaying}
         onPlayPause={handlePlayPauseMacro}
+        onNextStep={handleNextStep}
       />
       <Box 
         sx={{ 

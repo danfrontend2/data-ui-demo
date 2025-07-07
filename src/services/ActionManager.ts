@@ -32,6 +32,7 @@ export default class ActionManager {
   private executionPromise: Promise<void> | null = null;
   private executionResolve: (() => void) | null = null;
   private onPlayStateChange?: (isPlaying: boolean) => void;
+  private currentSteps: Action[] = [];
 
   private getActionMessage(action: Action): string {
     switch (action.type) {
@@ -438,6 +439,7 @@ export default class ActionManager {
     this.isExecuting = true;
     this.isPaused = false;
     this.currentStepIndex = -1;
+    this.currentSteps = [...steps]; // Store steps for next step execution
     this.notifyPlayStateChange(true); // Notify that macro is playing
 
     try {
@@ -467,6 +469,30 @@ export default class ActionManager {
       this.executionPromise = null;
       this.executionResolve = null;
       this.notifyPlayStateChange(false); // Notify that macro is not playing
+    }
+  }
+
+  async executeNextStep() {
+    if (!this.isPaused || !this.currentSteps.length) {
+      console.log('Cannot execute next step: not paused or no steps available');
+      return;
+    }
+
+    const nextIndex = this.currentStepIndex + 1;
+    if (nextIndex < this.currentSteps.length) {
+      const step = this.currentSteps[nextIndex];
+      this.currentStepIndex = nextIndex;
+      this.notifyMacroUpdate();
+      await this.executeStep(step);
+      
+      // If this was the last step, reset execution state
+      if (nextIndex === this.currentSteps.length - 1) {
+        this.isExecuting = false;
+        this.isPaused = false;
+        this.executionPromise = null;
+        this.executionResolve = null;
+        this.notifyPlayStateChange(false);
+      }
     }
   }
 

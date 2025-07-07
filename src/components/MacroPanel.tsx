@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { Box, IconButton, Typography, Paper } from '@mui/material';
+import { Box, IconButton, Typography, Paper, Tooltip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 import { ActionType, Action } from '../types/actions';
 
 interface MacroPanelProps {
@@ -15,6 +16,7 @@ interface MacroPanelProps {
   currentStepIndex?: number;
   isPlaying?: boolean;
   onPlayPause?: () => void;
+  onNextStep?: () => void;
 }
 
 // Kelly colors for different action types
@@ -39,7 +41,8 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
   macroData, 
   currentStepIndex = -1,
   isPlaying = false,
-  onPlayPause
+  onPlayPause,
+  onNextStep
 }) => {
   const stepsContainerRef = useRef<HTMLDivElement>(null);
   const currentStepRef = useRef<HTMLDivElement>(null);
@@ -75,18 +78,13 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
       <Box sx={{ 
         p: 2, 
         display: 'flex', 
-        flexDirection: 'column',
-        gap: 1,
-        borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
+        borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+        justifyContent: 'space-between',
+        alignItems: 'center'
       }}>
-        <Box sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-          <Typography variant="h6">Macro Details</Typography>
-          <Box>
-            {onPlayPause && (
+        <Box>
+          {onPlayPause && (
+            <Tooltip title={!isPlaying ? "Play" : "Pause"}>
               <IconButton 
                 onClick={onPlayPause} 
                 size="small" 
@@ -95,12 +93,26 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
               >
                 {!isPlaying ? <PlayArrowIcon /> : <PauseIcon />}
               </IconButton>
-            )}
-            <IconButton onClick={onClose} size="small">
-              <CloseIcon />
-            </IconButton>
-          </Box>
+            </Tooltip>
+          )}
+          {onNextStep && (
+            <Tooltip title="Next step">
+              <span>
+                <IconButton 
+                  onClick={onNextStep} 
+                  size="small" 
+                  color="primary"
+                  disabled={isPlaying}
+                >
+                  <SkipNextIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
         </Box>
+        <IconButton onClick={onClose} size="small">
+          <CloseIcon />
+        </IconButton>
       </Box>
       
       <Box 
