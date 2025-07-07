@@ -165,6 +165,7 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
                     color: isActive ? 'secondary.contrastText' : '#000000',
                     borderRadius: 2,
                     position: 'relative',
+                    border: isActive ? '3px solid black' : 'none',
                     cursor: (onStepClick && !isPlaying) ? 'pointer' : 'default',
                     '&:hover': (onStepClick && !isPlaying) ? {
                       boxShadow: 3,
@@ -180,6 +181,9 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
                       left: '-5px',
                       top: '50%',
                       transform: 'translateY(-50%) rotate(45deg)',
+                      border: isActive ? '3px solid black' : 'none',
+                      borderRight: 'none',
+                      borderTop: 'none'
                     }
                   }}
                   onClick={() => !isPlaying && onStepClick && onStepClick(index)}
