@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Typography, Slider, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, Paper, Typography, Slider, Button, FormControl, InputLabel, Select, MenuItem, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import ActionManager from '../services/ActionManager';
 import { GridItem } from '../types';
 
@@ -117,7 +118,9 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
         borderBottom: '1px solid #ddd'
       }}>
         <Typography variant="h6">{getSelectedChartName()}</Typography>
-        <Button onClick={onClose} size="small">Close</Button>
+        <IconButton onClick={onClose} size="small">
+          <CloseIcon />
+        </IconButton>
       </Box>
       
       <Box sx={{ 

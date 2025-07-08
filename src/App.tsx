@@ -188,6 +188,7 @@ function App() {
           onAddItem={handleAddItem} 
           onRunMacro={handleRunMacro}
           onCloseAll={handleCloseAll}
+          onCloseMacroPanel={() => setIsMacroPanelOpen(false)}
           onRunCustomMacro={(steps: any[]) => actionManager.executeMacro(steps)}
           onArrangeItems={handleArrangeItems}
           onMacroLoad={handleMacroLoad}

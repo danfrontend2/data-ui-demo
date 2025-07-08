@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, Paper, Typography, CircularProgress, IconButton, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CloseIcon from '@mui/icons-material/Close';
 import { OpenAIService } from '../services/OpenAIService';
 import ActionManager from '../services/ActionManager';
 
@@ -113,7 +114,9 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad }) => 
         borderBottom: '1px solid #ddd'
       }}>
         <Typography variant="h6">AI Assistant</Typography>
-        <Button onClick={onClose} size="small">Close</Button>
+        <IconButton onClick={onClose} size="small">
+          <CloseIcon />
+        </IconButton>
       </Box>
       
       <Box sx={{ 

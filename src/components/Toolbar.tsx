@@ -33,6 +33,7 @@ interface ToolbarProps {
   onAddItem: (item: Layout) => void;
   onRunMacro: () => void;
   onCloseAll: () => void;
+  onCloseMacroPanel: () => void;
   onRunCustomMacro: (steps: Action[]) => void;
   onArrangeItems: (columns: number) => void;
   onMacroLoad: (macroData: { prompt: string; steps: Action[] }) => void;
@@ -54,7 +55,7 @@ const tooltipProps = {
   }
 };
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onArrangeItems, onMacroLoad, items }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onCloseMacroPanel, onArrangeItems, onMacroLoad, items }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
@@ -167,6 +168,19 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   const handleArrange = () => {
     onArrangeItems(columns);
     handleArrangeClose();
+  };
+
+  // Handle close all - close dialogs and items
+  const handleCloseAll = () => {
+    // Close all dialogs first
+    setIsChatOpen(false);
+    setIsSettingsOpen(false);
+    setIsPromptDialogOpen(false);
+    handleArrangeClose();
+    onCloseMacroPanel();
+    
+    // Then close all items
+    onCloseAll();
   };
 
   // Add click handler for charts
@@ -293,7 +307,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           title="Close all items"
           {...tooltipProps}
         >
-          <Button color="error" onClick={onCloseAll}>
+          <Button color="error" onClick={handleCloseAll}>
             <CloseIcon />
           </Button>
         </Tooltip>
