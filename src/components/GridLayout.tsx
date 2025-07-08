@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { WidthProvider, Responsive, Layout } from 'react-grid-layout';
+import ReactGridLayout, { WidthProvider, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import UploadIcon from '@mui/icons-material/Upload';
@@ -29,7 +29,7 @@ import 'ag-grid-community/styles/ag-theme-balham.css';
 // Register AG Grid Modules
 ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
+const SimpleGridLayout = WidthProvider(ReactGridLayout);
 
 interface GridLayoutProps {
   items: GridItem[];
@@ -567,25 +567,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
     );
   };
 
-  const layouts = useMemo(() => {
-    const result = {
-      lg: localItems.map(item => {
-        const layoutItem = {
-          i: item.i,
-          w: item.w || 12,
-          h: item.h || 9,
-          x: item.x || 0,
-          y: item.y || 0,
-          static: false,
-          type: item.type
-        };
-        console.log('Creating layout item:', { original: item, layout: layoutItem });
-        return layoutItem;
-      })
-    };
-    console.log('Created layouts:', result);
-    return result;
-  }, [localItems]);
+
 
   const onResizeStop = (layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent, element: HTMLElement) => {
     console.log('Resize stopped - old item:', oldItem);
@@ -771,11 +753,16 @@ const GridLayout: React.FC<GridLayoutProps> = ({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <ResponsiveGridLayout
+      <SimpleGridLayout
         className="layout"
-        layouts={layouts}
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        layout={localItems.map(item => ({
+          i: item.i,
+          x: item.x,
+          y: item.y,
+          w: item.w,
+          h: item.h
+        }))}
+        cols={12}
         rowHeight={30}
         compactType="vertical"
         verticalCompact={true}
@@ -790,7 +777,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
         draggableHandle=".drag-handle"
       >
         {localItems.map(item => renderGrid(item))}
-      </ResponsiveGridLayout>
+      </SimpleGridLayout>
     </div>
   );
 };
