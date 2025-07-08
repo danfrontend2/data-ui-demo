@@ -49,6 +49,24 @@ export function getActionMessage(action: Action): string {
         return `Arranging items in ${details.columns} columns`;
       }
       return 'Arranging panels...';
+    case 'UPDATE_CHART_OPACITY':
+      if (details.opacity !== undefined) {
+        const targetText = details.chartId ? `chart ${details.chartId}` : 'all charts';
+        return `Updating opacity to ${details.opacity} for ${targetText}`;
+      }
+      return 'Updating chart opacity...';
+    case 'UPDATE_CHART_STROKE_WIDTH':
+      if (details.strokeWidth !== undefined) {
+        const targetText = details.chartId ? `chart ${details.chartId}` : 'all charts';
+        return `Updating stroke width to ${details.strokeWidth} for ${targetText}`;
+      }
+      return 'Updating chart stroke width...';
+    case 'UPDATE_CHART_COLOR_SET':
+      if (details.colorSet) {
+        const targetText = details.chartId ? `chart ${details.chartId}` : 'all charts';
+        return `Changing color scheme to ${details.colorSet} for ${targetText}`;
+      }
+      return 'Updating chart colors...';
     default:
       return `Executing ${action.type}...`;
   }
