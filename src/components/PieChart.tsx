@@ -131,13 +131,23 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
         })
       );
 
-      // Configure slices
+      // Configure slices with dynamic stroke color
       pieSeries.slices.template.setAll({
         strokeWidth: chartConfig?.strokeWidth ?? 2,
         fillOpacity: chartConfig?.opacity ?? 1,
-        stroke: am5.color(0xffffff),
         templateField: "sliceSettings",
         cornerRadius: 5
+      });
+
+      // Set stroke color adapter to use darker version of fill color
+      pieSeries.slices.template.adapters.add("stroke", (stroke, target) => {
+        const fill = target.get("fill");
+        if (fill) {
+          // Use fill color number directly and make it darker
+          const darkStroke = getStrokeColor(fill.hex);
+          return darkStroke;
+        }
+        return stroke;
       });
 
       // Add hover state
@@ -184,8 +194,18 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
         pieSeries.slices.template.setAll({
           strokeWidth: chartConfig?.strokeWidth ?? 2,
           fillOpacity: chartConfig?.opacity ?? 1,
-          stroke: am5.color(0xffffff),
           cornerRadius: 5
+        });
+
+        // Set stroke color adapter to use darker version of fill color
+        pieSeries.slices.template.adapters.add("stroke", (stroke, target) => {
+          const fill = target.get("fill");
+          if (fill) {
+            // Use fill color number directly and make it darker
+            const darkStroke = getStrokeColor(fill.hex);
+            return darkStroke;
+          }
+          return stroke;
         });
 
         // Add hover state
