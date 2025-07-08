@@ -305,7 +305,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
             <SmartToyIcon />
           </Button>
         </Tooltip>
-        <PromptsMenu onPromptSelect={onPromptSelect} />
         <Tooltip 
           title="Close all items"
           {...tooltipProps}
@@ -314,6 +313,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
             <CloseIcon />
           </Button>
         </Tooltip>
+        <PromptsMenu onPromptSelect={onPromptSelect} />
         <input
           type="file"
           ref={fileInputRef}
