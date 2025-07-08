@@ -158,7 +158,23 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
       });
     }
 
-    // Create legend
+    // Add title if single series
+    if (series.length === 1) {
+      chart.children.unshift(
+        am5.Label.new(root, {
+          text: series[0].name,
+          fontSize: 16,
+          fontWeight: "600",
+          textAlign: "center",
+          x: am5.percent(50),
+          centerX: am5.percent(50),
+          paddingTop: 10,
+          paddingBottom: 10
+        })
+      );
+    }
+
+    // Create legend (always show for hiding/showing values)
     const legend = chart.children.push(
       am5.Legend.new(root, {
         centerX: am5.percent(50),

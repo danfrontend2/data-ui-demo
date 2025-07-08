@@ -94,6 +94,22 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
       })
     );
 
+    // Add title if single series
+    if (series.length === 1) {
+      chart.children.unshift(
+        am5.Label.new(root, {
+          text: series[0].name,
+          fontSize: 16,
+          fontWeight: "600",
+          textAlign: "center",
+          x: am5.percent(50),
+          centerX: am5.percent(50),
+          paddingTop: 10,
+          paddingBottom: 10
+        })
+      );
+    }
+
     // Create series for each field
     series.forEach((seriesConfig) => {
       const lineSeries = chart.series.push(
@@ -127,7 +143,7 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
       lineSeries.data.setAll(data);
     });
 
-    // Create legend
+    // Create legend (always show for hiding/showing values)
     const legend = chart.children.push(am5.Legend.new(root, {
       centerX: am5.percent(50),
       x: am5.percent(50),

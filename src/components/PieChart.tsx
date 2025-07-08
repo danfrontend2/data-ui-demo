@@ -106,6 +106,21 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
     if (series.length <= 1) {
       // Single series - create one series
       const field = Object.keys(data[0]).find(key => key !== 'category') || '';
+      
+      // Add title for single series
+      chart.children.unshift(
+        am5.Label.new(root, {
+          text: series[0]?.name || field,
+          fontSize: 16,
+          fontWeight: "600",
+          textAlign: "center",
+          x: am5.percent(50),
+          centerX: am5.percent(50),
+          paddingTop: 10,
+          paddingBottom: 10
+        })
+      );
+      
       const pieSeries = chart.series.push(
         am5percent.PieSeries.new(root, {
           categoryField: "category",
@@ -140,7 +155,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
 
       pieSeries.data.setAll(data);
 
-      // Create legend
+      // Create legend (always show for hiding/showing values)
       const legend = chart.children.push(
         am5.Legend.new(root, {
           centerX: am5.percent(50),
