@@ -40,12 +40,17 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad }) => 
       // Get macro from OpenAI
       const macro = await openAIService.generateMacro(input);
       
-      // Show macro in MacroPanel instead of executing immediately
+      // Show macro in MacroPanel and auto-start execution
       if (onMacroLoad && macro.prompt && macro.steps) {
         onMacroLoad(macro);
         
+        // Auto-start the macro execution
+        setTimeout(() => {
+          ActionManager.getInstance().executeMacro(macro.steps);
+        }, 100);
+        
         const aiMessage: Message = {
-          text: 'Macro generated! Check the macro panel to execute it step by step.',
+          text: 'Macro generated and started! Check the macro panel to control execution.',
           isUser: false,
           macro: macro
         };
