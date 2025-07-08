@@ -1,0 +1,8 @@
+{
+  "macros": [
+    "macro_triple_charts.json",
+    "macro_countries_and_mountains.json", 
+    "macro_window_arrangement.json",
+    "macro_animals_pie.json"
+  ]
+} 

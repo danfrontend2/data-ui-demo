@@ -27,6 +27,7 @@ import { GridItem } from '../types';
 import { Action } from '../types/actions';
 import Chat from './Chat';
 import ChartSettings from './ChartSettings';
+import PromptsMenu from './PromptsMenu';
 import ActionManager from '../services/ActionManager';
 
 interface ToolbarProps {
@@ -37,6 +38,7 @@ interface ToolbarProps {
   onRunCustomMacro: (steps: Action[]) => void;
   onArrangeItems: (columns: number) => void;
   onMacroLoad: (macroData: { prompt: string; steps: Action[] }) => void;
+  onPromptSelect?: (prompt: string) => void;
   items: GridItem[];
 }
 
@@ -55,7 +57,7 @@ const tooltipProps = {
   }
 };
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onCloseMacroPanel, onArrangeItems, onMacroLoad, items }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onCloseMacroPanel, onArrangeItems, onMacroLoad, onPromptSelect, items }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
@@ -303,6 +305,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
             <SmartToyIcon />
           </Button>
         </Tooltip>
+        <PromptsMenu onPromptSelect={onPromptSelect} />
         <Tooltip 
           title="Close all items"
           {...tooltipProps}
