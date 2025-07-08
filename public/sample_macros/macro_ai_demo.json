@@ -1,5 +1,5 @@
 {
-  "prompt": "open AI chat and ask about creating a world population chart",
+  "prompt": "open AI chat and ask about creating a largest animals pie chart",
   "show_panel": false,
   "steps": [
     {
@@ -7,7 +7,7 @@
       "timestamp": 1751614945857,
       "type": "OPEN_AI_CHAT",
       "details": {
-        "message": "Show me a world population chart",
+        "message": "Largest animals pie chart",
         "autoSend": true
       }
     }

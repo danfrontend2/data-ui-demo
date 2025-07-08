@@ -48,17 +48,33 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad, prefi
       
       // Show macro in MacroPanel and auto-start execution
       if (onMacroLoad && macro.prompt && macro.steps) {
-        onMacroLoad(macro);
+        // Add ARRANGE action to the end of steps
+        const arrangeAction: any = {
+          id: `arrange_${Date.now()}`,
+          timestamp: Date.now(),
+          type: 'ARRANGE',
+          details: {
+            columns: 2
+          },
+          message: 'Arranging items in 2 columns'
+        };
+
+        const macroWithArrange = {
+          ...macro,
+          steps: [...macro.steps, arrangeAction]
+        };
+
+        onMacroLoad(macroWithArrange);
         
         // Auto-start the macro execution
         setTimeout(() => {
-          ActionManager.getInstance().executeMacro(macro.steps);
+          ActionManager.getInstance().executeMacro(macroWithArrange.steps);
         }, 100);
         
         const aiMessage: Message = {
           text: 'Macro generated and started! Check the macro panel to control execution.',
           isUser: false,
-          macro: macro
+          macro: macroWithArrange
         };
 
         setMessages(prev => [...prev, aiMessage]);
