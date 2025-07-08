@@ -160,7 +160,7 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
         transformOrigin={{ horizontal: 'left', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
       >
-        <Box sx={{ px: 2, py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <MenuItem disabled sx={{ px: 2, py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
           <Typography variant="h6" sx={{ 
             display: 'flex', 
             alignItems: 'center',
@@ -170,9 +170,9 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
             <ChatIcon sx={{ mr: 1, fontSize: '1.2rem' }} />
             Showtime: Select a Demo Macro
           </Typography>
-        </Box>
+        </MenuItem>
 
-{isLoading ? (
+        {isLoading ? (
           <MenuItem disabled>
             <Typography variant="body2" color="text.secondary">
               Loading macros...
@@ -180,8 +180,8 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
           </MenuItem>
         ) : (
           promptOptions.map((promptOption: PromptOption, index: number) => (
-            <React.Fragment key={promptOption.id}>
               <MenuItem
+                key={promptOption.id}
                 onClick={() => handleMacroSelect(promptOption)}
                 sx={{
                   px: 2,
@@ -213,7 +213,6 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
                   {promptOption.prompt.charAt(0).toUpperCase() + promptOption.prompt.slice(1)}
                 </Typography>
               </MenuItem>
-            </React.Fragment>
           ))
         )}
       </Menu>
