@@ -508,10 +508,55 @@ export default class ActionManager {
   }
 
   resumeMacroExecution() {
-    if (this.isPaused && this.executionResolve) {
+    if (this.isPaused) {
+      if (this.executionResolve) {
+        // Resume normal execution flow
+        this.isPaused = false;
+        this.notifyPlayStateChange(true);
+        this.executionResolve();
+      } else if (this.currentSteps.length > 0) {
+        // Continue execution from current step when paused via executeUpToStep
+        this.continueExecutionFromCurrentStep();
+      }
+    }
+  }
+
+  private async continueExecutionFromCurrentStep() {
+    if (!this.isPaused || !this.currentSteps.length) {
+      return;
+    }
+
+    this.isPaused = false;
+    this.notifyPlayStateChange(true);
+
+    try {
+      // Continue from the next step after current
+      for (let i = this.currentStepIndex + 1; i < this.currentSteps.length; i++) {
+        // Check if we were paused again
+        if (this.isPaused) {
+          // Create a promise that will be resolved when resuming
+          this.executionPromise = new Promise((resolve) => {
+            this.executionResolve = resolve;
+          });
+          await this.executionPromise;
+          this.executionPromise = null;
+          this.executionResolve = null;
+        }
+
+        const step = this.currentSteps[i];
+        this.currentStepIndex = i;
+        this.notifyMacroUpdate();
+        await this.executeStep(step);
+        await new Promise(resolve => setTimeout(resolve, 500)); // Delay between steps
+      }
+    } catch (error) {
+      console.error('Error continuing macro execution:', error);
+    } finally {
+      this.isExecuting = false;
       this.isPaused = false;
-      this.notifyPlayStateChange(true);
-      this.executionResolve();
+      this.executionPromise = null;
+      this.executionResolve = null;
+      this.notifyPlayStateChange(false);
     }
   }
 
