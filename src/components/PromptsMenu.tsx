@@ -8,7 +8,7 @@ import {
   Tooltip,
   Divider
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import MovieIcon from '@mui/icons-material/Movie';
 import ChatIcon from '@mui/icons-material/Chat';
 
 interface PromptOption {
@@ -82,7 +82,21 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect }) => {
 
   return (
     <>
-      <Tooltip title="demo macros">
+      <Tooltip 
+        title="Select macro for demo"
+        componentsProps={{
+          tooltip: {
+            sx: {
+              bgcolor: '#4caf50',
+              color: 'white',
+              fontSize: '1rem',
+              padding: '8px 16px',
+              borderRadius: '4px',
+              fontWeight: 500
+            }
+          }
+        }}
+      >
         <IconButton
           onClick={handleClick}
           size="small"
@@ -95,7 +109,15 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect }) => {
             }
           }}
         >
-          <MenuIcon />
+          <MovieIcon 
+            sx={{
+              color: '#ff4444',
+              fontSize: '1.5rem',
+              '&:hover': {
+                color: '#ff6666'
+              }
+            }}
+          />
         </IconButton>
       </Tooltip>
 
@@ -121,7 +143,7 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect }) => {
             fontWeight: 600
           }}>
             <ChatIcon sx={{ mr: 1, fontSize: '1.2rem' }} />
-            Demo macros
+            Select macro for demo
           </Typography>
         </Box>
 
