@@ -206,7 +206,7 @@ export default class ActionManager {
       }
     });
 
-    this.registerHandler('SELECT_RANGE', ({ gridId, startCell, endCell }) => {
+    this.registerHandler('SELECT_RANGE', ({ gridId, startCell, endCell, range }) => {
       const gridApi = window.gridApis[gridId];
       if (gridApi) {
         // Get all rows data
@@ -222,9 +222,24 @@ export default class ActionManager {
             headerName: col.headerName as string
           }));
 
-        // Extract selected data
-        const startRow = Math.min(startCell.rowIndex, endCell.rowIndex);
-        const endRow = Math.max(startCell.rowIndex, endCell.rowIndex);
+        // Extract selected data - support both formats
+        let startRow: number, endRow: number;
+        
+        if (range) {
+          // New format: range object with startRow/endRow
+          startRow = range.startRow;
+          endRow = range.endRow;
+        } else if (startCell && endCell && 
+                   typeof startCell.rowIndex !== 'undefined' && 
+                   typeof endCell.rowIndex !== 'undefined') {
+          // Old format: startCell/endCell objects with rowIndex
+          startRow = Math.min(startCell.rowIndex, endCell.rowIndex);
+          endRow = Math.max(startCell.rowIndex, endCell.rowIndex);
+        } else {
+          console.error('Invalid SELECT_RANGE format: missing range or startCell/endCell');
+          return;
+        }
+
         const selectedData = rowData.slice(startRow, endRow + 1);
 
         // Convert to chart format
