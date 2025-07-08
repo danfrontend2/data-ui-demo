@@ -16,13 +16,17 @@ interface PromptOption {
   title: string;
   description: string;
   prompt: string;
+  filename: string;
+  macroData: any;
 }
 
 interface PromptsMenuProps {
   onPromptSelect?: (prompt: string) => void;
+  onRunMacro?: (steps: any[]) => void;
+  onMacroLoad?: (macroData: { prompt: string; steps: any[] }) => void;
 }
 
-const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect }) => {
+const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, onMacroLoad }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [promptOptions, setPromptOptions] = useState<PromptOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +53,9 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect }) => {
             id,
             title: macroData.prompt,
             description: `Macro: ${id.replace(/[_-]/g, ' ')}`,
-            prompt: macroData.prompt
+            prompt: macroData.prompt,
+            filename,
+            macroData
           };
         });
         
@@ -73,9 +79,15 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect }) => {
     setAnchorEl(null);
   };
 
-  const handlePromptSelect = (prompt: string) => {
-    if (onPromptSelect) {
-      onPromptSelect(prompt);
+  const handleMacroSelect = (promptOption: PromptOption) => {
+    // Run the macro if handlers are provided
+    if (onRunMacro && onMacroLoad && promptOption.macroData) {
+      onRunMacro(promptOption.macroData.steps);
+      onMacroLoad(promptOption.macroData);
+    } 
+    // Fallback to old behavior if new handlers not provided
+    else if (onPromptSelect) {
+      onPromptSelect(promptOption.prompt);
     }
     handleClose();
   };
@@ -83,7 +95,7 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect }) => {
   return (
     <>
       <Tooltip 
-        title="Select macro for demo"
+        title="Showtime: Select a Demo Macro"
         componentsProps={{
           tooltip: {
             sx: {
@@ -143,7 +155,7 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect }) => {
             fontWeight: 600
           }}>
             <ChatIcon sx={{ mr: 1, fontSize: '1.2rem' }} />
-            Select macro for demo
+            Showtime: Select a Demo Macro
           </Typography>
         </Box>
 
@@ -157,7 +169,7 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect }) => {
           promptOptions.map((promptOption: PromptOption, index: number) => (
             <React.Fragment key={promptOption.id}>
               <MenuItem
-                onClick={() => handlePromptSelect(promptOption.prompt)}
+                onClick={() => handleMacroSelect(promptOption)}
                 sx={{
                   px: 2,
                   py: 1.5,

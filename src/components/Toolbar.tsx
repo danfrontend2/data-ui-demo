@@ -313,7 +313,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
             <CloseIcon />
           </Button>
         </Tooltip>
-        <PromptsMenu onPromptSelect={onPromptSelect} />
+        <PromptsMenu 
+          onRunMacro={onRunCustomMacro}
+          onMacroLoad={onMacroLoad}
+          onPromptSelect={onPromptSelect}
+        />
         <input
           type="file"
           ref={fileInputRef}
