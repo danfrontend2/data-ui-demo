@@ -3,6 +3,7 @@ import { GridItem } from '../types';
 import { Layout } from 'react-grid-layout';
 import { GridApi } from 'ag-grid-community';
 import { SetStateAction } from 'react';
+import { getActionMessage } from '../utils/messageUtils';
 
 declare global {
   interface Window {
@@ -34,30 +35,7 @@ export default class ActionManager {
   private onPlayStateChange?: (isPlaying: boolean) => void;
   private currentSteps: Action[] = [];
 
-  private getActionMessage(action: Action): string {
-    switch (action.type) {
-      case 'START':
-        return 'Starting macro execution...';
-      case 'ADD_GRID':
-        return 'Adding new grid panel...';
-      case 'REMOVE_GRID':
-        return 'Removing grid panel...';
-      case 'REMOVE_ALL_GRIDS':
-        return 'Clearing all panels...';
-      case 'UPDATE_LAYOUT':
-        return 'Updating layout arrangement...';
-      case 'DROP_FILE':
-        return 'Loading data into grid...';
-      case 'SELECT_RANGE':
-        return 'Selecting data range...';
-      case 'ADD_CHART':
-        return 'Creating chart visualization...';
-      case 'ARRANGE':
-        return `Arranging panels in ${action.details.columns} columns...`;
-      default:
-        return `Executing ${action.type}...`;
-    }
-  }
+
 
   private constructor() {
     console.log('Initializing ActionManager...');
@@ -368,47 +346,9 @@ export default class ActionManager {
       details
     };
 
-    // Add default messages when recording
+    // Add message when recording
     if (this.recording) {
-      switch (type) {
-        case 'ADD_GRID':
-          action.message = 'Adding a new data grid';
-          break;
-        case 'REMOVE_GRID':
-          action.message = 'Removing item';
-          break;
-        case 'UPDATE_CELL':
-          action.message = 'Updating cell value';
-          break;
-        case 'UPDATE_LAYOUT':
-          action.message = `Adjusting layout, height: ${details.layout.at(-1).h}, width: ${details.layout.at(-1).w}`;
-          break;
-        case 'DROP_FILE':
-          action.message = `Loading data from file, ${details.excelData.length} rows, fields: ${details.excelData[0]} `;
-          break;
-        case 'SELECT_RANGE':
-          action.message = `Selecting data range, lines:${details.range.startRow} - ${details.range.endRow}`;
-          break;
-        case 'ADD_CHART':
-          const chartType = details.item.type;
-          switch (chartType) {
-            case 'pie-chart':
-              action.message = `Adding a pie chart, for categories:[${details.item.chartData.map((obj: any) => obj.category).join(", ")}]`;
-              break;
-            case 'line-chart':
-              action.message = `Adding a line chart, for categories:[${details.item.chartData.map((obj: any) => obj.category).join(", ")}]`;
-              break;
-            case 'bar-chart':
-              action.message = `Adding a bar chart, for categories:[${details.item.chartData.map((obj: any) => obj.category).join(", ")}]`;
-              break;
-            default:
-              action.message = 'Adding a new chart';
-          }
-          break;
-        case 'ARRANGE':
-          action.message = `Arranging items in ${details.columns} columns`;
-          break;
-      }
+      action.message = getActionMessage(action);
     }
 
     this.actionLog.push(action);
@@ -583,11 +523,9 @@ export default class ActionManager {
     const fixedStep = this.fixGridIds(step);
     console.log('Fixed step:', fixedStep);
     
-    // Update message if provided
-    if (this.onMessage && fixedStep.message) {
-      this.onMessage(fixedStep.message);
-    } else if (this.onMessage) {
-      this.onMessage(this.getActionMessage(fixedStep));
+    // Always use generated message for consistency
+    if (this.onMessage) {
+      this.onMessage(getActionMessage(fixedStep));
     }
     
     const handler = this.actionHandlers[fixedStep.type];

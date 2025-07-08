@@ -5,6 +5,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import { ActionType, Action } from '../types/actions';
+import { getActionMessage } from '../utils/messageUtils';
 
 interface MacroPanelProps {
   isOpen: boolean;
@@ -197,7 +198,7 @@ const MacroPanel: React.FC<MacroPanelProps> = ({
                       fontWeight: isActive ? 700 : 400
                     }}
                   >
-                    {step.message || `Executing ${step.type}`}
+                    {getActionMessage(step)}
                   </Typography>
                 </Paper>
               </Box>
