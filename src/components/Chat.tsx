@@ -81,14 +81,16 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad, prefi
   useEffect(() => {
     if (prefilledMessage) {
       setInput(prefilledMessage);
+      setHasAutoSent(false); // Reset auto-send flag when new message arrives
     }
   }, [prefilledMessage]);
 
   // Handle auto-send separately to ensure handleSend is available
   useEffect(() => {
-    if (prefilledMessage && shouldAutoSend && !isLoading && input === prefilledMessage) {
+    if (prefilledMessage && shouldAutoSend && !isLoading && !hasAutoSent && input === prefilledMessage) {
       // Auto-send after a small delay to ensure UI is ready
       const timer = setTimeout(() => {
+        setHasAutoSent(true);
         handleSend();
         if (onMessageSent) {
           onMessageSent();
@@ -97,7 +99,7 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad, prefi
       
       return () => clearTimeout(timer);
     }
-  }, [prefilledMessage, shouldAutoSend, input, isLoading, onMessageSent]);
+  }, [prefilledMessage, shouldAutoSend, input, isLoading, hasAutoSent, onMessageSent]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
