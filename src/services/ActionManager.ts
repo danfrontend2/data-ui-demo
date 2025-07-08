@@ -23,6 +23,7 @@ export default class ActionManager {
   private setItems: ((items: GridItem[]) => void) | null = null;
   private items: GridItem[] = [];
   private selectedData: any[] = [];
+  private fieldToHeaderMapping: Map<string, string> = new Map(); // Store field -> headerName mapping
   private onMessage: ((message: string | null) => void) | null = null;
   private onStepChange?: (stepIndex: number) => void;
   private isExecuting = false;
@@ -43,7 +44,19 @@ export default class ActionManager {
 
   private constructor() {
     console.log('Initializing ActionManager...');
+    this.initializeDefaultMappings();
     this.initializeHandlers();
+  }
+
+  // Initialize default field mappings for default grid data
+  private initializeDefaultMappings() {
+    // Default mappings for the default grid columns
+    this.fieldToHeaderMapping.set('country', 'Country');
+    this.fieldToHeaderMapping.set('population', 'Population (M)');
+    this.fieldToHeaderMapping.set('gdp', 'GDP (T$)');
+    this.fieldToHeaderMapping.set('area', 'Area (K km²)');
+    
+    console.log('Initialized default field->header mappings:', Array.from(this.fieldToHeaderMapping.entries()));
   }
 
   static getInstance(): ActionManager {
@@ -149,6 +162,10 @@ export default class ActionManager {
             ...headers.map(header => {
               // Create a safe field name by removing special characters
               const safeField = header.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_');
+              
+              // Store mapping for future use
+              this.fieldToHeaderMapping.set(safeField, header);
+              
               return {
                 field: safeField,
                 headerName: header,
@@ -158,6 +175,7 @@ export default class ActionManager {
             })
           ];
           console.log('Column definitions:', columnDefs);
+          console.log('Stored field->header mapping:', Array.from(this.fieldToHeaderMapping.entries()));
 
           // Convert array data to row objects
           const rowData = excelData.slice(1).map((row: any[], index: number) => {
@@ -193,35 +211,54 @@ export default class ActionManager {
       console.log('gridId:', gridId);
       console.log('Available gridApis:', Object.keys(window.gridApis || {}));
       
-      const gridApi = window.gridApis[gridId];
-      console.log('gridApi found:', !!gridApi);
+      let gridApi = window.gridApis[gridId];
+      console.log('gridApi found with exact ID:', !!gridApi);
+      
+      // Fallback: if exact gridId not found, try to find any available grid
+      if (!gridApi && window.gridApis && Object.keys(window.gridApis).length > 0) {
+        const availableGridId = Object.keys(window.gridApis)[0];
+        gridApi = window.gridApis[availableGridId];
+        console.log(`Fallback: using gridId "${availableGridId}" instead of "${gridId}"`);
+      }
       
       if (gridApi) {
         console.log('Starting SELECT_RANGE processing...');
         
         // Get all rows data
         const renderedNodes = gridApi.getRenderedNodes();
-        console.log('Rendered nodes count:', renderedNodes.length);
+        console.log('Rendered nodes:', renderedNodes);
+        console.log('Rendered nodes count:', renderedNodes?.length || 0);
         
-        const rowData = renderedNodes.map(node => node.data);
-        console.log('Row data extracted, length:', rowData.length);
+        if (!renderedNodes || !Array.isArray(renderedNodes)) {
+          console.log('No rendered nodes, exiting');
+          return;
+        }
         
-        if (!rowData) {
+        const rowData = renderedNodes.map(node => node?.data).filter(data => data);
+        console.log('Row data extracted, length:', rowData?.length || 0);
+        
+        if (!rowData || rowData.length === 0) {
           console.log('No row data, exiting');
           return;
         }
 
         // Get column definitions
         const columnDefs = gridApi.getColumnDefs() as any[];
-        console.log('Column defs:', columnDefs.length);
+        console.log('Column defs:', columnDefs);
+        console.log('Column defs length:', columnDefs?.length || 0);
+        
+        if (!columnDefs || !Array.isArray(columnDefs)) {
+          console.log('No column definitions, exiting');
+          return;
+        }
         
         const columns = columnDefs
-          .filter(col => !col.hide && 'field' in col)
+          .filter(col => col && !col.hide && 'field' in col)
           .map(col => ({
             field: col.field as string,
             headerName: col.headerName as string
           }));
-        console.log('Processed columns:', columns.length);
+        console.log('Processed columns:', columns?.length || 0);
 
         // Extract selected data - support both formats
         console.log('Parameters - range:', range, 'startCell:', startCell, 'endCell:', endCell);
@@ -233,7 +270,7 @@ export default class ActionManager {
           // New format: range object with startRow/endRow
           startRow = range.startRow;
           endRow = range.endRow;
-          selectedColumns = range.columns || columns.map(col => col.field);
+          selectedColumns = range.columns || (columns && columns.length > 0 ? columns.map(col => col?.field).filter(field => field) : []);
           console.log('Range processing - startRow:', startRow, 'endRow:', endRow, 'columns:', selectedColumns);
         } else if (startCell && endCell && 
                    typeof startCell.rowIndex !== 'undefined' && 
@@ -242,11 +279,16 @@ export default class ActionManager {
           // Old format: startCell/endCell objects with rowIndex
           startRow = Math.min(startCell.rowIndex, endCell.rowIndex);
           endRow = Math.max(startCell.rowIndex, endCell.rowIndex);
-          selectedColumns = columns.map(col => col.field);
+          selectedColumns = columns && columns.length > 0 ? columns.map(col => col?.field).filter(field => field) : [];
           console.log('StartCell/EndCell processing - startRow:', startRow, 'endRow:', endRow, 'columns:', selectedColumns);
         } else {
           console.error('Invalid SELECT_RANGE format: missing range or startCell/endCell');
           console.log('Received data - range:', range, 'startCell:', startCell, 'endCell:', endCell);
+          return;
+        }
+        
+        if (!selectedColumns || selectedColumns.length === 0) {
+          console.log('No selected columns, exiting');
           return;
         }
 
@@ -268,51 +310,62 @@ export default class ActionManager {
 
         // Flash the selected cells to highlight the selection
         try {
+          console.log('=== STARTING FLASH CELLS ===');
           console.log('Flash cells - startRow:', startRow, 'endRow:', endRow, 'selectedColumns:', selectedColumns);
           
           // Get all row nodes first
           const allRowNodes = gridApi.getRenderedNodes();
-          console.log('Total rendered nodes:', allRowNodes.length);
+          console.log('Total rendered nodes:', allRowNodes?.length || 0);
           
-          // Select the right row nodes
-          const rowNodes: any[] = [];
-          for (let i = startRow; i <= endRow; i++) {
-            if (allRowNodes[i]) {
-              rowNodes.push(allRowNodes[i]);
+          if (!allRowNodes || !Array.isArray(allRowNodes)) {
+            console.warn('FLASH ABORTED: No row nodes for flash');
+          } else {
+            console.log('Row nodes available, proceeding with flash...');
+            
+            // Select the right row nodes
+            const rowNodes: any[] = [];
+            for (let i = startRow; i <= endRow; i++) {
+              if (allRowNodes[i]) {
+                rowNodes.push(allRowNodes[i]);
+              }
+            }
+            
+            console.log('Selected row nodes:', rowNodes?.length || 0);
+            
+            // Get column objects
+            const columnObjects = selectedColumns && Array.isArray(selectedColumns) ? selectedColumns
+              .map(colField => {
+                if (!colField || typeof colField !== 'string') return null;
+                const col = gridApi.getColumn(colField);
+                console.log('Column field:', colField, 'found column:', !!col);
+                return col;
+              })
+              .filter((col): col is NonNullable<typeof col> => col !== null) : [];
+
+            console.log('Column objects found:', columnObjects?.length || 0);
+
+            if (rowNodes && rowNodes.length > 0 && columnObjects && columnObjects.length > 0) {
+              console.log('✅ Calling flashCells with:', { rowNodes: rowNodes.length, columns: columnObjects.length });
+              
+              // Add a small delay to ensure the grid is ready
+              setTimeout(() => {
+                gridApi.flashCells({
+                  rowNodes: rowNodes,
+                  columns: columnObjects,
+                  flashDuration: 1000,  // Longer flash for visibility
+                  fadeDuration: 800    // Longer fade for visibility
+                });
+                console.log('✅ flashCells called successfully');
+              }, 100);
+            } else {
+              console.warn('❌ FLASH SKIPPED: No rows or columns to flash:', { 
+                rowNodes: rowNodes?.length || 0, 
+                columns: columnObjects?.length || 0 
+              });
             }
           }
-          
-          console.log('Selected row nodes:', rowNodes.length);
-          
-          // Get column objects
-          const columnObjects = selectedColumns
-            .map(colField => {
-              const col = gridApi.getColumn(colField);
-              console.log('Column field:', colField, 'found column:', !!col);
-              return col;
-            })
-            .filter((col): col is NonNullable<typeof col> => col !== null);
-
-          console.log('Column objects found:', columnObjects.length);
-
-          if (rowNodes.length > 0 && columnObjects.length > 0) {
-            console.log('Calling flashCells with:', { rowNodes: rowNodes.length, columns: columnObjects.length });
-            
-            // Add a small delay to ensure the grid is ready
-            setTimeout(() => {
-              gridApi.flashCells({
-                rowNodes: rowNodes,
-                columns: columnObjects,
-                flashDuration: 1000,  // Longer flash for visibility
-                fadeDuration: 800    // Longer fade for visibility
-              });
-              console.log('flashCells called');
-            }, 100);
-          } else {
-            console.warn('No rows or columns to flash:', { rowNodes: rowNodes.length, columns: columnObjects.length });
-          }
         } catch (error) {
-          console.error('Could not flash cells:', error);
+          console.error('❌ FLASH ERROR:', error);
         }
       } else {
         console.error('gridApi not found for gridId:', gridId);
@@ -322,6 +375,19 @@ export default class ActionManager {
 
     this.registerHandler('ADD_CHART', ({ item }) => {
       if (!this.setItems) return;
+      
+      // Fix series names to use original headers instead of normalized field names
+      if (item.chartConfig?.series) {
+        item.chartConfig.series = item.chartConfig.series.map((series: any) => {
+          const originalName = this.denormalizeFieldName(series.field);
+          console.log(`Converting series name: "${series.field}" -> "${originalName}"`);
+          return {
+            ...series,
+            name: originalName
+          };
+        });
+      }
+      
       const newItems = [...this.items];
       const existingIndex = newItems.findIndex(i => i.i === item.i);
       if (existingIndex >= 0) {
@@ -733,6 +799,32 @@ export default class ActionManager {
     return field.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_');
   }
 
+  // Utility function to restore original field names from normalized ones
+  private denormalizeFieldName(normalizedField: string): string {
+    // First try to find exact match in stored mapping
+    const exactMatch = this.fieldToHeaderMapping.get(normalizedField);
+    if (exactMatch) {
+      console.log(`Found exact mapping: "${normalizedField}" -> "${exactMatch}"`);
+      return exactMatch;
+    }
+    
+    // Fallback: try to find partial matches (useful for cases like "population" -> "Population (M)")
+    for (const [field, header] of Array.from(this.fieldToHeaderMapping.entries())) {
+      // Check if the normalized field is a simplified version of a stored field
+      const simplifiedStoredField = field.toLowerCase().replace(/_+/g, '');
+      const simplifiedInputField = normalizedField.toLowerCase().replace(/_+/g, '');
+      
+      if (simplifiedStoredField.includes(simplifiedInputField) || 
+          simplifiedInputField.includes(simplifiedStoredField)) {
+        console.log(`Found partial mapping: "${normalizedField}" -> "${header}" (via "${field}")`);
+        return header;
+      }
+    }
+    
+    console.log(`No mapping found for "${normalizedField}", returning as-is`);
+    return normalizedField; // Return as-is if no mapping found
+  }
+
   setMessageHandler(handler: MessageCallback) {
     this.onMessage = handler;
   }
@@ -743,22 +835,18 @@ export default class ActionManager {
     console.log('Step details:', step.details);
     console.log('Available handlers:', Object.keys(this.actionHandlers));
     
-    // Fix grid ID mismatches - replace generic IDs with actual grid IDs
-    const fixedStep = this.fixGridIds(step);
-    console.log('Fixed step:', fixedStep);
-    
     // Always use generated message for consistency
     if (this.onMessage) {
-      this.onMessage(getActionMessage(fixedStep));
+      this.onMessage(getActionMessage(step));
     }
     
-    const handler = this.actionHandlers[fixedStep.type];
+    const handler = this.actionHandlers[step.type];
     if (handler) {
-      console.log('Handler found for action:', fixedStep.type);
-      await handler(fixedStep.details);
+      console.log('Handler found for action:', step.type);
+      await handler(step.details);
     } else {
-      console.warn('No handler found for action:', fixedStep.type);
-      console.warn('Step with missing handler:', JSON.stringify(fixedStep, null, 2));
+      console.warn('No handler found for action:', step.type);
+      console.warn('Step with missing handler:', JSON.stringify(step, null, 2));
     }
 
     // Auto-scroll to bottom after each action
@@ -767,59 +855,35 @@ export default class ActionManager {
 
   private scrollWorkspaceToBottom() {
     try {
-      // Find the main workspace container
-      const workspaceContainer = document.querySelector('.react-grid-layout') as HTMLElement;
-      if (workspaceContainer) {
-        // Scroll to the bottom of the workspace
-        workspaceContainer.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'end' 
+      // Wait a bit for the layout to settle after adding new items
+      setTimeout(() => {
+        console.log('Auto-scrolling to workspace bottom...');
+        
+        // Simple approach: just scroll to the very bottom of the page
+        const documentHeight = Math.max(
+          document.body.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.clientHeight,
+          document.documentElement.scrollHeight,
+          document.documentElement.offsetHeight
+        );
+        
+        console.log('Document height:', documentHeight, 'Window height:', window.innerHeight);
+        
+        // Scroll to bottom with extra padding
+        window.scrollTo({ 
+          top: documentHeight + 200, // Extra padding to ensure everything is visible
+          behavior: 'smooth' 
         });
-        console.log('Scrolled workspace to bottom');
-      } else {
-        // Fallback: scroll the main content area
-        const mainContent = document.querySelector('main') || document.querySelector('.main-content') || document.body;
-        if (mainContent) {
-          mainContent.scrollTo({ 
-            top: mainContent.scrollHeight, 
-            behavior: 'smooth' 
-          });
-          console.log('Scrolled main content to bottom');
-        }
-      }
+        
+        console.log('Scrolled window to bottom:', documentHeight + 200);
+      }, 300); // Wait 300ms for layout to settle
     } catch (error) {
       console.warn('Could not auto-scroll workspace:', error);
     }
   }
 
-  private fixGridIds(step: Action): Action {
-    // Get the first (and usually only) grid ID from current items
-    const currentGridId = this.items.find(item => item.type === 'grid')?.i;
-    
-    if (!currentGridId) {
-      return step; // No grid to fix
-    }
-    
-    // Create a copy of the step to avoid modifying the original
-    const fixedStep = JSON.parse(JSON.stringify(step));
-    
-    // Fix gridId references in SELECT_RANGE and other actions
-    // Check if gridId is a simple number (string representation)
-    if (fixedStep.details.gridId && 
-        /^\d+$/.test(fixedStep.details.gridId)) {
-      console.log(`Fixing gridId from ${fixedStep.details.gridId} to ${currentGridId}`);
-      fixedStep.details.gridId = currentGridId;
-    }
-    
-    // Fix sourceGridId in ADD_CHART
-    if (fixedStep.details.item?.sourceGridId && 
-        /^\d+$/.test(fixedStep.details.item.sourceGridId)) {
-      console.log(`Fixing sourceGridId from ${fixedStep.details.item.sourceGridId} to ${currentGridId}`);
-      fixedStep.details.item.sourceGridId = currentGridId;
-    }
-    
-    return fixedStep;
-  }
+
 
   async executeUpToStep(steps: Action[] | Record<string, Action>, targetStepIndex: number) {
     if (this.isExecuting) {

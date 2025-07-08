@@ -246,7 +246,9 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   };
 
   const handleRangeSelection = (params: GetContextMenuItemsParams) => {
-    const gridId = params.api.getGridId();
+    // Find the correct gridId from our items by looking at which grid this API belongs to
+    const gridId = Object.keys(window.gridApis).find(id => window.gridApis[id] === params.api);
+    console.log('handleRangeSelection - found gridId:', gridId, 'from window.gridApis:', Object.keys(window.gridApis));
     if (!gridId) return;
 
     const cellRanges = params.api.getCellRanges();
@@ -326,20 +328,26 @@ const GridLayout: React.FC<GridLayoutProps> = ({
     const sourceGridItem = localItems.find(item => item.i === gridId);
     const sourceHeight = sourceGridItem?.h || 4;
 
-    // Create new chart item
+    // Create new chart item with reasonable height
     const chartItem: GridItem = {
       i: `${type}-${Date.now()}`,
       x: 0,
       y: maxY,
       w: 6,
-      h: sourceHeight * 2,
+      h: Math.min(8, Math.max(4, sourceHeight)), // Height between 4 and 8 units
       type,
       chartData,
       chartConfig: {
-        series: columns.slice(1).map(field => ({
-          field,
-          name: field
-        }))
+        series: columns.slice(1).map(field => {
+          // Get original header name from column definition
+          const columnDef = params.api.getColumnDef(field);
+          const originalName = columnDef?.headerName || field;
+          
+          return {
+            field,
+            name: originalName  // Use original header name instead of normalized field
+          };
+        })
       }
     };
 

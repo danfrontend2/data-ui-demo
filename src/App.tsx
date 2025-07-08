@@ -162,10 +162,9 @@ function App() {
 
   return (
     <Box sx={{ 
-      height: '100vh',
+      minHeight: '100vh',
       display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden'
+      flexDirection: 'column'
     }}>
       <MacroPanel
         isOpen={isMacroPanelOpen}
@@ -183,8 +182,7 @@ function App() {
           display: 'flex',
           flexDirection: 'column',
           mr: isMacroPanelOpen ? '400px' : 0,
-          transition: 'margin-right 0.3s ease-in-out',
-          overflow: 'hidden'
+          transition: 'margin-right 0.3s ease-in-out'
         }}
       >
         <Toolbar 
@@ -197,7 +195,7 @@ function App() {
           onMacroLoad={handleMacroLoad}
           items={items}
         />
-        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+        <Box sx={{ flex: 1 }}>
           <GridLayout 
             items={items}
             onRemoveItem={handleRemoveItem}
