@@ -207,6 +207,7 @@ function App() {
           <Chat
             onClose={() => setIsChatOpen(false)}
             onExecuteMacro={handleExecuteMacro}
+            onMacroLoad={handleMacroLoad}
           />
         )}
       </Box>

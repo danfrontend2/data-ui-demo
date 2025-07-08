@@ -14,9 +14,10 @@ interface Message {
 interface ChatProps {
   onClose: () => void;
   onExecuteMacro?: (macro: any) => Promise<void>;
+  onMacroLoad?: (macroData: { prompt: string; steps: any[] }) => void;
 }
 
-const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro }) => {
+const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,22 +40,20 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro }) => {
       // Get macro from OpenAI
       const macro = await openAIService.generateMacro(input);
       
-      // Try to execute macro
-      if (onExecuteMacro) {
-        // Ensure we pass the macro in the same format as file macros
-        const macroToExecute = macro.steps ? macro : { steps: macro };
-        await onExecuteMacro(macroToExecute);
-        // After AI-generated macro execution, arrange in 2 columns
-        ActionManager.getInstance().logAction('ARRANGE', { columns: 2 });
+      // Show macro in MacroPanel instead of executing immediately
+      if (onMacroLoad && macro.prompt && macro.steps) {
+        onMacroLoad(macro);
+        
+        const aiMessage: Message = {
+          text: 'Macro generated! Check the macro panel to execute it step by step.',
+          isUser: false,
+          macro: macro
+        };
+
+        setMessages(prev => [...prev, aiMessage]);
+      } else {
+        throw new Error('Invalid macro format');
       }
-
-      const aiMessage: Message = {
-        text: 'Macro generated and executed successfully!',
-        isUser: false,
-        macro: macro
-      };
-
-      setMessages(prev => [...prev, aiMessage]);
     } catch (error: any) {
       const errorMessage: Message = {
         text: `Error: ${error.message}`,

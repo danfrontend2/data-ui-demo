@@ -344,6 +344,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           <Chat
             onClose={() => setIsChatOpen(false)}
             onExecuteMacro={async (macro: Action[]) => onRunCustomMacro(macro)}
+            onMacroLoad={onMacroLoad}
           />
         )}
 
