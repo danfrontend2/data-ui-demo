@@ -405,6 +405,9 @@ export default class ActionManager {
               action.message = 'Adding a new chart';
           }
           break;
+        case 'ARRANGE':
+          action.message = `Arranging items in ${details.columns} columns`;
+          break;
       }
     }
 
