@@ -375,31 +375,31 @@ export default class ActionManager {
           action.message = 'Adding a new data grid';
           break;
         case 'REMOVE_GRID':
-          action.message = 'Removing the grid';
+          action.message = 'Removing item';
           break;
         case 'UPDATE_CELL':
           action.message = 'Updating cell value';
           break;
         case 'UPDATE_LAYOUT':
-          action.message = 'Adjusting layout';
+          action.message = `Adjusting layout, height: ${details.layout.at(-1).h}, width: ${details.layout.at(-1).w}`;
           break;
         case 'DROP_FILE':
-          action.message = 'Loading data from file';
+          action.message = `Loading data from file, ${details.excelData.length} rows, fields: ${details.excelData[0]} `;
           break;
         case 'SELECT_RANGE':
-          action.message = 'Selecting data range';
+          action.message = `Selecting data range, lines:${details.range.startRow} - ${details.range.endRow}`;
           break;
         case 'ADD_CHART':
           const chartType = details.item.type;
           switch (chartType) {
             case 'pie-chart':
-              action.message = 'Adding a pie chart';
+              action.message = `Adding a pie chart, for categories:[${details.item.chartData.map((obj: any) => obj.category).join(", ")}]`;
               break;
             case 'line-chart':
-              action.message = 'Adding a line chart';
+              action.message = `Adding a line chart, for categories:[${details.item.chartData.map((obj: any) => obj.category).join(", ")}]`;
               break;
             case 'bar-chart':
-              action.message = 'Adding a bar chart';
+              action.message = `Adding a bar chart, for categories:[${details.item.chartData.map((obj: any) => obj.category).join(", ")}]`;
               break;
             default:
               action.message = 'Adding a new chart';
