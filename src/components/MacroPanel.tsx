@@ -4,16 +4,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
-import { ActionType, Action } from '../types/actions';
+import { ActionType, Action, MacroData } from '../types/actions';
 import { getActionMessage } from '../utils/messageUtils';
 
 interface MacroPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  macroData: {
-    prompt: string;
-    steps: Action[];
-  } | null;
+  macroData: MacroData | null;
   currentStepIndex?: number;
   isPlaying?: boolean;
   onPlayPause?: () => void;

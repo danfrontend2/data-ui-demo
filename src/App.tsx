@@ -7,14 +7,14 @@ import MacroPanel from './components/MacroPanel';
 import { Layout } from 'react-grid-layout';
 import { GridItem } from './types';
 import ActionManager from './services/ActionManager';
-import { DEMO_MACRO, Action } from './types/actions';
+import { DEMO_MACRO, Action, MacroData } from './types/actions';
 import './App.css';
 
 function App() {
   const [items, setItems] = useState<GridItem[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isMacroPanelOpen, setIsMacroPanelOpen] = useState(false);
-  const [currentMacro, setCurrentMacro] = useState<{ prompt: string; steps: Action[] } | null>(null);
+  const [currentMacro, setCurrentMacro] = useState<MacroData | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1);
   const [isMacroPlaying, setIsMacroPlaying] = useState(false);
   const actionManager = ActionManager.getInstance();
@@ -105,7 +105,7 @@ function App() {
     actionManager.logAction('ARRANGE', { columns });
   };
 
-  const handleMacroLoad = (macroData: { prompt: string; steps: Action[] }) => {
+  const handleMacroLoad = (macroData: MacroData) => {
     // Check if START action exists at the beginning, if not add it
     const updatedSteps = [...macroData.steps];
     if (updatedSteps.length > 0 && updatedSteps[0].type !== 'START') {
@@ -119,13 +119,16 @@ function App() {
       updatedSteps.unshift(startAction);
     }
     
-    const updatedMacroData = {
+    const updatedMacroData: MacroData = {
       ...macroData,
       steps: updatedSteps
     };
     
     setCurrentMacro(updatedMacroData);
-    setIsMacroPanelOpen(true);
+    
+    // Only open panel if show_panel is not explicitly false
+    const shouldShowPanel = macroData.show_panel !== false;
+    setIsMacroPanelOpen(shouldShowPanel);
     setCurrentStepIndex(-1); // Reset step index when loading new macro
   };
 

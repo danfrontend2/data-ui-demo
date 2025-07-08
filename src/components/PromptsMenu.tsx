@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import MovieIcon from '@mui/icons-material/Movie';
 import ChatIcon from '@mui/icons-material/Chat';
+import { MacroData } from '../types/actions';
 
 interface PromptOption {
   id: string;
@@ -23,7 +24,7 @@ interface PromptOption {
 interface PromptsMenuProps {
   onPromptSelect?: (prompt: string) => void;
   onRunMacro?: (steps: any[]) => void;
-  onMacroLoad?: (macroData: { prompt: string; steps: any[] }) => void;
+  onMacroLoad?: (macroData: MacroData) => void;
 }
 
 const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, onMacroLoad }) => {

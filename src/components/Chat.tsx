@@ -4,6 +4,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
 import { OpenAIService } from '../services/OpenAIService';
 import ActionManager from '../services/ActionManager';
+import { MacroData } from '../types/actions';
 
 interface Message {
   text: string;
@@ -15,7 +16,7 @@ interface Message {
 interface ChatProps {
   onClose: () => void;
   onExecuteMacro?: (macro: any) => Promise<void>;
-  onMacroLoad?: (macroData: { prompt: string; steps: any[] }) => void;
+  onMacroLoad?: (macroData: MacroData) => void;
   prefilledMessage?: string;
   shouldAutoSend?: boolean;
   onMessageSent?: () => void;

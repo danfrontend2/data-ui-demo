@@ -24,7 +24,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Layout } from 'react-grid-layout';
 import { GridItem } from '../types';
-import { Action } from '../types/actions';
+import { Action, MacroData } from '../types/actions';
 import Chat from './Chat';
 import ChartSettings from './ChartSettings';
 import PromptsMenu from './PromptsMenu';
@@ -37,7 +37,7 @@ interface ToolbarProps {
   onCloseMacroPanel: () => void;
   onRunCustomMacro: (steps: Action[]) => void;
   onArrangeItems: (columns: number) => void;
-  onMacroLoad: (macroData: { prompt: string; steps: Action[] }) => void;
+  onMacroLoad: (macroData: MacroData) => void;
   onPromptSelect?: (prompt: string) => void;
   items: GridItem[];
 }

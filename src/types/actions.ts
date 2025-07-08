@@ -114,6 +114,12 @@ export interface OpenAIChatAction extends Action {
   };
 }
 
+export interface MacroData {
+  prompt: string;
+  steps: Action[];
+  show_panel?: boolean;
+}
+
 export const DEMO_MACRO: Action[] = [
   {
     id: '1',
