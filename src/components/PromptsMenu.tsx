@@ -190,7 +190,7 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
                     wordWrap: 'break-word'
                   }}
                 >
-                  {promptOption.prompt}
+                  {promptOption.prompt.charAt(0).toUpperCase() + promptOption.prompt.slice(1)}
                 </Typography>
               </MenuItem>
               {index < promptOptions.length - 1 && <Divider />}
