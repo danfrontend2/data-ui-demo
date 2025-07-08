@@ -2,7 +2,6 @@ import { Action, ActionType } from '../types/actions';
 import { GridItem } from '../types';
 import { Layout } from 'react-grid-layout';
 import { GridApi } from 'ag-grid-community';
-import { SetStateAction } from 'react';
 import { getActionMessage } from '../utils/messageUtils';
 
 declare global {
@@ -190,36 +189,64 @@ export default class ActionManager {
     });
 
     this.registerHandler('SELECT_RANGE', ({ gridId, startCell, endCell, range }) => {
+      console.log('=== SELECT_RANGE handler called ===');
+      console.log('gridId:', gridId);
+      console.log('Available gridApis:', Object.keys(window.gridApis || {}));
+      
       const gridApi = window.gridApis[gridId];
+      console.log('gridApi found:', !!gridApi);
+      
       if (gridApi) {
+        console.log('Starting SELECT_RANGE processing...');
+        
         // Get all rows data
-        const rowData = gridApi.getRenderedNodes().map(node => node.data);
-        if (!rowData) return;
+        const renderedNodes = gridApi.getRenderedNodes();
+        console.log('Rendered nodes count:', renderedNodes.length);
+        
+        const rowData = renderedNodes.map(node => node.data);
+        console.log('Row data extracted, length:', rowData.length);
+        
+        if (!rowData) {
+          console.log('No row data, exiting');
+          return;
+        }
 
         // Get column definitions
         const columnDefs = gridApi.getColumnDefs() as any[];
+        console.log('Column defs:', columnDefs.length);
+        
         const columns = columnDefs
           .filter(col => !col.hide && 'field' in col)
           .map(col => ({
             field: col.field as string,
             headerName: col.headerName as string
           }));
+        console.log('Processed columns:', columns.length);
 
         // Extract selected data - support both formats
-        let startRow: number, endRow: number;
+        console.log('Parameters - range:', range, 'startCell:', startCell, 'endCell:', endCell);
+        
+        let startRow: number, endRow: number, selectedColumns: string[];
         
         if (range) {
+          console.log('Using range format');
           // New format: range object with startRow/endRow
           startRow = range.startRow;
           endRow = range.endRow;
+          selectedColumns = range.columns || columns.map(col => col.field);
+          console.log('Range processing - startRow:', startRow, 'endRow:', endRow, 'columns:', selectedColumns);
         } else if (startCell && endCell && 
                    typeof startCell.rowIndex !== 'undefined' && 
                    typeof endCell.rowIndex !== 'undefined') {
+          console.log('Using startCell/endCell format');
           // Old format: startCell/endCell objects with rowIndex
           startRow = Math.min(startCell.rowIndex, endCell.rowIndex);
           endRow = Math.max(startCell.rowIndex, endCell.rowIndex);
+          selectedColumns = columns.map(col => col.field);
+          console.log('StartCell/EndCell processing - startRow:', startRow, 'endRow:', endRow, 'columns:', selectedColumns);
         } else {
           console.error('Invalid SELECT_RANGE format: missing range or startCell/endCell');
+          console.log('Received data - range:', range, 'startCell:', startCell, 'endCell:', endCell);
           return;
         }
 
@@ -238,6 +265,58 @@ export default class ActionManager {
 
         // Store the selected data
         this.selectedData = chartData;
+
+        // Flash the selected cells to highlight the selection
+        try {
+          console.log('Flash cells - startRow:', startRow, 'endRow:', endRow, 'selectedColumns:', selectedColumns);
+          
+          // Get all row nodes first
+          const allRowNodes = gridApi.getRenderedNodes();
+          console.log('Total rendered nodes:', allRowNodes.length);
+          
+          // Select the right row nodes
+          const rowNodes: any[] = [];
+          for (let i = startRow; i <= endRow; i++) {
+            if (allRowNodes[i]) {
+              rowNodes.push(allRowNodes[i]);
+            }
+          }
+          
+          console.log('Selected row nodes:', rowNodes.length);
+          
+          // Get column objects
+          const columnObjects = selectedColumns
+            .map(colField => {
+              const col = gridApi.getColumn(colField);
+              console.log('Column field:', colField, 'found column:', !!col);
+              return col;
+            })
+            .filter((col): col is NonNullable<typeof col> => col !== null);
+
+          console.log('Column objects found:', columnObjects.length);
+
+          if (rowNodes.length > 0 && columnObjects.length > 0) {
+            console.log('Calling flashCells with:', { rowNodes: rowNodes.length, columns: columnObjects.length });
+            
+            // Add a small delay to ensure the grid is ready
+            setTimeout(() => {
+              gridApi.flashCells({
+                rowNodes: rowNodes,
+                columns: columnObjects,
+                flashDuration: 1000,  // Longer flash for visibility
+                fadeDuration: 800    // Longer fade for visibility
+              });
+              console.log('flashCells called');
+            }, 100);
+          } else {
+            console.warn('No rows or columns to flash:', { rowNodes: rowNodes.length, columns: columnObjects.length });
+          }
+        } catch (error) {
+          console.error('Could not flash cells:', error);
+        }
+      } else {
+        console.error('gridApi not found for gridId:', gridId);
+        console.log('Available gridApis:', window.gridApis);
       }
     });
 
@@ -695,15 +774,16 @@ export default class ActionManager {
     const fixedStep = JSON.parse(JSON.stringify(step));
     
     // Fix gridId references in SELECT_RANGE and other actions
+    // Check if gridId is a simple number (string representation)
     if (fixedStep.details.gridId && 
-        (fixedStep.details.gridId === "1" || fixedStep.details.gridId === "2")) {
+        /^\d+$/.test(fixedStep.details.gridId)) {
       console.log(`Fixing gridId from ${fixedStep.details.gridId} to ${currentGridId}`);
       fixedStep.details.gridId = currentGridId;
     }
     
     // Fix sourceGridId in ADD_CHART
     if (fixedStep.details.item?.sourceGridId && 
-        (fixedStep.details.item.sourceGridId === "1" || fixedStep.details.item.sourceGridId === "2")) {
+        /^\d+$/.test(fixedStep.details.item.sourceGridId)) {
       console.log(`Fixing sourceGridId from ${fixedStep.details.item.sourceGridId} to ${currentGridId}`);
       fixedStep.details.item.sourceGridId = currentGridId;
     }
