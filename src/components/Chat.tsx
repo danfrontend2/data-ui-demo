@@ -25,25 +25,9 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad, prefi
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAutoSent, setHasAutoSent] = useState(false);
   
   const openAIService = OpenAIService.getInstance();
-
-  // Handle prefilled message and auto-send
-  useEffect(() => {
-    if (prefilledMessage) {
-      setInput(prefilledMessage);
-      
-      if (shouldAutoSend && !isLoading) {
-        // Auto-send after a small delay to ensure UI is ready
-        setTimeout(() => {
-          handleSend();
-          if (onMessageSent) {
-            onMessageSent();
-          }
-        }, 100);
-      }
-    }
-  }, [prefilledMessage, shouldAutoSend]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -92,6 +76,28 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad, prefi
       setIsLoading(false);
     }
   };
+
+  // Handle prefilled message
+  useEffect(() => {
+    if (prefilledMessage) {
+      setInput(prefilledMessage);
+    }
+  }, [prefilledMessage]);
+
+  // Handle auto-send separately to ensure handleSend is available
+  useEffect(() => {
+    if (prefilledMessage && shouldAutoSend && !isLoading && input === prefilledMessage) {
+      // Auto-send after a small delay to ensure UI is ready
+      const timer = setTimeout(() => {
+        handleSend();
+        if (onMessageSent) {
+          onMessageSent();
+        }
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [prefilledMessage, shouldAutoSend, input, isLoading, onMessageSent]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
