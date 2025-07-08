@@ -33,6 +33,18 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
   const [isLoading, setIsLoading] = useState(false);
   const open = Boolean(anchorEl);
 
+  // Generate beautiful gradient colors for menu items
+  const getGradientColors = (index: number, hover: boolean = false) => {
+    const gradients = [
+      hover ? 'rgba(255, 107, 107, 0.25), rgba(255, 142, 83, 0.25)' : 'rgba(255, 107, 107, 0.15), rgba(255, 142, 83, 0.15)', // warm red-orange
+      hover ? 'rgba(74, 144, 226, 0.25), rgba(80, 227, 194, 0.25)' : 'rgba(74, 144, 226, 0.15), rgba(80, 227, 194, 0.15)', // blue-teal
+      hover ? 'rgba(247, 159, 31, 0.25), rgba(238, 205, 163, 0.25)' : 'rgba(247, 159, 31, 0.15), rgba(238, 205, 163, 0.15)', // golden
+      hover ? 'rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.25)' : 'rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15)', // purple-pink
+      hover ? 'rgba(34, 197, 94, 0.25), rgba(101, 163, 13, 0.25)' : 'rgba(34, 197, 94, 0.15), rgba(101, 163, 13, 0.15)', // green
+    ];
+    return gradients[index % gradients.length];
+  };
+
   // Load macros from public folder
   useEffect(() => {
     const loadMacros = async () => {
@@ -176,9 +188,17 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
                   py: 1.5,
                   minHeight: 'auto',
                   alignItems: 'flex-start',
+                  background: `linear-gradient(135deg, ${getGradientColors(index)})`,
+                  borderRadius: '8px',
+                  mb: 1,
+                  mx: 1,
+                  mt: index === 0 ? 2 : 0,
                   '&:hover': {
-                    backgroundColor: 'action.hover',
-                  }
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    background: `linear-gradient(135deg, ${getGradientColors(index, true)})`,
+                  },
+                  transition: 'all 0.2s ease-in-out'
                 }}
               >
                 <Typography 
@@ -193,7 +213,6 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
                   {promptOption.prompt.charAt(0).toUpperCase() + promptOption.prompt.slice(1)}
                 </Typography>
               </MenuItem>
-              {index < promptOptions.length - 1 && <Divider />}
             </React.Fragment>
           ))
         )}
