@@ -68,6 +68,8 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   const [arrangeAnchorEl, setArrangeAnchorEl] = useState<HTMLElement | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedChartId, setSelectedChartId] = useState<string | undefined>();
+  const [chatMessage, setChatMessage] = useState('');
+  const [shouldAutoSend, setShouldAutoSend] = useState(false);
   const actionManager = ActionManager.getInstance();
 
   const handleAddItem = () => {
@@ -209,6 +211,24 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
       document.removeEventListener('click', handleClick);
     };
   }, [isSettingsOpen]);
+
+  // Set up AI chat handler in ActionManager
+  useEffect(() => {
+    actionManager.setAIChatHandler((message: string, autoSend?: boolean) => {
+      // Open chat if not already open
+      if (!isChatOpen) {
+        setIsSettingsOpen(false);
+        setIsChatOpen(true);
+      }
+      
+      // Set the message and optionally auto-send it
+      // We'll need to pass this to Chat component
+      setChatMessage(message);
+      if (autoSend) {
+        setShouldAutoSend(true);
+      }
+    });
+  }, [isChatOpen, actionManager]);
 
   // When settings panel is closed, reset selected chart
   useEffect(() => {
@@ -366,6 +386,12 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
             onClose={() => setIsChatOpen(false)}
             onExecuteMacro={async (macro: Action[]) => onRunCustomMacro(macro)}
             onMacroLoad={onMacroLoad}
+            prefilledMessage={chatMessage}
+            shouldAutoSend={shouldAutoSend}
+            onMessageSent={() => {
+              setChatMessage('');
+              setShouldAutoSend(false);
+            }}
           />
         )}
 

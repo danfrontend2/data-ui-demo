@@ -14,7 +14,8 @@ export type ActionType =
   | 'ARRANGE'
   | 'UPDATE_CHART_OPACITY'
   | 'UPDATE_CHART_STROKE_WIDTH'
-  | 'UPDATE_CHART_COLOR_SET';
+  | 'UPDATE_CHART_COLOR_SET'
+  | 'OPEN_AI_CHAT';
 
 export interface Action {
   id: string;
@@ -103,6 +104,14 @@ export interface StartAction extends Action {
   type: 'START';
   details: {};
   message: string;
+}
+
+export interface OpenAIChatAction extends Action {
+  type: 'OPEN_AI_CHAT';
+  details: {
+    message: string;
+    autoSend?: boolean;
+  };
 }
 
 export const DEMO_MACRO: Action[] = [

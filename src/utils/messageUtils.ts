@@ -67,6 +67,11 @@ export function getActionMessage(action: Action): string {
         return `Changing color scheme to ${details.colorSet} for ${targetText}`;
       }
       return 'Updating chart colors...';
+    case 'OPEN_AI_CHAT':
+      if (details.message) {
+        return `Opening AI chat with message: "${details.message}"`;
+      }
+      return 'Opening AI chat...';
     default:
       return `Executing ${action.type}...`;
   }

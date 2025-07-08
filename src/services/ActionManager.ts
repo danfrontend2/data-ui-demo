@@ -34,6 +34,7 @@ export default class ActionManager {
   private executionResolve: (() => void) | null = null;
   private onPlayStateChange?: (isPlaying: boolean) => void;
   private currentSteps: Action[] = [];
+  private onOpenAIChat?: (message: string, autoSend?: boolean) => void;
 
 
 
@@ -321,6 +322,12 @@ export default class ActionManager {
       this.setItems(newItems);
     });
 
+    this.registerHandler('OPEN_AI_CHAT', ({ message, autoSend = true }) => {
+      if (this.onOpenAIChat) {
+        this.onOpenAIChat(message, autoSend);
+      }
+    });
+
     console.log('Action handlers initialized');
   }
 
@@ -383,6 +390,10 @@ export default class ActionManager {
 
   setPlayStateHandler(handler: (isPlaying: boolean) => void) {
     this.onPlayStateChange = handler;
+  }
+
+  setAIChatHandler(handler: (message: string, autoSend?: boolean) => void) {
+    this.onOpenAIChat = handler;
   }
 
   private notifyMacroUpdate() {

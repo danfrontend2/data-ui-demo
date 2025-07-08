@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Paper, Typography, CircularProgress, IconButton, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
@@ -16,14 +16,34 @@ interface ChatProps {
   onClose: () => void;
   onExecuteMacro?: (macro: any) => Promise<void>;
   onMacroLoad?: (macroData: { prompt: string; steps: any[] }) => void;
+  prefilledMessage?: string;
+  shouldAutoSend?: boolean;
+  onMessageSent?: () => void;
 }
 
-const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad }) => {
+const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad, prefilledMessage, shouldAutoSend, onMessageSent }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const openAIService = OpenAIService.getInstance();
+
+  // Handle prefilled message and auto-send
+  useEffect(() => {
+    if (prefilledMessage) {
+      setInput(prefilledMessage);
+      
+      if (shouldAutoSend && !isLoading) {
+        // Auto-send after a small delay to ensure UI is ready
+        setTimeout(() => {
+          handleSend();
+          if (onMessageSent) {
+            onMessageSent();
+          }
+        }, 100);
+      }
+    }
+  }, [prefilledMessage, shouldAutoSend]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;

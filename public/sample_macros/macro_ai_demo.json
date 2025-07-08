@@ -1,0 +1,14 @@
+{
+  "prompt": "open AI chat and ask about creating a world population chart",
+  "steps": [
+    {
+      "id": "1751614945857",
+      "timestamp": 1751614945857,
+      "type": "OPEN_AI_CHAT",
+      "details": {
+        "message": "create a world population chart with top 10 countries",
+        "autoSend": true
+      }
+    }
+  ]
+} 
