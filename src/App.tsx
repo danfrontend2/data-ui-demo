@@ -194,6 +194,7 @@ function App() {
           onArrangeItems={handleArrangeItems}
           onMacroLoad={handleMacroLoad}
           items={items}
+          isMacroPanelOpen={isMacroPanelOpen}
         />
         <Box sx={{ flex: 1 }}>
           <GridLayout 

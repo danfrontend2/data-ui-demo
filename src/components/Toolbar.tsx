@@ -41,6 +41,7 @@ interface ToolbarProps {
   onMacroLoad: (macroData: MacroData) => void;
   onPromptSelect?: (prompt: string) => void;
   items: GridItem[];
+  isMacroPanelOpen?: boolean;
 }
 
 const tooltipProps = {
@@ -58,7 +59,7 @@ const tooltipProps = {
   }
 };
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onCloseMacroPanel, onArrangeItems, onMacroLoad, onPromptSelect, items }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onCloseMacroPanel, onArrangeItems, onMacroLoad, onPromptSelect, items, isMacroPanelOpen }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
@@ -519,6 +520,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
             onClose={() => setIsSettingsOpen(false)}
             items={items}
             selectedChartId={selectedChartId}
+            isMacroPanelOpen={isMacroPanelOpen}
           />
         )}
       </MuiToolbar>

@@ -8,6 +8,7 @@ interface ChartSettingsProps {
   onClose: () => void;
   items: GridItem[];
   selectedChartId?: string;
+  isMacroPanelOpen?: boolean;
 }
 
 // Available color sets in amCharts 5
@@ -21,7 +22,7 @@ const COLOR_SETS = {
   'Spirited': 'spirited'
 };
 
-const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedChartId }) => {
+const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedChartId, isMacroPanelOpen }) => {
   const [opacity, setOpacity] = useState(1);
   const [strokeWidth, setStrokeWidth] = useState(2);
   const [colorSet, setColorSet] = useState('kelly');
@@ -149,14 +150,15 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
     <Paper 
       elevation={3}
       sx={{
-        position: 'absolute',
-        top: '64px',
-        right: '16px',
+        position: 'fixed',
+        top: '80px',
+        right: isMacroPanelOpen ? '416px' : '16px', // 400px for panel + 16px margin
         width: '300px',
         height: '400px',
         display: 'flex',
         flexDirection: 'column',
         zIndex: 1000,
+        transition: 'right 0.3s ease-in-out'
       }}
     >
       <Box sx={{ 
