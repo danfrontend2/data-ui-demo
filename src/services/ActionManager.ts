@@ -760,6 +760,36 @@ export default class ActionManager {
       console.warn('No handler found for action:', fixedStep.type);
       console.warn('Step with missing handler:', JSON.stringify(fixedStep, null, 2));
     }
+
+    // Auto-scroll to bottom after each action
+    this.scrollWorkspaceToBottom();
+  }
+
+  private scrollWorkspaceToBottom() {
+    try {
+      // Find the main workspace container
+      const workspaceContainer = document.querySelector('.react-grid-layout') as HTMLElement;
+      if (workspaceContainer) {
+        // Scroll to the bottom of the workspace
+        workspaceContainer.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'end' 
+        });
+        console.log('Scrolled workspace to bottom');
+      } else {
+        // Fallback: scroll the main content area
+        const mainContent = document.querySelector('main') || document.querySelector('.main-content') || document.body;
+        if (mainContent) {
+          mainContent.scrollTo({ 
+            top: mainContent.scrollHeight, 
+            behavior: 'smooth' 
+          });
+          console.log('Scrolled main content to bottom');
+        }
+      }
+    } catch (error) {
+      console.warn('Could not auto-scroll workspace:', error);
+    }
   }
 
   private fixGridIds(step: Action): Action {
