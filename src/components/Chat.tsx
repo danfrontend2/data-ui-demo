@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button, Paper, Typography, CircularProgress, IconButton, Tooltip } from '@mui/material';
+import { Box, TextField, Button, Paper, Typography, IconButton, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
 import { OpenAIService } from '../services/OpenAIService';
@@ -231,8 +231,86 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad, prefi
           disabled={isLoading}
         />
         {isLoading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-            <CircularProgress size={20} />
+          <Box 
+            sx={{ 
+              mt: 1,
+              width: '100%',
+              height: '40px',
+              background: 'linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%)',
+              backgroundSize: '200% 100%',
+              borderRadius: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+              animation: 'gradientShift 3s ease-in-out infinite',
+              '@keyframes gradientShift': {
+                '0%': { backgroundPosition: '0% 50%' },
+                '50%': { backgroundPosition: '100% 50%' },
+                '100%': { backgroundPosition: '0% 50%' }
+              }
+            }}
+          >
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: 'white',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5
+              }}
+            >
+              AI is thinking
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  '& span': {
+                    width: '4px',
+                    height: '4px',
+                    borderRadius: '50%',
+                    backgroundColor: 'white',
+                    display: 'inline-block',
+                    margin: '0 1px',
+                    animation: 'bounce 1.4s ease-in-out infinite both',
+                  },
+                  '& span:nth-child(1)': { animationDelay: '-0.32s' },
+                  '& span:nth-child(2)': { animationDelay: '-0.16s' },
+                  '& span:nth-child(3)': { animationDelay: '0s' },
+                  '@keyframes bounce': {
+                    '0%, 80%, 100%': { 
+                      transform: 'scale(0)',
+                      opacity: 0.5
+                    },
+                    '40%': { 
+                      transform: 'scale(1)',
+                      opacity: 1
+                    }
+                  }
+                }}
+              >
+                <span />
+                <span />
+                <span />
+              </Box>
+            </Typography>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                animation: 'shimmer 2s infinite',
+                '@keyframes shimmer': {
+                  '0%': { left: '-100%' },
+                  '100%': { left: '100%' }
+                }
+              }}
+            />
           </Box>
         )}
       </Box>
