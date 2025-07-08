@@ -1,0 +1,106 @@
+{
+  "prompt": "demo arrange animations - 1, 2, 3, 4 columns",
+  "show_panel": true,
+  "steps": [
+    {
+      "id": "1",
+      "timestamp": 1751615000000,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_1",
+          "x": 0,
+          "y": 0,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "2",
+      "timestamp": 1751615001000,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_2",
+          "x": 6,
+          "y": 0,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "timestamp": 1751615002000,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_3",
+          "x": 0,
+          "y": 8,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "timestamp": 1751615003000,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_4",
+          "x": 6,
+          "y": 8,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "timestamp": 1751615004000,
+      "type": "ARRANGE",
+      "details": {
+        "columns": 1
+      }
+    },
+    {
+      "id": "6",
+      "timestamp": 1751615005000,
+      "type": "ARRANGE",
+      "details": {
+        "columns": 2
+      }
+    },
+    {
+      "id": "7",
+      "timestamp": 1751615006000,
+      "type": "ARRANGE",
+      "details": {
+        "columns": 3
+      }
+    },
+    {
+      "id": "8",
+      "timestamp": 1751615007000,
+      "type": "ARRANGE",
+      "details": {
+        "columns": 4
+      }
+    },
+    {
+      "id": "9",
+      "timestamp": 1751615008000,
+      "type": "ARRANGE",
+      "details": {
+        "columns": 2
+      }
+    }
+  ]
+} 

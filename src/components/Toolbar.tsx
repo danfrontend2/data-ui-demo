@@ -11,7 +11,8 @@ import {
   Tooltip,
   Slider,
   Box,
-  Popover
+  Popover,
+  Typography
 } from '@mui/material';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -66,11 +67,29 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [columns, setColumns] = useState<number>(2);
   const [arrangeAnchorEl, setArrangeAnchorEl] = useState<HTMLElement | null>(null);
+  const [isAnimatingArrange, setIsAnimatingArrange] = useState(false);
+  const dummyButtonRef = useRef<HTMLButtonElement>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedChartId, setSelectedChartId] = useState<string | undefined>();
   const [chatMessage, setChatMessage] = useState('');
   const [shouldAutoSend, setShouldAutoSend] = useState(false);
   const actionManager = ActionManager.getInstance();
+
+  // Animate arrange slider change
+  const animateArrangeSlider = async (targetColumns: number, duration: number = 1000) => {
+    setIsAnimatingArrange(true);
+    const startColumns = columns;
+    const steps = 30;
+    const stepDuration = duration / steps;
+    const increment = (targetColumns - startColumns) / steps;
+
+    for (let i = 0; i <= steps; i++) {
+      const newValue = Math.round(startColumns + (increment * i));
+      setColumns(newValue);
+      await new Promise(resolve => setTimeout(resolve, stepDuration));
+    }
+    setIsAnimatingArrange(false);
+  };
 
   const handleAddItem = () => {
     onAddItem({
@@ -240,6 +259,31 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         setSelectedChartId(chartId);
       }
     });
+
+    // Set up arrange settings handler in ActionManager
+    actionManager.setArrangeSettingsHandler(async (targetColumns: number) => {
+      // Close other panels
+      setIsChatOpen(false);
+      setIsSettingsOpen(false);
+      
+      // Open arrange popover using dummy button as anchor
+      if (dummyButtonRef.current) {
+        setArrangeAnchorEl(dummyButtonRef.current);
+        // Wait for popover to open
+        await new Promise(resolve => setTimeout(resolve, 200));
+        // Animate slider to target value
+        await animateArrangeSlider(targetColumns, 800);
+      }
+    });
+
+    // Set up close handlers in ActionManager
+    actionManager.setCloseChartSettingsHandler(() => {
+      setIsSettingsOpen(false);
+    });
+
+    actionManager.setCloseArrangeSettingsHandler(() => {
+      setArrangeAnchorEl(null);
+    });
   }, [isChatOpen, actionManager]);
 
   // When settings panel is closed, reset selected chart
@@ -357,6 +401,17 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           onChange={handleLoadMacro}
           accept=".json"
         />
+        {/* Invisible button for arrange popover anchor */}
+        <button
+          ref={dummyButtonRef}
+          style={{ 
+            position: 'absolute', 
+            opacity: 0, 
+            pointerEvents: 'none',
+            left: '200px',
+            top: '20px'
+          }}
+        />
 
         <Popover
           open={Boolean(arrangeAnchorEl)}
@@ -372,22 +427,51 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           }}
         >
           <Box sx={{ p: 2, width: 300 }}>
-            <Box sx={{ mb: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, textAlign: 'center' }}>
+              Arrange Items
+            </Typography>
+            <Box 
+              sx={{ 
+                mb: 2,
+                '& .MuiSlider-root': {
+                  transition: 'all 0.3s ease',
+                  ...(isAnimatingArrange ? {
+                    '& .MuiSlider-thumb': {
+                      boxShadow: '0 0 15px rgba(103, 126, 234, 0.7)',
+                      backgroundColor: '#677eea',
+                      transform: 'scale(1.2)',
+                    },
+                    '& .MuiSlider-track': {
+                      backgroundColor: '#677eea',
+                      boxShadow: '0 0 10px rgba(103, 126, 234, 0.3)',
+                    }
+                  } : {})
+                }
+              }}
+            >
               <Slider
                 value={columns}
                 min={1}
                 max={4}
                 step={1}
                 marks
-                onChange={(_, value) => setColumns(value as number)}
+                onChange={(_, value) => !isAnimatingArrange && setColumns(value as number)}
+                disabled={isAnimatingArrange}
               />
             </Box>
             <Button 
               variant="contained" 
               onClick={handleArrange}
               fullWidth
+              disabled={isAnimatingArrange}
+              sx={{
+                ...(isAnimatingArrange ? {
+                  backgroundColor: '#677eea',
+                  boxShadow: '0 0 10px rgba(103, 126, 234, 0.3)',
+                } : {})
+              }}
             >
-              Arrange ({columns} columns)
+              {isAnimatingArrange ? 'Arranging...' : `Arrange (${columns} columns)`}
             </Button>
           </Box>
         </Popover>

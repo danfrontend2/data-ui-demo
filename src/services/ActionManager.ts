@@ -36,6 +36,9 @@ export default class ActionManager {
   private currentSteps: Action[] = [];
   private onOpenAIChat?: (message: string, autoSend?: boolean) => void;
   private onOpenChartSettings?: (chartId?: string) => void;
+  private onOpenArrangeSettings?: (columns: number) => void;
+  private onCloseChartSettings?: () => void;
+  private onCloseArrangeSettings?: () => void;
 
 
 
@@ -250,7 +253,14 @@ export default class ActionManager {
       this.setItems(newItems);
     });
 
-    this.registerHandler('ARRANGE', ({ columns }: { columns: number }) => {
+    this.registerHandler('ARRANGE', async ({ columns }: { columns: number }) => {
+      // Open arrange settings to show the change
+      if (this.onOpenArrangeSettings) {
+        this.onOpenArrangeSettings(columns);
+        // Wait a bit to show the panel opening and slider animation
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
+
       if (!this.setItems) return;
       const itemWidth = Math.floor(12 / columns);
       const newItems = this.items.map((item: GridItem, index: number) => ({
@@ -261,6 +271,14 @@ export default class ActionManager {
         y: Math.floor(index / columns) * 9
       }));
       this.setItems(newItems);
+      
+      // Additional pause to show the visual change
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Close arrange settings panel
+      if (this.onCloseArrangeSettings) {
+        this.onCloseArrangeSettings();
+      }
     });
 
     this.registerHandler('UPDATE_CHART_OPACITY', async ({ opacity, chartId }) => {
@@ -431,6 +449,18 @@ export default class ActionManager {
     this.onOpenChartSettings = handler;
   }
 
+  setArrangeSettingsHandler(handler: (columns: number) => void) {
+    this.onOpenArrangeSettings = handler;
+  }
+
+  setCloseChartSettingsHandler(handler: () => void) {
+    this.onCloseChartSettings = handler;
+  }
+
+  setCloseArrangeSettingsHandler(handler: () => void) {
+    this.onCloseArrangeSettings = handler;
+  }
+
   private notifyMacroUpdate() {
     if (this.onStepChange) {
       this.onStepChange(this.currentStepIndex);
@@ -508,6 +538,14 @@ export default class ActionManager {
       this.executionPromise = null;
       this.executionResolve = null;
       this.notifyPlayStateChange(false); // Notify that macro is not playing
+      
+      // Close all settings panels at the end of macro
+      if (this.onCloseChartSettings) {
+        this.onCloseChartSettings();
+      }
+      if (this.onCloseArrangeSettings) {
+        this.onCloseArrangeSettings();
+      }
     }
   }
 
@@ -531,6 +569,14 @@ export default class ActionManager {
         this.executionPromise = null;
         this.executionResolve = null;
         this.notifyPlayStateChange(false);
+        
+        // Close all settings panels at the end of macro
+        if (this.onCloseChartSettings) {
+          this.onCloseChartSettings();
+        }
+        if (this.onCloseArrangeSettings) {
+          this.onCloseArrangeSettings();
+        }
       }
     }
   }
@@ -592,6 +638,14 @@ export default class ActionManager {
       this.executionPromise = null;
       this.executionResolve = null;
       this.notifyPlayStateChange(false);
+      
+      // Close all settings panels at the end of macro
+      if (this.onCloseChartSettings) {
+        this.onCloseChartSettings();
+      }
+      if (this.onCloseArrangeSettings) {
+        this.onCloseArrangeSettings();
+      }
     }
   }
 
