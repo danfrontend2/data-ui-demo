@@ -228,6 +228,18 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         setShouldAutoSend(true);
       }
     });
+
+    // Set up chart settings handler in ActionManager
+    actionManager.setChartSettingsHandler((chartId?: string) => {
+      // Close chat if open
+      setIsChatOpen(false);
+      // Open chart settings
+      setIsSettingsOpen(true);
+      // Select the specific chart if provided
+      if (chartId) {
+        setSelectedChartId(chartId);
+      }
+    });
   }, [isChatOpen, actionManager]);
 
   // When settings panel is closed, reset selected chart

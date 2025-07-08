@@ -35,6 +35,7 @@ export default class ActionManager {
   private onPlayStateChange?: (isPlaying: boolean) => void;
   private currentSteps: Action[] = [];
   private onOpenAIChat?: (message: string, autoSend?: boolean) => void;
+  private onOpenChartSettings?: (chartId?: string) => void;
 
 
 
@@ -262,7 +263,14 @@ export default class ActionManager {
       this.setItems(newItems);
     });
 
-    this.registerHandler('UPDATE_CHART_OPACITY', ({ opacity, chartId }) => {
+    this.registerHandler('UPDATE_CHART_OPACITY', async ({ opacity, chartId }) => {
+      // Open chart settings to show the change
+      if (this.onOpenChartSettings) {
+        this.onOpenChartSettings(chartId);
+        // Wait a bit to show the panel opening
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
       if (!this.setItems || !this.items) return;
       
       const newItems = this.items.map(item => {
@@ -280,9 +288,19 @@ export default class ActionManager {
       });
       
       this.setItems(newItems);
+      
+      // Additional pause to show the visual change
+      await new Promise(resolve => setTimeout(resolve, 800));
     });
 
-    this.registerHandler('UPDATE_CHART_STROKE_WIDTH', ({ strokeWidth, chartId }) => {
+    this.registerHandler('UPDATE_CHART_STROKE_WIDTH', async ({ strokeWidth, chartId }) => {
+      // Open chart settings to show the change
+      if (this.onOpenChartSettings) {
+        this.onOpenChartSettings(chartId);
+        // Wait a bit to show the panel opening
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
       if (!this.setItems || !this.items) return;
       
       const newItems = this.items.map(item => {
@@ -300,9 +318,19 @@ export default class ActionManager {
       });
       
       this.setItems(newItems);
+      
+      // Additional pause to show the visual change
+      await new Promise(resolve => setTimeout(resolve, 800));
     });
 
-    this.registerHandler('UPDATE_CHART_COLOR_SET', ({ colorSet, chartId }) => {
+    this.registerHandler('UPDATE_CHART_COLOR_SET', async ({ colorSet, chartId }) => {
+      // Open chart settings to show the change
+      if (this.onOpenChartSettings) {
+        this.onOpenChartSettings(chartId);
+        // Wait a bit to show the panel opening
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
       if (!this.setItems || !this.items) return;
       
       const newItems = this.items.map(item => {
@@ -320,6 +348,9 @@ export default class ActionManager {
       });
       
       this.setItems(newItems);
+      
+      // Additional pause to show the visual change
+      await new Promise(resolve => setTimeout(resolve, 800));
     });
 
     this.registerHandler('OPEN_AI_CHAT', ({ message, autoSend = true }) => {
@@ -394,6 +425,10 @@ export default class ActionManager {
 
   setAIChatHandler(handler: (message: string, autoSend?: boolean) => void) {
     this.onOpenAIChat = handler;
+  }
+
+  setChartSettingsHandler(handler: (chartId?: string) => void) {
+    this.onOpenChartSettings = handler;
   }
 
   private notifyMacroUpdate() {

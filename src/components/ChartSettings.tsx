@@ -25,7 +25,38 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
   const [opacity, setOpacity] = useState(1);
   const [strokeWidth, setStrokeWidth] = useState(2);
   const [colorSet, setColorSet] = useState('kelly');
+  const [isAnimating, setIsAnimating] = useState(false);
   const actionManager = ActionManager.getInstance();
+
+  // Animate slider value change
+  const animateSliderChange = async (
+    currentValue: number, 
+    targetValue: number, 
+    setter: (value: number) => void,
+    duration: number = 1000
+  ) => {
+    setIsAnimating(true);
+    const steps = 30;
+    const stepDuration = duration / steps;
+    const increment = (targetValue - currentValue) / steps;
+
+    for (let i = 0; i <= steps; i++) {
+      const newValue = currentValue + (increment * i);
+      setter(newValue);
+      await new Promise(resolve => setTimeout(resolve, stepDuration));
+    }
+    setIsAnimating(false);
+  };
+
+  // Animate color set change with brief highlight
+  const animateColorSetChange = async (targetColorSet: string) => {
+    setIsAnimating(true);
+    // Brief flash animation before changing
+    await new Promise(resolve => setTimeout(resolve, 200));
+    setColorSet(targetColorSet);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    setIsAnimating(false);
+  };
 
   // Get current settings from the selected chart
   useEffect(() => {
@@ -34,12 +65,30 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
       (selectedChartId ? item.i === selectedChartId : true)
     );
     
-    if (selectedChart) {
-      setOpacity(selectedChart.chartConfig?.opacity ?? 1);
-      setStrokeWidth(selectedChart.chartConfig?.strokeWidth ?? 2);
-      setColorSet(selectedChart.chartConfig?.colorSet ?? 'kelly');
+    if (selectedChart && !isAnimating) {
+      const newOpacity = selectedChart.chartConfig?.opacity ?? 1;
+      const newStrokeWidth = selectedChart.chartConfig?.strokeWidth ?? 2;
+      const newColorSet = selectedChart.chartConfig?.colorSet ?? 'kelly';
+      
+      // Check if values changed (indicating programmatic change from macro)
+      const opacityChanged = Math.abs(opacity - newOpacity) > 0.01;
+      const strokeWidthChanged = strokeWidth !== newStrokeWidth;
+      const colorSetChanged = colorSet !== newColorSet;
+      
+      if (opacityChanged) {
+        animateSliderChange(opacity, newOpacity, setOpacity, 800);
+      } else if (strokeWidthChanged) {
+        animateSliderChange(strokeWidth, newStrokeWidth, setStrokeWidth, 800);
+      } else if (colorSetChanged) {
+        animateColorSetChange(newColorSet);
+      } else {
+        // No animation needed, just set values directly
+        setOpacity(newOpacity);
+        setStrokeWidth(newStrokeWidth);
+        setColorSet(newColorSet);
+      }
     }
-  }, [items, selectedChartId]);
+  }, [items, selectedChartId, isAnimating]);
 
   const handleOpacityChange = (_event: Event, value: number | number[]) => {
     const newOpacity = value as number;
@@ -130,14 +179,25 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
         flexDirection: 'column',
         gap: 3
       }}>
-        <FormControl fullWidth>
+        <FormControl 
+          fullWidth
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              transition: 'all 0.3s ease',
+              ...(isAnimating && colorSet !== 'kelly' ? {
+                backgroundColor: 'rgba(103, 126, 234, 0.1)',
+                boxShadow: '0 0 10px rgba(103, 126, 234, 0.3)',
+              } : {})
+            }
+          }}
+        >
           <InputLabel id="color-set-label">Color Set</InputLabel>
           <Select
             labelId="color-set-label"
             value={colorSet}
             label="Color Set"
             onChange={handleColorSetChange}
-            disabled={!isChartSelected}
+            disabled={!isChartSelected || isAnimating}
           >
             {Object.entries(COLOR_SETS).map(([label, value]) => (
               <MenuItem key={value} value={value}>{label}</MenuItem>
@@ -145,7 +205,19 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
           </Select>
         </FormControl>
 
-        <Box>
+        <Box 
+          sx={{
+            '& .MuiSlider-root': {
+              transition: 'all 0.3s ease',
+              ...(isAnimating ? {
+                '& .MuiSlider-thumb': {
+                  boxShadow: '0 0 10px rgba(103, 126, 234, 0.5)',
+                  backgroundColor: '#677eea',
+                }
+              } : {})
+            }
+          }}
+        >
           <Typography gutterBottom>Fill Opacity</Typography>
           <Slider
             value={opacity}
@@ -159,11 +231,23 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
               { value: 0.5, label: '0.5' },
               { value: 1, label: '1' }
             ]}
-            disabled={!isChartSelected}
+            disabled={!isChartSelected || isAnimating}
           />
         </Box>
 
-        <Box>
+        <Box 
+          sx={{
+            '& .MuiSlider-root': {
+              transition: 'all 0.3s ease',
+              ...(isAnimating ? {
+                '& .MuiSlider-thumb': {
+                  boxShadow: '0 0 10px rgba(103, 126, 234, 0.5)',
+                  backgroundColor: '#677eea',
+                }
+              } : {})
+            }
+          }}
+        >
           <Typography gutterBottom>Stroke Width</Typography>
           <Slider
             value={strokeWidth}
@@ -177,7 +261,7 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
               { value: 5, label: '5' },
               { value: 10, label: '10' }
             ]}
-            disabled={!isChartSelected}
+            disabled={!isChartSelected || isAnimating}
           />
         </Box>
       </Box>
