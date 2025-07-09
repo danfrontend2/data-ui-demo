@@ -171,7 +171,8 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
           am5.Legend.new(root, {
             centerX: am5.percent(50),
             x: am5.percent(50),
-            useDefaultMarker: true
+            useDefaultMarker: true,
+            clickTarget: "itemContainer"
           })
         );
 
@@ -220,11 +221,23 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
                 
                 console.log('PieChart: Final slice name determined:', sliceName);
                 
+                // Determine current visibility state and record the opposite
+                let currentVisibility = true; // Default to visible
+                
+                if (pieSeries.dataItems && pieSeries.dataItems.length > index) {
+                  const pieDataItem = pieSeries.dataItems[index];
+                  if (pieDataItem) {
+                    // Check if the slice is currently hidden
+                    currentVisibility = !pieDataItem.isHidden();
+                    console.log('PieChart: Current visibility of slice:', sliceName, '=', currentVisibility);
+                  }
+                }
+                
                 // Record the action - for single-series pie, we toggle individual slices
                 actionManager.logAction('TOGGLE_CHART_SERIES', {
                   chartId,
                   seriesName: sliceName, // This is actually a slice name, not series name
-                  visible: false // We'll improve this logic later
+                  visible: !currentVisibility // Toggle the current state
                 });
               });
             });
