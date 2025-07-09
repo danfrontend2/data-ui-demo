@@ -171,79 +171,65 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
           am5.Legend.new(root, {
             centerX: am5.percent(50),
             x: am5.percent(50),
-            useDefaultMarker: true,
-            clickTarget: "itemContainer"
+            useDefaultMarker: true
           })
         );
 
         legend.data.setAll(pieSeries.dataItems);
+
+        console.log('PieChart: Setting up single-series pie chart legend');
         
-                // Track slice clicks for single-series pie charts
-        legend.events.on("click", function(ev) {
-          console.log('Pie legend clicked!', ev);
-          console.log('Recording state:', ActionManager.getInstance().isRecording());
-          console.log('Executing state:', ActionManager.getInstance().isExecutingMacro());
+        // Set up recording of legend interactions for single-series pie chart
+        const actionManager = ActionManager.getInstance();
+        if (actionManager.isRecording()) {
+          console.log('PieChart: Setting up single-series legend recording for chart:', chartId);
           
-          if (ActionManager.getInstance().isRecording() && 
-              !ActionManager.getInstance().isExecutingMacro()) {
-            const target = ev.target;
-            console.log('Pie legend clicked during recording', target);
-            console.log('Target dataItem:', target.dataItem);
-            
-            // Try to find which data item was clicked through the legend
-            const dataItem = target.dataItem;
-            if (dataItem && dataItem.dataContext) {
-              const pieDataItem = dataItem.dataContext as any;
-              const categoryName = pieDataItem.get("category");
-              const isCurrentlyVisible = !pieDataItem.isHidden();
-              
-              console.log('Found pie data item:', categoryName, 'visible:', isCurrentlyVisible);
-              
-              if (categoryName) {
-                console.log(`Recording pie slice toggle: ${categoryName} -> ${!isCurrentlyVisible}`);
-                // Use a small delay to let amCharts process the click first
-                setTimeout(() => {
-                  ActionManager.getInstance().logAction('TOGGLE_CHART_SERIES', {
-                    chartId: chartId,
-                    seriesName: categoryName,
-                    visible: !isCurrentlyVisible // Will be toggled after this click
-                  });
-                }, 50);
-              }
-            } else {
-              console.log('Using fallback method to detect changes');
-              // Fallback: track changes in all slices states
-              const sliceStates = new Map();
-              pieSeries.dataItems.forEach(function(dataItem) {
-                const categoryName = dataItem.get("category");
-                const isVisible = !dataItem.isHidden();
-                sliceStates.set(categoryName, isVisible);
-              });
-              
-              console.log('Initial slice states:', Array.from(sliceStates.entries()));
-              
-              // Check for changes after a short delay
-              setTimeout(() => {
-                pieSeries.dataItems.forEach(function(dataItem) {
-                  const categoryName = dataItem.get("category");
-                  const isVisible = !dataItem.isHidden();
-                  const previousState = sliceStates.get(categoryName);
+          // Use setTimeout to ensure legend is fully rendered before adding event handlers
+          setTimeout(() => {
+            legend.children.each(function(child: any, index: number) {
+              child.events.on("click", function(ev: any) {
+                console.log('PieChart: Single-series legend item clicked, index:', index);
+                
+                // For single-series pie charts, get the slice name by index
+                let sliceName = 'Unknown';
+                
+                // Get the corresponding data item from pie series by index
+                if (pieSeries.dataItems && pieSeries.dataItems.length > index) {
+                  const pieDataItem = pieSeries.dataItems[index];
+                  console.log('PieChart: Found pie data item by index:', pieDataItem);
                   
-                  console.log(`Slice ${categoryName}: was ${previousState}, now ${isVisible}`);
-                  
-                  if (categoryName && isVisible !== previousState) {
-                    console.log(`Recording pie slice toggle: ${categoryName} -> ${isVisible}`);
-                    ActionManager.getInstance().logAction('TOGGLE_CHART_SERIES', {
-                      chartId: chartId,
-                      seriesName: categoryName,
-                      visible: isVisible
-                    });
+                  if (pieDataItem) {
+                    const category = pieDataItem.get("category");
+                    sliceName = (typeof category === 'string') ? category : 'Unknown';
+                    console.log('PieChart: Got slice name from pie data item:', sliceName);
                   }
+                }
+                
+                // Fallback: try to get from original data by index
+                if (sliceName === 'Unknown' && data && data.length > index) {
+                  const dataPoint = data[index];
+                  console.log('PieChart: Fallback to original data point:', dataPoint);
+                  
+                  sliceName = (dataPoint.category && typeof dataPoint.category === 'string') ? dataPoint.category :
+                             (dataPoint.name && typeof dataPoint.name === 'string') ? dataPoint.name :
+                             (dataPoint.country && typeof dataPoint.country === 'string') ? dataPoint.country :
+                             (dataPoint.element && typeof dataPoint.element === 'string') ? dataPoint.element :
+                             'Unknown';
+                  console.log('PieChart: Got slice name from original data:', sliceName);
+                }
+                
+                console.log('PieChart: Final slice name determined:', sliceName);
+                
+                // Record the action - for single-series pie, we toggle individual slices
+                actionManager.logAction('TOGGLE_CHART_SERIES', {
+                  chartId,
+                  seriesName: sliceName, // This is actually a slice name, not series name
+                  visible: false // We'll improve this logic later
                 });
-              }, 50);
-            }
-          }
-        });
+              });
+            });
+          }, 500); // Give time for legend to fully render
+        }
       }
     } else {
       // Multiple series - create separate series for each field
