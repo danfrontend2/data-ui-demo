@@ -481,7 +481,10 @@ const GridLayout: React.FC<GridLayoutProps> = ({
       columnDefs: columnDefs[item.i] || defaultColumns,
       rowData: gridData[item.i] || defaultData,
       onGridReady: (params: GridReadyEvent) => {
+        console.log('=== Grid ready for item.i:', item.i);
+        console.log('Registering gridApi for gridId:', item.i);
         window.gridApis[item.i] = params.api;
+        console.log('window.gridApis after registration:', Object.keys(window.gridApis));
       },
       onCellValueChanged,
       getContextMenuItems

@@ -210,19 +210,57 @@ export default class ActionManager {
       console.log('=== SELECT_RANGE handler called ===');
       console.log('gridId:', gridId);
       console.log('Available gridApis:', Object.keys(window.gridApis || {}));
+      console.log('Available gridApis contents:', window.gridApis);
       
-      let gridApi = window.gridApis[gridId];
+      let gridApi: GridApi | null = window.gridApis[gridId] || null;
       console.log('gridApi found with exact ID:', !!gridApi);
       
-      // Fallback: if exact gridId not found, try to find any available grid
+      // Check if the found API is destroyed
+      if (gridApi) {
+        try {
+          if (gridApi.isDestroyed()) {
+            console.log('Found gridApi is destroyed, clearing it');
+            delete window.gridApis[gridId];
+            gridApi = null;
+          }
+        } catch (e) {
+          console.log('Error checking gridApi, treating as destroyed:', e);
+          gridApi = null;
+        }
+      }
+      
+      // Fallback: find the first ACTIVE grid
       if (!gridApi && window.gridApis && Object.keys(window.gridApis).length > 0) {
-        const availableGridId = Object.keys(window.gridApis)[0];
-        gridApi = window.gridApis[availableGridId];
-        console.log(`Fallback: using gridId "${availableGridId}" instead of "${gridId}"`);
+        console.log('Looking for active gridApi...');
+        for (const [availableGridId, api] of Object.entries(window.gridApis)) {
+          try {
+            if (!api.isDestroyed()) {
+              gridApi = api;
+              console.log(`Fallback: using active gridId "${availableGridId}" instead of "${gridId}"`);
+              break;
+            } else {
+              console.log(`GridId "${availableGridId}" is destroyed, skipping`);
+              delete window.gridApis[availableGridId]; // Clean up destroyed APIs
+            }
+          } catch (e) {
+            console.log(`Error checking gridId "${availableGridId}", skipping:`, e);
+            delete window.gridApis[availableGridId]; // Clean up problematic APIs
+          }
+        }
+        console.log('Final fallback gridApi found:', !!gridApi);
       }
       
       if (gridApi) {
         console.log('Starting SELECT_RANGE processing...');
+        console.log('gridApi type:', typeof gridApi);
+        console.log('gridApi methods available:', Object.getOwnPropertyNames(gridApi).filter(name => typeof (gridApi as any)[name] === 'function'));
+        
+        // Check if gridApi is alive and working
+        try {
+          console.log('Testing gridApi.isDestroyed():', gridApi.isDestroyed());
+        } catch (e) {
+          console.log('Error checking isDestroyed:', e);
+        }
         
         // Get all rows data
         const renderedNodes = gridApi.getRenderedNodes();
@@ -336,7 +374,7 @@ export default class ActionManager {
             const columnObjects = selectedColumns && Array.isArray(selectedColumns) ? selectedColumns
               .map(colField => {
                 if (!colField || typeof colField !== 'string') return null;
-                const col = gridApi.getColumn(colField);
+                const col = gridApi!.getColumn(colField);
                 console.log('Column field:', colField, 'found column:', !!col);
                 return col;
               })
@@ -347,15 +385,22 @@ export default class ActionManager {
             if (rowNodes && rowNodes.length > 0 && columnObjects && columnObjects.length > 0) {
               console.log('✅ Calling flashCells with:', { rowNodes: rowNodes.length, columns: columnObjects.length });
               
+              // Capture gridApi reference for setTimeout
+              const activeGridApi = gridApi;
+              
               // Add a small delay to ensure the grid is ready
               setTimeout(() => {
-                gridApi.flashCells({
-                  rowNodes: rowNodes,
-                  columns: columnObjects,
-                  flashDuration: 1000,  // Longer flash for visibility
-                  fadeDuration: 800    // Longer fade for visibility
-                });
-                console.log('✅ flashCells called successfully');
+                if (activeGridApi && !activeGridApi.isDestroyed()) {
+                  activeGridApi.flashCells({
+                    rowNodes: rowNodes,
+                    columns: columnObjects,
+                    flashDuration: 1000,  // Longer flash for visibility
+                    fadeDuration: 800    // Longer fade for visibility
+                  });
+                  console.log('✅ flashCells called successfully');
+                } else {
+                  console.log('❌ gridApi became invalid before flashCells');
+                }
               }, 100);
             } else {
               console.warn('❌ FLASH SKIPPED: No rows or columns to flash:', { 

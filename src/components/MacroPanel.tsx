@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
-import { ActionType, Action, MacroData } from '../types/actions';
+import { ActionType, MacroData } from '../types/actions';
 import { getActionMessage } from '../utils/messageUtils';
 
 interface MacroPanelProps {
