@@ -42,6 +42,9 @@ interface ToolbarProps {
   onPromptSelect?: (prompt: string) => void;
   items: GridItem[];
   isMacroPanelOpen?: boolean;
+  showInitialGlow?: boolean;
+  forceTooltipOpen?: boolean;
+  onShowTimeClick?: () => void;
 }
 
 const tooltipProps = {
@@ -59,7 +62,7 @@ const tooltipProps = {
   }
 };
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onCloseMacroPanel, onArrangeItems, onMacroLoad, onPromptSelect, items, isMacroPanelOpen }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onCloseMacroPanel, onArrangeItems, onMacroLoad, onPromptSelect, items, isMacroPanelOpen, showInitialGlow = false, forceTooltipOpen = false, onShowTimeClick }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
@@ -394,6 +397,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           onRunMacro={onRunCustomMacro}
           onMacroLoad={onMacroLoad}
           onPromptSelect={onPromptSelect}
+          showInitialGlow={showInitialGlow}
+          forceTooltipOpen={forceTooltipOpen}
+          onButtonClick={onShowTimeClick}
         />
         <input
           type="file"

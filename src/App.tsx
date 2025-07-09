@@ -17,6 +17,8 @@ function App() {
   const [currentMacro, setCurrentMacro] = useState<MacroData | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1);
   const [isMacroPlaying, setIsMacroPlaying] = useState(false);
+  const [showStartAnimation, setShowStartAnimation] = useState(true);
+  const [showTooltip, setShowTooltip] = useState(false);
   const actionManager = ActionManager.getInstance();
 
   useEffect(() => {
@@ -33,7 +35,24 @@ function App() {
     actionManager.updateItems(items);
   }, [items, actionManager]);
 
+  // Show tooltip after a short delay when page loads
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowTooltip(true);
+      // Hide tooltip after 3 seconds
+      setTimeout(() => {
+        setShowTooltip(false);
+      }, 3000);
+    }, 1000); // Show tooltip after 1 second
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleAddItem = (newItem: Layout) => {
+    // Hide start animation and tooltip when user interacts with the app
+    setShowStartAnimation(false);
+    setShowTooltip(false);
+    
     // Calculate the maximum Y coordinate of existing items
     const maxY = items.reduce((max, item) => {
       const itemBottom = item.y + item.h;
@@ -94,7 +113,17 @@ function App() {
   };
 
   const handleCloseAll = () => {
+    // Hide start animation and tooltip when user interacts with the app
+    setShowStartAnimation(false);
+    setShowTooltip(false);
+    
     actionManager.logAction('REMOVE_ALL_GRIDS', {});
+  };
+
+  const handleShowTimeClick = () => {
+    // Hide start animation and tooltip when Show Time button is clicked
+    setShowStartAnimation(false);
+    setShowTooltip(false);
   };
 
   const handleLayoutChange = (layout: Layout[]) => {
@@ -106,6 +135,10 @@ function App() {
   };
 
   const handleMacroLoad = (macroData: MacroData) => {
+    // Hide start animation and tooltip when user interacts with the app
+    setShowStartAnimation(false);
+    setShowTooltip(false);
+    
     // Check if START action exists at the beginning, if not add it
     const updatedSteps = [...macroData.steps];
     if (updatedSteps.length > 0 && updatedSteps[0].type !== 'START') {
@@ -195,6 +228,9 @@ function App() {
           onMacroLoad={handleMacroLoad}
           items={items}
           isMacroPanelOpen={isMacroPanelOpen}
+          showInitialGlow={showStartAnimation}
+          forceTooltipOpen={showTooltip}
+          onShowTimeClick={handleShowTimeClick}
         />
         <Box sx={{ flex: 1 }}>
           <GridLayout 
@@ -214,6 +250,7 @@ function App() {
           />
         )}
       </Box>
+
     </Box>
   );
 }

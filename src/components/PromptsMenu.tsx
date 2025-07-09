@@ -4,7 +4,8 @@ import {
   Menu,
   MenuItem,
   Typography,
-  Tooltip
+  Tooltip,
+  keyframes
 } from '@mui/material';
 import MovieIcon from '@mui/icons-material/Movie';
 import ChatIcon from '@mui/icons-material/Chat';
@@ -23,12 +24,29 @@ interface PromptsMenuProps {
   onPromptSelect?: (prompt: string) => void;
   onRunMacro?: (steps: any[]) => void;
   onMacroLoad?: (macroData: MacroData) => void;
+  showInitialGlow?: boolean;
+  forceTooltipOpen?: boolean;
+  onButtonClick?: () => void;
 }
 
-const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, onMacroLoad }) => {
+// Keyframes for button glow animation
+const buttonGlow = keyframes`
+  0% {
+    box-shadow: 0 0 5px #ff4444, 0 0 10px #ff4444, 0 0 15px #ff4444;
+  }
+  50% {
+    box-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444, 0 0 30px #ff4444;
+  }
+  100% {
+    box-shadow: 0 0 5px #ff4444, 0 0 10px #ff4444, 0 0 15px #ff4444;
+  }
+`;
+
+const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, onMacroLoad, showInitialGlow = false, forceTooltipOpen = false, onButtonClick }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [promptOptions, setPromptOptions] = useState<PromptOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   // Generate beautiful gradient colors for menu items
@@ -84,6 +102,8 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+    // Call the callback to stop glow when button is clicked
+    onButtonClick?.();
   };
 
   const handleClose = () => {
@@ -107,6 +127,9 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
     <>
       <Tooltip 
         title="Showtime: Select a Demo Macro"
+        open={forceTooltipOpen || tooltipOpen}
+        onOpen={() => setTooltipOpen(true)}
+        onClose={() => setTooltipOpen(false)}
         componentsProps={{
           tooltip: {
             sx: {
@@ -129,7 +152,11 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
             backgroundColor: open ? 'action.selected' : 'transparent',
             '&:hover': {
               backgroundColor: 'action.hover',
-            }
+            },
+            ...(showInitialGlow ? {
+              animation: `${buttonGlow} 2s ease-in-out infinite`,
+              borderRadius: '50%',
+            } : {})
           }}
         >
           <MovieIcon 
