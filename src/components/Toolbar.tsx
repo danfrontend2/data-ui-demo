@@ -114,15 +114,23 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
     setIsRecording(false);
     const macro = actionManager.stopRecording();
     setRecordedMacro(macro);
+    // Set default neutral prompt
+    setPrompt('Create a data visualization');
     setIsPromptDialogOpen(true);
   };
 
   const handleSaveMacro = () => {
+    // Validate that prompt is not empty
+    if (!prompt.trim()) {
+      alert('Please enter a prompt before saving the macro.');
+      return;
+    }
+    
     setIsPromptDialogOpen(false);
     
     // Create macro object with prompt
     const macroWithPrompt = {
-      prompt,
+      prompt: prompt.trim(),
       steps: recordedMacro
     };
     
@@ -499,24 +507,36 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         )}
 
         {/* Prompt Dialog */}
-        <Dialog open={isPromptDialogOpen} onClose={() => setIsPromptDialogOpen(false)}>
+        <Dialog open={isPromptDialogOpen} onClose={() => setIsPromptDialogOpen(false)} maxWidth="sm" fullWidth>
           <DialogTitle>Save Macro</DialogTitle>
           <DialogContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Enter a prompt that describes what this macro does. This will help you and others understand the purpose of the macro.
+            </Typography>
             <TextField
               autoFocus
               margin="dense"
               label="Prompt"
+              placeholder="e.g., Create a bar chart showing population data"
               fullWidth
               variant="outlined"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               multiline
               rows={4}
+              helperText={`${prompt.trim().length} characters`}
             />
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setIsPromptDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveMacro} startIcon={<SaveIcon />}>Save</Button>
+            <Button 
+              onClick={handleSaveMacro} 
+              startIcon={<SaveIcon />}
+              disabled={!prompt.trim()}
+              variant="contained"
+            >
+              Save
+            </Button>
           </DialogActions>
         </Dialog>
 
