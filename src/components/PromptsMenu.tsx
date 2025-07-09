@@ -178,22 +178,41 @@ const PromptsMenu: React.FC<PromptsMenuProps> = ({ onPromptSelect, onRunMacro, o
         PaperProps={{
           sx: {
             width: 380,
-            maxHeight: 500,
+            maxHeight: 700,
             mt: 1
           }
         }}
         transformOrigin={{ horizontal: 'left', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
       >
-        <MenuItem disabled sx={{ px: 2, py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <MenuItem sx={{ px: 2, py: 1, borderBottom: '1px solid', borderColor: 'divider', cursor: 'default' }}>
           <Typography variant="h6" sx={{ 
             display: 'flex', 
             alignItems: 'center',
             fontSize: '1.1rem',
-            fontWeight: 600
+            fontWeight: 600,
+            color: '#000000 !important'
           }}>
-            <ChatIcon sx={{ mr: 1, fontSize: '1.2rem' }} />
+            <ChatIcon sx={{ mr: 1, fontSize: '1.2rem', color: '#000000 !important' }} />
             Showtime: Select a Demo Macro
+          </Typography>
+        </MenuItem>
+        
+        <MenuItem sx={{ px: 2, py: 1.5, borderBottom: '1px solid', borderColor: 'divider', cursor: 'default' }}>
+          <Typography variant="body1" sx={{ 
+            color: '#000000 !important',
+            lineHeight: 1.5,
+            fontSize: '1.02rem',
+            fontWeight: 500,
+            whiteSpace: 'normal',
+            wordWrap: 'break-word',
+            width: '100%'
+          }}>
+            This is a demonstration of macro playback. Everything they do can be done manually through the UI.
+            <br /><br />
+            To load data into the grid, click the load button on the grid or drag and drop an Excel file.
+            <br /><br />
+            To create a chart, select a data range on the grid and choose a chart type from the context menu.
           </Typography>
         </MenuItem>
 
