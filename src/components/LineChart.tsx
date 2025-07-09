@@ -10,6 +10,7 @@ import am5themes_Spirited from "@amcharts/amcharts5/themes/Spirited";
 import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
 import { ChartDataPoint } from '../types';
 import { ChartConfig } from '../types';
+import ActionManager from '../services/ActionManager';
 
 interface LineChartProps {
   data: ChartDataPoint[];
@@ -162,6 +163,26 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
         marginBottom: 15
       }));
       legend.data.setAll(chart.series.values);
+      
+            // Track series visibility changes for recording
+      chart.series.each(function(series) {
+        series.on("visible", function() {
+          const seriesName = series.get("name");
+          const isVisible = series.get("visible");
+          
+          // Only log during recording and NOT during macro execution
+          if (ActionManager.getInstance().isRecording() && 
+              !ActionManager.getInstance().isExecutingMacro() && 
+              seriesName) {
+            console.log(`Recording series toggle: ${seriesName} -> ${isVisible}`);
+            ActionManager.getInstance().logAction('TOGGLE_CHART_SERIES', {
+              chartId: chartId,
+              seriesName: seriesName,
+              visible: isVisible
+            });
+          }
+        });
+      });
     }
 
     // Add cursor
@@ -171,10 +192,20 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
       yAxis: yAxis
     }));
 
+    // Register chart instance globally for ActionManager access
+    if (!(window as any).chartInstances) {
+      (window as any).chartInstances = {};
+    }
+    (window as any).chartInstances[chartId] = chart;
+
     // Save root for cleanup
     chartRef.current = root;
 
     return () => {
+      // Unregister chart instance
+      if ((window as any).chartInstances) {
+        delete (window as any).chartInstances[chartId];
+      }
       root.dispose();
     };
   }, [data, chartId, series, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend, chartConfig?.hiddenSeries]);

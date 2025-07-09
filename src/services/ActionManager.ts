@@ -6,10 +6,13 @@ import { getActionMessage } from '../utils/messageUtils';
 
 declare global {
   interface Window {
-    gridApis: {
-      [key: string]: GridApi;
-    };
-  }
+  gridApis: {
+    [key: string]: GridApi;
+  };
+  chartInstances: {
+    [key: string]: any; // amCharts chart instances
+  };
+}
 }
 
 type MessageCallback = (message: string | null) => void;
@@ -594,6 +597,69 @@ export default class ActionManager {
     this.registerHandler('TOGGLE_CHART_SERIES', async ({ chartId, seriesName, visible }) => {
       if (!this.setItems || !this.items) return;
       
+      // First, apply direct changes to existing charts via global chart registry
+      console.log('Attempting to toggle chart series:', { chartId, seriesName, visible });
+      
+      try {
+        // Initialize chart instances registry if it doesn't exist
+        if (!(window as any).chartInstances) {
+          (window as any).chartInstances = {};
+        }
+        
+        // Find the target chart
+        const targetChartId = chartId || this.items.find(item => 
+          (item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart')
+        )?.i;
+        
+        console.log('Target chart ID:', targetChartId);
+        console.log('Available chart instances:', Object.keys((window as any).chartInstances));
+        
+        if (targetChartId) {
+          const chart = (window as any).chartInstances[targetChartId];
+          console.log('Chart instance found:', !!chart);
+          
+          if (chart && chart.series) {
+            console.log('Chart has series:', chart.series.length);
+            
+            // For bar/line charts
+            chart.series.each((series: any) => {
+              const name = series.get("name");
+              console.log('Checking series:', name, 'target:', seriesName);
+              if (name === seriesName) {
+                console.log('Found matching series, toggling visibility to:', visible);
+                if (visible) {
+                  series.show();
+                } else {
+                  series.hide();
+                }
+              }
+            });
+            
+            // For pie charts (single series with data items)
+            if (chart.series.length === 1) {
+              const pieSeries = chart.series.getIndex(0);
+              if (pieSeries && pieSeries.dataItems) {
+                pieSeries.dataItems.forEach((dataItem: any) => {
+                  const category = dataItem.get("category");
+                  console.log('Checking pie slice:', category, 'target:', seriesName);
+                  if (category === seriesName) {
+                    console.log('Found matching pie slice, toggling visibility to:', visible);
+                    if (visible) {
+                      dataItem.show();
+                    } else {
+                      dataItem.hide();
+                    }
+                  }
+                });
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to apply direct chart changes:', error);
+      }
+      
+      // Then update the configuration for future renders
       const newItems = this.items.map(item => {
         if ((item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart') && 
             (!chartId || item.i === chartId)) {
@@ -685,6 +751,18 @@ export default class ActionManager {
   stopRecording(): Action[] {
     this.recording = false;
     return this.recordedActions;
+  }
+
+  isRecording(): boolean {
+    return this.recording;
+  }
+
+  isExecutingMacro(): boolean {
+    return this.isExecuting;
+  }
+
+  getHandler(type: ActionType): ((details: any) => void) | undefined {
+    return this.actionHandlers[type];
   }
 
   setStepChangeHandler(handler: (stepIndex: number) => void) {

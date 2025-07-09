@@ -10,6 +10,7 @@ import am5themes_Spirited from "@amcharts/amcharts5/themes/Spirited";
 import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
 import { ChartDataPoint } from '../types';
 import { ChartConfig } from '../types';
+import ActionManager from '../services/ActionManager';
 
 interface PieChartProps {
   data: ChartDataPoint[];
@@ -176,6 +177,31 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
         );
 
         legend.data.setAll(pieSeries.dataItems);
+        
+                // Track slice clicks for single-series pie charts
+        legend.events.on("click", function(ev) {
+          if (ActionManager.getInstance().isRecording()) {
+            // For single series pie charts, we need to track individual slice visibility
+            // This is more complex, so let's add a simple approach
+            const target = ev.target;
+            console.log('Pie legend clicked during recording', target);
+            
+            // We'll try to identify which slice was clicked and toggle it
+            setTimeout(() => {
+              pieSeries.dataItems.forEach(function(dataItem) {
+                const categoryName = dataItem.get("category");
+                const isVisible = !dataItem.isHidden();
+                
+                // For now, let's just log all slices states - in future we can be more specific
+                if (categoryName) {
+                  console.log(`Pie slice ${categoryName} state: ${isVisible}`);
+                  // We would need more complex logic to detect which specific slice changed
+                  // For now this is a placeholder
+                }
+              });
+            }, 10);
+          }
+        });
       }
     } else {
       // Multiple series - create separate series for each field
@@ -236,13 +262,43 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
         });
 
         legend.data.setAll(chart.series.values);
+        
+                // Track series visibility changes for multi-series pie charts
+        chart.series.each(function(series) {
+          series.on("visible", function() {
+            const seriesName = series.get("name");
+            const isVisible = series.get("visible");
+            
+            // Only log during recording and NOT during macro execution
+            if (ActionManager.getInstance().isRecording() && 
+                !ActionManager.getInstance().isExecutingMacro() && 
+                seriesName) {
+              console.log(`Recording pie series toggle: ${seriesName} -> ${isVisible}`);
+              ActionManager.getInstance().logAction('TOGGLE_CHART_SERIES', {
+                chartId: chartId,
+                seriesName: seriesName,
+                visible: isVisible
+              });
+            }
+          });
+        });
       }
     }
+
+    // Register chart instance globally for ActionManager access
+    if (!(window as any).chartInstances) {
+      (window as any).chartInstances = {};
+    }
+    (window as any).chartInstances[chartId] = chart;
 
     // Save root for cleanup
     chartRef.current = root;
 
     return () => {
+      // Unregister chart instance
+      if ((window as any).chartInstances) {
+        delete (window as any).chartInstances[chartId];
+      }
       root.dispose();
     };
   }, [data, chartId, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend, chartConfig?.hiddenSeries]);
