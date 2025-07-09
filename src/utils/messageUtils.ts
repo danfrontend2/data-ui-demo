@@ -23,6 +23,11 @@ export function getActionMessage(action: Action): string {
         return `Loading data from file, ${details.excelData.length} rows, fields: ${details.excelData[0]}`;
       }
       return 'Loading data into grid...';
+    case 'UPDATE_CELL':
+      if (details.field && details.newValue !== undefined) {
+        return `Updating cell ${details.field} to "${details.newValue}"`;
+      }
+      return 'Updating cell value...';
     case 'SELECT_RANGE':
       if (details.range) {
         return `Selecting data range, lines:${details.range.startRow} - ${details.range.endRow}`;
@@ -67,6 +72,13 @@ export function getActionMessage(action: Action): string {
         return `Changing color scheme to ${details.colorSet} for ${targetText}`;
       }
       return 'Updating chart colors...';
+    case 'UPDATE_CHART_SHOW_LEGEND':
+      if (details.showLegend !== undefined) {
+        const action = details.showLegend ? 'Showing' : 'Hiding';
+        const targetText = details.chartId ? `chart ${details.chartId}` : 'all charts';
+        return `${action} legend for ${targetText}`;
+      }
+      return 'Toggling chart legend...';
     case 'TOGGLE_CHART_SERIES':
       if (details.seriesName) {
         const action = details.visible ? 'Showing' : 'Hiding';
