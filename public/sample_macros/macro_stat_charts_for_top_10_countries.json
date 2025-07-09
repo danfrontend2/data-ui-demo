@@ -1,0 +1,1244 @@
+{
+  "prompt": "Stat charts for top-10 countries",
+  "steps": [
+    {
+      "id": "1752053290062",
+      "timestamp": 1752053290062,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_blsqepxph",
+          "x": 0,
+          "y": 0,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      },
+      "message": "Adding a new data grid"
+    },
+    {
+      "id": "1752053290136",
+      "timestamp": 1752053290136,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_blsqepxph",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752053297705",
+      "timestamp": 1752053297705,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_blsqepxph",
+        "excelData": [
+          [
+            "Country",
+            "Population (million)",
+            "GDP (USD tn)",
+            "GDP per cap (USD)",
+            "Life Exp (yrs)",
+            "HDI",
+            "CO₂ per cap (t/yr)",
+            "Urbanization (%)"
+          ],
+          [
+            "China",
+            1412,
+            17.7,
+            12500,
+            77,
+            0.761,
+            7.6,
+            64
+          ],
+          [
+            "India",
+            1400,
+            3.7,
+            2600,
+            70,
+            0.645,
+            1.9,
+            35
+          ],
+          [
+            "USA",
+            339,
+            28.8,
+            85000,
+            78,
+            0.938,
+            14.7,
+            83
+          ],
+          [
+            "Indonesia",
+            278,
+            1.5,
+            5400,
+            71,
+            0.707,
+            2.1,
+            57
+          ],
+          [
+            "Pakistan",
+            241,
+            0.4,
+            1700,
+            67,
+            0.557,
+            0.9,
+            38
+          ],
+          [
+            "Nigeria",
+            223,
+            0.5,
+            2200,
+            55,
+            0.539,
+            0.6,
+            52
+          ],
+          [
+            "Brazil",
+            216,
+            2.2,
+            10200,
+            76,
+            0.754,
+            2.2,
+            87
+          ],
+          [
+            "Bangladesh",
+            172,
+            0.5,
+            2900,
+            72,
+            0.661,
+            0.3,
+            40
+          ],
+          [
+            "Russia",
+            144,
+            2,
+            13900,
+            72,
+            0.824,
+            12.4,
+            74
+          ],
+          [
+            "Mexico",
+            129,
+            1.8,
+            13900,
+            75,
+            0.779,
+            4.1,
+            83
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      },
+      "message": "Loading data from file, 11 rows, fields: Country,Population (million),GDP (USD tn),GDP per cap (USD),Life Exp (yrs),HDI,CO₂ per cap (t/yr),Urbanization (%)"
+    },
+    {
+      "id": "1752053300690",
+      "timestamp": 1752053300690,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 12,
+            "h": 10,
+            "x": 0,
+            "y": 0,
+            "i": "grid_blsqepxph",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 10, width: 12"
+    },
+    {
+      "id": "1752053300690",
+      "timestamp": 1752053300690,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 12,
+            "h": 10,
+            "x": 0,
+            "y": 0,
+            "i": "grid_blsqepxph",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 10, width: 12"
+    },
+    {
+      "id": "1752053307551",
+      "timestamp": 1752053307551,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "grid_blsqepxph",
+        "range": {
+          "columns": [
+            "Country",
+            "Population__million_"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      },
+      "message": "Selecting data range, lines:0 - 9"
+    },
+    {
+      "id": "1752053307553",
+      "timestamp": 1752053307553,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "pie-chart-1752053307553",
+          "x": 0,
+          "y": 10,
+          "w": 6,
+          "h": 8,
+          "type": "pie-chart",
+          "chartData": [
+            {
+              "category": "China",
+              "Population__million_": 1412
+            },
+            {
+              "category": "India",
+              "Population__million_": 1400
+            },
+            {
+              "category": "USA",
+              "Population__million_": 339
+            },
+            {
+              "category": "Indonesia",
+              "Population__million_": 278
+            },
+            {
+              "category": "Pakistan",
+              "Population__million_": 241
+            },
+            {
+              "category": "Nigeria",
+              "Population__million_": 223
+            },
+            {
+              "category": "Brazil",
+              "Population__million_": 216
+            },
+            {
+              "category": "Bangladesh",
+              "Population__million_": 172
+            },
+            {
+              "category": "Russia",
+              "Population__million_": 144
+            },
+            {
+              "category": "Mexico",
+              "Population__million_": 129
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Population__million_",
+                "name": "Population (million)"
+              }
+            ]
+          },
+          "sourceGridId": "grid_blsqepxph",
+          "selectedRange": {
+            "columns": [
+              "Country",
+              "Population__million_"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      },
+      "message": "Adding a pie chart, for categories:[China, India, USA, Indonesia, Pakistan, Nigeria, Brazil, Bangladesh, Russia, Mexico]"
+    },
+    {
+      "id": "1752053307617",
+      "timestamp": 1752053307617,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 12,
+            "h": 10,
+            "x": 0,
+            "y": 0,
+            "i": "grid_blsqepxph",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 10,
+            "i": "pie-chart-1752053307553",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752053320391",
+      "timestamp": 1752053320391,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "grid_blsqepxph",
+        "range": {
+          "columns": [
+            "Country",
+            "GDP__USD_tn_"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      },
+      "message": "Selecting data range, lines:0 - 9"
+    },
+    {
+      "id": "1752053320393",
+      "timestamp": 1752053320393,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "bar-chart-1752053320393",
+          "x": 0,
+          "y": 18,
+          "w": 6,
+          "h": 8,
+          "type": "bar-chart",
+          "chartData": [
+            {
+              "category": "China",
+              "GDP__USD_tn_": 17.7
+            },
+            {
+              "category": "India",
+              "GDP__USD_tn_": 3.7
+            },
+            {
+              "category": "USA",
+              "GDP__USD_tn_": 28.8
+            },
+            {
+              "category": "Indonesia",
+              "GDP__USD_tn_": 1.5
+            },
+            {
+              "category": "Pakistan",
+              "GDP__USD_tn_": 0.4
+            },
+            {
+              "category": "Nigeria",
+              "GDP__USD_tn_": 0.5
+            },
+            {
+              "category": "Brazil",
+              "GDP__USD_tn_": 2.2
+            },
+            {
+              "category": "Bangladesh",
+              "GDP__USD_tn_": 0.5
+            },
+            {
+              "category": "Russia",
+              "GDP__USD_tn_": 2
+            },
+            {
+              "category": "Mexico",
+              "GDP__USD_tn_": 1.8
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "GDP__USD_tn_",
+                "name": "GDP (USD tn)"
+              }
+            ]
+          },
+          "sourceGridId": "grid_blsqepxph",
+          "selectedRange": {
+            "columns": [
+              "Country",
+              "GDP__USD_tn_"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      },
+      "message": "Adding a bar chart, for categories:[China, India, USA, Indonesia, Pakistan, Nigeria, Brazil, Bangladesh, Russia, Mexico]"
+    },
+    {
+      "id": "1752053320453",
+      "timestamp": 1752053320453,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 12,
+            "h": 10,
+            "x": 0,
+            "y": 0,
+            "i": "grid_blsqepxph",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 10,
+            "i": "pie-chart-1752053307553",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 18,
+            "i": "bar-chart-1752053320393",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752053341800",
+      "timestamp": 1752053341800,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "grid_blsqepxph",
+        "range": {
+          "columns": [
+            "Country",
+            "CO__per_cap__t_yr_",
+            "Urbanization____"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      },
+      "message": "Selecting data range, lines:0 - 9"
+    },
+    {
+      "id": "1752053341802",
+      "timestamp": 1752053341802,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "bar-chart-1752053341802",
+          "x": 0,
+          "y": 26,
+          "w": 6,
+          "h": 8,
+          "type": "bar-chart",
+          "chartData": [
+            {
+              "category": "China",
+              "CO__per_cap__t_yr_": 7.6,
+              "Urbanization____": 64
+            },
+            {
+              "category": "India",
+              "CO__per_cap__t_yr_": 1.9,
+              "Urbanization____": 35
+            },
+            {
+              "category": "USA",
+              "CO__per_cap__t_yr_": 14.7,
+              "Urbanization____": 83
+            },
+            {
+              "category": "Indonesia",
+              "CO__per_cap__t_yr_": 2.1,
+              "Urbanization____": 57
+            },
+            {
+              "category": "Pakistan",
+              "CO__per_cap__t_yr_": 0.9,
+              "Urbanization____": 38
+            },
+            {
+              "category": "Nigeria",
+              "CO__per_cap__t_yr_": 0.6,
+              "Urbanization____": 52
+            },
+            {
+              "category": "Brazil",
+              "CO__per_cap__t_yr_": 2.2,
+              "Urbanization____": 87
+            },
+            {
+              "category": "Bangladesh",
+              "CO__per_cap__t_yr_": 0.3,
+              "Urbanization____": 40
+            },
+            {
+              "category": "Russia",
+              "CO__per_cap__t_yr_": 12.4,
+              "Urbanization____": 74
+            },
+            {
+              "category": "Mexico",
+              "CO__per_cap__t_yr_": 4.1,
+              "Urbanization____": 83
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "CO__per_cap__t_yr_",
+                "name": "CO₂ per cap (t/yr)"
+              },
+              {
+                "field": "Urbanization____",
+                "name": "Urbanization (%)"
+              }
+            ]
+          },
+          "sourceGridId": "grid_blsqepxph",
+          "selectedRange": {
+            "columns": [
+              "Country",
+              "CO__per_cap__t_yr_",
+              "Urbanization____"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      },
+      "message": "Adding a bar chart, for categories:[China, India, USA, Indonesia, Pakistan, Nigeria, Brazil, Bangladesh, Russia, Mexico]"
+    },
+    {
+      "id": "1752053341855",
+      "timestamp": 1752053341855,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 12,
+            "h": 10,
+            "x": 0,
+            "y": 0,
+            "i": "grid_blsqepxph",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 10,
+            "i": "pie-chart-1752053307553",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 18,
+            "i": "bar-chart-1752053320393",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 26,
+            "i": "bar-chart-1752053341802",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752053360554",
+      "timestamp": 1752053360554,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "grid_blsqepxph",
+        "range": {
+          "columns": [
+            "Country",
+            "Life_Exp__yrs_"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      },
+      "message": "Selecting data range, lines:0 - 9"
+    },
+    {
+      "id": "1752053360556",
+      "timestamp": 1752053360556,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "line-chart-1752053360556",
+          "x": 0,
+          "y": 34,
+          "w": 6,
+          "h": 8,
+          "type": "line-chart",
+          "chartData": [
+            {
+              "category": "China",
+              "Life_Exp__yrs_": 77
+            },
+            {
+              "category": "India",
+              "Life_Exp__yrs_": 70
+            },
+            {
+              "category": "USA",
+              "Life_Exp__yrs_": 78
+            },
+            {
+              "category": "Indonesia",
+              "Life_Exp__yrs_": 71
+            },
+            {
+              "category": "Pakistan",
+              "Life_Exp__yrs_": 67
+            },
+            {
+              "category": "Nigeria",
+              "Life_Exp__yrs_": 55
+            },
+            {
+              "category": "Brazil",
+              "Life_Exp__yrs_": 76
+            },
+            {
+              "category": "Bangladesh",
+              "Life_Exp__yrs_": 72
+            },
+            {
+              "category": "Russia",
+              "Life_Exp__yrs_": 72
+            },
+            {
+              "category": "Mexico",
+              "Life_Exp__yrs_": 75
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Life_Exp__yrs_",
+                "name": "Life Exp (yrs)"
+              }
+            ]
+          },
+          "sourceGridId": "grid_blsqepxph",
+          "selectedRange": {
+            "columns": [
+              "Country",
+              "Life_Exp__yrs_"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      },
+      "message": "Adding a line chart, for categories:[China, India, USA, Indonesia, Pakistan, Nigeria, Brazil, Bangladesh, Russia, Mexico]"
+    },
+    {
+      "id": "1752053360611",
+      "timestamp": 1752053360611,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 12,
+            "h": 10,
+            "x": 0,
+            "y": 0,
+            "i": "grid_blsqepxph",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 10,
+            "i": "pie-chart-1752053307553",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 18,
+            "i": "bar-chart-1752053320393",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 26,
+            "i": "bar-chart-1752053341802",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 34,
+            "i": "line-chart-1752053360556",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752053366801",
+      "timestamp": 1752053366801,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_blsqepxph"
+      },
+      "message": "Removing item"
+    },
+    {
+      "id": "1752053366836",
+      "timestamp": 1752053366836,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1752053307553",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "bar-chart-1752053320393",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 16,
+            "i": "bar-chart-1752053341802",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 24,
+            "i": "line-chart-1752053360556",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752053375170",
+      "timestamp": 1752053375170,
+      "type": "ARRANGE",
+      "details": {
+        "columns": 4
+      },
+      "message": "Arranging items in 4 columns"
+    },
+    {
+      "id": "1752053376688",
+      "timestamp": 1752053376688,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 3,
+            "h": 9,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1752053307553",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 3,
+            "h": 9,
+            "x": 3,
+            "y": 0,
+            "i": "bar-chart-1752053320393",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 3,
+            "h": 9,
+            "x": 6,
+            "y": 0,
+            "i": "bar-chart-1752053341802",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 3,
+            "h": 9,
+            "x": 9,
+            "y": 0,
+            "i": "line-chart-1752053360556",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 9, width: 3"
+    },
+    {
+      "id": "1752053385885",
+      "timestamp": 1752053385885,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752053320393",
+        "seriesName": "Bangladesh: 0.5",
+        "visible": false
+      },
+      "message": "Hiding series \"Bangladesh: 0.5\" in chart chart-bar-chart-1752053320393"
+    },
+    {
+      "id": "1752053387531",
+      "timestamp": 1752053387531,
+      "type": "UPDATE_CHART_SHOW_LEGEND",
+      "details": {
+        "showLegend": false,
+        "chartId": "bar-chart-1752053320393"
+      },
+      "message": "Executing UPDATE_CHART_SHOW_LEGEND..."
+    },
+    {
+      "id": "1752053394179",
+      "timestamp": 1752053394179,
+      "type": "ARRANGE",
+      "details": {
+        "columns": 2
+      },
+      "message": "Arranging items in 2 columns"
+    },
+    {
+      "id": "1752053395703",
+      "timestamp": 1752053395703,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 9,
+            "x": 0,
+            "y": 0,
+            "i": "pie-chart-1752053307553",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 9,
+            "x": 6,
+            "y": 0,
+            "i": "bar-chart-1752053320393",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 9,
+            "x": 0,
+            "y": 9,
+            "i": "bar-chart-1752053341802",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 9,
+            "x": 6,
+            "y": 9,
+            "i": "line-chart-1752053360556",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 9, width: 6"
+    },
+    {
+      "id": "1752053403413",
+      "timestamp": 1752053403413,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "USA",
+        "visible": false
+      },
+      "message": "Hiding series \"USA\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053404663",
+      "timestamp": 1752053404663,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "India",
+        "visible": false
+      },
+      "message": "Hiding series \"India\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053405996",
+      "timestamp": 1752053405996,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "China",
+        "visible": false
+      },
+      "message": "Hiding series \"China\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053407363",
+      "timestamp": 1752053407363,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Pakistan",
+        "visible": false
+      },
+      "message": "Hiding series \"Pakistan\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053409462",
+      "timestamp": 1752053409462,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Mexico",
+        "visible": false
+      },
+      "message": "Hiding series \"Mexico\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053411046",
+      "timestamp": 1752053411046,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Pakistan",
+        "visible": false
+      },
+      "message": "Hiding series \"Pakistan\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053413295",
+      "timestamp": 1752053413295,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Brazil",
+        "visible": false
+      },
+      "message": "Hiding series \"Brazil\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053414079",
+      "timestamp": 1752053414079,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Bangladesh",
+        "visible": false
+      },
+      "message": "Hiding series \"Bangladesh\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053414812",
+      "timestamp": 1752053414812,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Indonesia",
+        "visible": false
+      },
+      "message": "Hiding series \"Indonesia\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053416346",
+      "timestamp": 1752053416346,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "China",
+        "visible": false
+      },
+      "message": "Hiding series \"China\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053417768",
+      "timestamp": 1752053417768,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "China",
+        "visible": false
+      },
+      "message": "Hiding series \"China\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053418596",
+      "timestamp": 1752053418596,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Pakistan",
+        "visible": false
+      },
+      "message": "Hiding series \"Pakistan\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053419345",
+      "timestamp": 1752053419345,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Russia",
+        "visible": false
+      },
+      "message": "Hiding series \"Russia\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053420451",
+      "timestamp": 1752053420451,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Russia",
+        "visible": false
+      },
+      "message": "Hiding series \"Russia\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053423012",
+      "timestamp": 1752053423012,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Nigeria",
+        "visible": false
+      },
+      "message": "Hiding series \"Nigeria\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053424604",
+      "timestamp": 1752053424604,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "Nigeria",
+        "visible": false
+      },
+      "message": "Hiding series \"Nigeria\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053425362",
+      "timestamp": 1752053425362,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752053307553",
+        "seriesName": "India",
+        "visible": false
+      },
+      "message": "Hiding series \"India\" in chart chart-pie-chart-1752053307553"
+    },
+    {
+      "id": "1752053431746",
+      "timestamp": 1752053431746,
+      "type": "UPDATE_CHART_SHOW_LEGEND",
+      "details": {
+        "showLegend": true,
+        "chartId": "bar-chart-1752053320393"
+      },
+      "message": "Executing UPDATE_CHART_SHOW_LEGEND..."
+    },
+    {
+      "id": "1752053434718",
+      "timestamp": 1752053434718,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752053320393",
+        "seriesName": "India: 3.7",
+        "visible": false
+      },
+      "message": "Hiding series \"India: 3.7\" in chart chart-bar-chart-1752053320393"
+    },
+    {
+      "id": "1752053435028",
+      "timestamp": 1752053435028,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752053320393",
+        "seriesName": "India: 3.7",
+        "visible": true
+      },
+      "message": "Showing series \"India: 3.7\" in chart chart-bar-chart-1752053320393"
+    },
+    {
+      "id": "1752053436626",
+      "timestamp": 1752053436626,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752053320393",
+        "seriesName": "Nigeria: 0.5",
+        "visible": false
+      },
+      "message": "Hiding series \"Nigeria: 0.5\" in chart chart-bar-chart-1752053320393"
+    },
+    {
+      "id": "1752053437181",
+      "timestamp": 1752053437181,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752053320393",
+        "seriesName": "Nigeria: 0.5",
+        "visible": true
+      },
+      "message": "Showing series \"Nigeria: 0.5\" in chart chart-bar-chart-1752053320393"
+    },
+    {
+      "id": "1752053439618",
+      "timestamp": 1752053439618,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752053320393",
+        "seriesName": "China: 17.7",
+        "visible": false
+      },
+      "message": "Hiding series \"China: 17.7\" in chart chart-bar-chart-1752053320393"
+    },
+    {
+      "id": "1752053440129",
+      "timestamp": 1752053440129,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752053320393",
+        "seriesName": "China: 17.7",
+        "visible": true
+      },
+      "message": "Showing series \"China: 17.7\" in chart chart-bar-chart-1752053320393"
+    },
+    {
+      "id": "1752053442559",
+      "timestamp": 1752053442559,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-line-chart-1752053360556",
+        "seriesName": "Life Exp (yrs)",
+        "visible": false
+      },
+      "message": "Hiding series \"Life Exp (yrs)\" in chart chart-line-chart-1752053360556"
+    },
+    {
+      "id": "1752053442963",
+      "timestamp": 1752053442963,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-line-chart-1752053360556",
+        "seriesName": "Life Exp (yrs)",
+        "visible": true
+      },
+      "message": "Showing series \"Life Exp (yrs)\" in chart chart-line-chart-1752053360556"
+    },
+    {
+      "id": "1752053446301",
+      "timestamp": 1752053446301,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752053341802",
+        "seriesName": "Urbanization (%)",
+        "visible": false
+      },
+      "message": "Hiding series \"Urbanization (%)\" in chart chart-bar-chart-1752053341802"
+    },
+    {
+      "id": "1752053448145",
+      "timestamp": 1752053448145,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752053341802",
+        "seriesName": "Urbanization (%)",
+        "visible": true
+      },
+      "message": "Showing series \"Urbanization (%)\" in chart chart-bar-chart-1752053341802"
+    }
+  ]
+}

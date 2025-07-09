@@ -1,0 +1,333 @@
+{
+  "prompt": "Changing chart settings",
+  "steps": [
+    {
+      "id": "1752054394194",
+      "timestamp": 1752054394194,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_yjbqbqltk",
+          "x": 0,
+          "y": 0,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      },
+      "message": "Adding a new data grid"
+    },
+    {
+      "id": "1752054394220",
+      "timestamp": 1752054394220,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_yjbqbqltk",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054401666",
+      "timestamp": 1752054401666,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "grid_yjbqbqltk",
+        "range": {
+          "columns": [
+            "country",
+            "population",
+            "gdp"
+          ],
+          "startRow": 0,
+          "endRow": 9
+        }
+      },
+      "message": "Selecting data range, lines:0 - 9"
+    },
+    {
+      "id": "1752054401668",
+      "timestamp": 1752054401668,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "bar-chart-1752054401668",
+          "x": 0,
+          "y": 8,
+          "w": 6,
+          "h": 8,
+          "type": "bar-chart",
+          "chartData": [
+            {
+              "category": "China",
+              "population": 1412,
+              "gdp": 17.7
+            },
+            {
+              "category": "India",
+              "population": 1400,
+              "gdp": 3.7
+            },
+            {
+              "category": "USA",
+              "population": 339,
+              "gdp": 28.8
+            },
+            {
+              "category": "Indonesia",
+              "population": 278,
+              "gdp": 1.5
+            },
+            {
+              "category": "Pakistan",
+              "population": 241,
+              "gdp": 0.4
+            },
+            {
+              "category": "Nigeria",
+              "population": 223,
+              "gdp": 0.5
+            },
+            {
+              "category": "Brazil",
+              "population": 216,
+              "gdp": 2.2
+            },
+            {
+              "category": "Bangladesh",
+              "population": 172,
+              "gdp": 0.5
+            },
+            {
+              "category": "Russia",
+              "population": 144,
+              "gdp": 2
+            },
+            {
+              "category": "Mexico",
+              "population": 129,
+              "gdp": 1.8
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "population",
+                "name": "Population (M)"
+              },
+              {
+                "field": "gdp",
+                "name": "GDP (T$)"
+              }
+            ]
+          },
+          "sourceGridId": "grid_yjbqbqltk",
+          "selectedRange": {
+            "columns": [
+              "country",
+              "population",
+              "gdp"
+            ],
+            "startRow": 0,
+            "endRow": 9
+          }
+        }
+      },
+      "message": "Adding a bar chart, for categories:[China, India, USA, Indonesia, Pakistan, Nigeria, Brazil, Bangladesh, Russia, Mexico]"
+    },
+    {
+      "id": "1752054401706",
+      "timestamp": 1752054401706,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_yjbqbqltk",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "bar-chart-1752054401668",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054404311",
+      "timestamp": 1752054404311,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "grid_yjbqbqltk"
+      },
+      "message": "Removing item"
+    },
+    {
+      "id": "1752054404334",
+      "timestamp": 1752054404334,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "bar-chart-1752054401668",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054405915",
+      "timestamp": 1752054405915,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 9,
+            "h": 13,
+            "x": 0,
+            "y": 0,
+            "i": "bar-chart-1752054401668",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 13, width: 9"
+    },
+    {
+      "id": "1752054405915",
+      "timestamp": 1752054405915,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 9,
+            "h": 13,
+            "x": 0,
+            "y": 0,
+            "i": "bar-chart-1752054401668",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 13, width: 9"
+    },
+    {
+      "id": "1752054411855",
+      "timestamp": 1752054411855,
+      "type": "UPDATE_CHART_OPACITY",
+      "details": {
+        "opacity": 0.5,
+        "chartId": "bar-chart-1752054401668"
+      },
+      "message": "Updating opacity to 0.5 for chart bar-chart-1752054401668"
+    },
+    {
+      "id": "1752054414879",
+      "timestamp": 1752054414879,
+      "type": "UPDATE_CHART_OPACITY",
+      "details": {
+        "opacity": 0,
+        "chartId": "bar-chart-1752054401668"
+      },
+      "message": "Updating opacity to 0 for chart bar-chart-1752054401668"
+    },
+    {
+      "id": "1752054417175",
+      "timestamp": 1752054417175,
+      "type": "UPDATE_CHART_OPACITY",
+      "details": {
+        "opacity": 0.5,
+        "chartId": "bar-chart-1752054401668"
+      },
+      "message": "Updating opacity to 0.5 for chart bar-chart-1752054401668"
+    },
+    {
+      "id": "1752054420751",
+      "timestamp": 1752054420751,
+      "type": "UPDATE_CHART_COLOR_SET",
+      "details": {
+        "colorSet": "material",
+        "chartId": "bar-chart-1752054401668"
+      },
+      "message": "Changing color scheme to material for chart bar-chart-1752054401668"
+    },
+    {
+      "id": "1752054425046",
+      "timestamp": 1752054425046,
+      "type": "UPDATE_CHART_COLOR_SET",
+      "details": {
+        "colorSet": "vividark",
+        "chartId": "bar-chart-1752054401668"
+      },
+      "message": "Changing color scheme to vividark for chart bar-chart-1752054401668"
+    },
+    {
+      "id": "1752054427487",
+      "timestamp": 1752054427487,
+      "type": "UPDATE_CHART_STROKE_WIDTH",
+      "details": {
+        "strokeWidth": 5,
+        "chartId": "bar-chart-1752054401668"
+      },
+      "message": "Updating stroke width to 5 for chart bar-chart-1752054401668"
+    },
+    {
+      "id": "1752054429996",
+      "timestamp": 1752054429996,
+      "type": "UPDATE_CHART_STROKE_WIDTH",
+      "details": {
+        "strokeWidth": 9,
+        "chartId": "bar-chart-1752054401668"
+      },
+      "message": "Updating stroke width to 9 for chart bar-chart-1752054401668"
+    },
+    {
+      "id": "1752054432475",
+      "timestamp": 1752054432475,
+      "type": "UPDATE_CHART_SHOW_LEGEND",
+      "details": {
+        "showLegend": false,
+        "chartId": "bar-chart-1752054401668"
+      },
+      "message": "Executing UPDATE_CHART_SHOW_LEGEND..."
+    },
+    {
+      "id": "1752054434312",
+      "timestamp": 1752054434312,
+      "type": "UPDATE_CHART_SHOW_LEGEND",
+      "details": {
+        "showLegend": true,
+        "chartId": "bar-chart-1752054401668"
+      },
+      "message": "Executing UPDATE_CHART_SHOW_LEGEND..."
+    }
+  ]
+}

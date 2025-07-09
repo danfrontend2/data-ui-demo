@@ -1,0 +1,1429 @@
+{
+  "prompt": "Largest animals, longes rivers and highest buildings in charts!",
+  "steps": [
+    {
+      "id": "1752054212186",
+      "timestamp": 1752054212186,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_rs3dq9sx6",
+          "x": 0,
+          "y": 0,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      },
+      "message": "Adding a new data grid"
+    },
+    {
+      "id": "1752054212230",
+      "timestamp": 1752054212230,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054217731",
+      "timestamp": 1752054217731,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_rs3dq9sx6",
+        "excelData": [
+          [
+            "Animal",
+            "Average_Weight_kg",
+            "Length_m",
+            "Habitat"
+          ],
+          [
+            "African Elephant",
+            6000,
+            6.5,
+            "Africa"
+          ],
+          [
+            "Asian Elephant",
+            4000,
+            5.8,
+            "South Asia"
+          ],
+          [
+            "White Rhinoceros",
+            2300,
+            4,
+            "Southern Africa"
+          ],
+          [
+            "Hippopotamus",
+            1500,
+            3.5,
+            "Africa"
+          ],
+          [
+            "Giraffe",
+            1200,
+            5.5,
+            "Africa"
+          ],
+          [
+            "American Bison",
+            1000,
+            3.2,
+            "North America"
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      },
+      "message": "Loading data from file, 7 rows, fields: Animal,Average_Weight_kg,Length_m,Habitat"
+    },
+    {
+      "id": "1752054223350",
+      "timestamp": 1752054223350,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "grid_rs3dq9sx6",
+        "range": {
+          "columns": [
+            "Animal",
+            "Average_Weight_kg"
+          ],
+          "startRow": 0,
+          "endRow": 5
+        }
+      },
+      "message": "Selecting data range, lines:0 - 5"
+    },
+    {
+      "id": "1752054223353",
+      "timestamp": 1752054223353,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "pie-chart-1752054223352",
+          "x": 0,
+          "y": 8,
+          "w": 6,
+          "h": 8,
+          "type": "pie-chart",
+          "chartData": [
+            {
+              "category": "African Elephant",
+              "Average_Weight_kg": 6000
+            },
+            {
+              "category": "Asian Elephant",
+              "Average_Weight_kg": 4000
+            },
+            {
+              "category": "White Rhinoceros",
+              "Average_Weight_kg": 2300
+            },
+            {
+              "category": "Hippopotamus",
+              "Average_Weight_kg": 1500
+            },
+            {
+              "category": "Giraffe",
+              "Average_Weight_kg": 1200
+            },
+            {
+              "category": "American Bison",
+              "Average_Weight_kg": 1000
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Average_Weight_kg",
+                "name": "Average_Weight_kg"
+              }
+            ]
+          },
+          "sourceGridId": "grid_rs3dq9sx6",
+          "selectedRange": {
+            "columns": [
+              "Animal",
+              "Average_Weight_kg"
+            ],
+            "startRow": 0,
+            "endRow": 5
+          }
+        }
+      },
+      "message": "Adding a pie chart, for categories:[African Elephant, Asian Elephant, White Rhinoceros, Hippopotamus, Giraffe, American Bison]"
+    },
+    {
+      "id": "1752054223400",
+      "timestamp": 1752054223400,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054226359",
+      "timestamp": 1752054226359,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054226359",
+      "timestamp": 1752054226359,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054226370",
+      "timestamp": 1752054226371,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054230379",
+      "timestamp": 1752054230379,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_3br8dx98s",
+          "x": 0,
+          "y": 8,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      },
+      "message": "Adding a new data grid"
+    },
+    {
+      "id": "1752054230409",
+      "timestamp": 1752054230409,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054237576",
+      "timestamp": 1752054237576,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_3br8dx98s",
+        "excelData": [
+          [
+            "River",
+            "Length_km",
+            "Countries_Passed_Through",
+            "Continent"
+          ],
+          [
+            "Nile",
+            6650,
+            "Egypt, Sudan, South Sudan, etc.",
+            "Africa"
+          ],
+          [
+            "Amazon",
+            6400,
+            "Brazil, Peru, Colombia, etc.",
+            "South America"
+          ],
+          [
+            "Yangtze",
+            6300,
+            "China",
+            "Asia"
+          ],
+          [
+            "Mississippi-Missouri",
+            6275,
+            "USA",
+            "North America"
+          ],
+          [
+            "Yenisei",
+            5539,
+            "Russia, Mongolia",
+            "Asia"
+          ],
+          [
+            "Yellow River",
+            5464,
+            "China",
+            "Asia"
+          ],
+          [
+            "Ob-Irtysh",
+            5410,
+            "Russia, Kazakhstan",
+            "Asia"
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      },
+      "message": "Loading data from file, 8 rows, fields: River,Length_km,Countries_Passed_Through,Continent"
+    },
+    {
+      "id": "1752054241636",
+      "timestamp": 1752054241636,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "grid_3br8dx98s",
+        "range": {
+          "columns": [
+            "River",
+            "Length_km"
+          ],
+          "startRow": 0,
+          "endRow": 6
+        }
+      },
+      "message": "Selecting data range, lines:0 - 6"
+    },
+    {
+      "id": "1752054241638",
+      "timestamp": 1752054241638,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "bar-chart-1752054241638",
+          "x": 0,
+          "y": 16,
+          "w": 6,
+          "h": 8,
+          "type": "bar-chart",
+          "chartData": [
+            {
+              "category": "Nile",
+              "Length_km": 6650
+            },
+            {
+              "category": "Amazon",
+              "Length_km": 6400
+            },
+            {
+              "category": "Yangtze",
+              "Length_km": 6300
+            },
+            {
+              "category": "Mississippi-Missouri",
+              "Length_km": 6275
+            },
+            {
+              "category": "Yenisei",
+              "Length_km": 5539
+            },
+            {
+              "category": "Yellow River",
+              "Length_km": 5464
+            },
+            {
+              "category": "Ob-Irtysh",
+              "Length_km": 5410
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Length_km",
+                "name": "Length_km"
+              }
+            ]
+          },
+          "sourceGridId": "grid_3br8dx98s",
+          "selectedRange": {
+            "columns": [
+              "River",
+              "Length_km"
+            ],
+            "startRow": 0,
+            "endRow": 6
+          }
+        }
+      },
+      "message": "Adding a bar chart, for categories:[Nile, Amazon, Yangtze, Mississippi-Missouri, Yenisei, Yellow River, Ob-Irtysh]"
+    },
+    {
+      "id": "1752054241691",
+      "timestamp": 1752054241691,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 16,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054244861",
+      "timestamp": 1752054244861,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 8,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054244861",
+      "timestamp": 1752054244861,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 8,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054244878",
+      "timestamp": 1752054244878,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 8,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054246692",
+      "timestamp": 1752054246692,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752054241638",
+        "seriesName": "Nile: 6650",
+        "visible": false
+      },
+      "message": "Hiding series \"Nile: 6650\" in chart chart-bar-chart-1752054241638"
+    },
+    {
+      "id": "1752054247158",
+      "timestamp": 1752054247158,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-bar-chart-1752054241638",
+        "seriesName": "Nile: 6650",
+        "visible": true
+      },
+      "message": "Showing series \"Nile: 6650\" in chart chart-bar-chart-1752054241638"
+    },
+    {
+      "id": "1752054248748",
+      "timestamp": 1752054248748,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "African Elephant",
+        "visible": true
+      },
+      "message": "Showing series \"African Elephant\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054249745",
+      "timestamp": 1752054249745,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "Asian Elephant",
+        "visible": true
+      },
+      "message": "Showing series \"Asian Elephant\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054251129",
+      "timestamp": 1752054251129,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "Asian Elephant",
+        "visible": true
+      },
+      "message": "Showing series \"Asian Elephant\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054251963",
+      "timestamp": 1752054251963,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "Asian Elephant",
+        "visible": true
+      },
+      "message": "Showing series \"Asian Elephant\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054253177",
+      "timestamp": 1752054253177,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "African Elephant",
+        "visible": true
+      },
+      "message": "Showing series \"African Elephant\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054254544",
+      "timestamp": 1752054254544,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "Hippopotamus",
+        "visible": true
+      },
+      "message": "Showing series \"Hippopotamus\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054256277",
+      "timestamp": 1752054256277,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "Hippopotamus",
+        "visible": true
+      },
+      "message": "Showing series \"Hippopotamus\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054257194",
+      "timestamp": 1752054257194,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "Giraffe",
+        "visible": true
+      },
+      "message": "Showing series \"Giraffe\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054258711",
+      "timestamp": 1752054258711,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "White Rhinoceros",
+        "visible": true
+      },
+      "message": "Showing series \"White Rhinoceros\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054262230",
+      "timestamp": 1752054262230,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_kmxl1nyls",
+          "x": 0,
+          "y": 16,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      },
+      "message": "Adding a new data grid"
+    },
+    {
+      "id": "1752054262272",
+      "timestamp": 1752054262272,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 8,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 16,
+            "i": "grid_kmxl1nyls",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054267111",
+      "timestamp": 1752054267111,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_kmxl1nyls",
+        "excelData": [
+          [
+            "Building",
+            "Height_m",
+            "Floors",
+            "City_Country",
+            "Year_Opened"
+          ],
+          [
+            "Burj Khalifa",
+            828,
+            163,
+            "Dubai, UAE",
+            2010
+          ],
+          [
+            "Merdeka 118",
+            679,
+            118,
+            "Kuala Lumpur, Malaysia",
+            2023
+          ],
+          [
+            "Shanghai Tower",
+            632,
+            128,
+            "Shanghai, China",
+            2015
+          ],
+          [
+            "Abraj Al-Bait Clock",
+            601,
+            120,
+            "Mecca, Saudi Arabia",
+            2012
+          ],
+          [
+            "Ping An Finance Ctr",
+            599,
+            115,
+            "Shenzhen, China",
+            2017
+          ],
+          [
+            "Lotte World Tower",
+            555,
+            123,
+            "Seoul, South Korea",
+            2016
+          ]
+        ],
+        "fileType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      },
+      "message": "Loading data from file, 7 rows, fields: Building,Height_m,Floors,City_Country,Year_Opened"
+    },
+    {
+      "id": "1752054273163",
+      "timestamp": 1752054273163,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "grid_kmxl1nyls",
+        "range": {
+          "columns": [
+            "Building",
+            "Height_m"
+          ],
+          "startRow": 0,
+          "endRow": 5
+        }
+      },
+      "message": "Selecting data range, lines:0 - 5"
+    },
+    {
+      "id": "1752054273165",
+      "timestamp": 1752054273165,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "bar-chart-1752054273165",
+          "x": 0,
+          "y": 24,
+          "w": 6,
+          "h": 8,
+          "type": "bar-chart",
+          "chartData": [
+            {
+              "category": "Burj Khalifa",
+              "Height_m": 828
+            },
+            {
+              "category": "Merdeka 118",
+              "Height_m": 679
+            },
+            {
+              "category": "Shanghai Tower",
+              "Height_m": 632
+            },
+            {
+              "category": "Abraj Al-Bait Clock",
+              "Height_m": 601
+            },
+            {
+              "category": "Ping An Finance Ctr",
+              "Height_m": 599
+            },
+            {
+              "category": "Lotte World Tower",
+              "Height_m": 555
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Height_m",
+                "name": "Height_m"
+              }
+            ]
+          },
+          "sourceGridId": "grid_kmxl1nyls",
+          "selectedRange": {
+            "columns": [
+              "Building",
+              "Height_m"
+            ],
+            "startRow": 0,
+            "endRow": 5
+          }
+        }
+      },
+      "message": "Adding a bar chart, for categories:[Burj Khalifa, Merdeka 118, Shanghai Tower, Abraj Al-Bait Clock, Ping An Finance Ctr, Lotte World Tower]"
+    },
+    {
+      "id": "1752054273228",
+      "timestamp": 1752054273228,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 8,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 16,
+            "i": "grid_kmxl1nyls",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 24,
+            "i": "bar-chart-1752054273165",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054275777",
+      "timestamp": 1752054275777,
+      "type": "REMOVE_GRID",
+      "details": {
+        "itemId": "bar-chart-1752054273165"
+      },
+      "message": "Removing item"
+    },
+    {
+      "id": "1752054275811",
+      "timestamp": 1752054275811,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 8,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 16,
+            "i": "grid_kmxl1nyls",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054278088",
+      "timestamp": 1752054278088,
+      "type": "SELECT_RANGE",
+      "details": {
+        "gridId": "grid_kmxl1nyls",
+        "range": {
+          "columns": [
+            "Building",
+            "Height_m"
+          ],
+          "startRow": 0,
+          "endRow": 5
+        }
+      },
+      "message": "Selecting data range, lines:0 - 5"
+    },
+    {
+      "id": "1752054278090",
+      "timestamp": 1752054278090,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "line-chart-1752054278089",
+          "x": 0,
+          "y": 24,
+          "w": 6,
+          "h": 8,
+          "type": "line-chart",
+          "chartData": [
+            {
+              "category": "Burj Khalifa",
+              "Height_m": 828
+            },
+            {
+              "category": "Merdeka 118",
+              "Height_m": 679
+            },
+            {
+              "category": "Shanghai Tower",
+              "Height_m": 632
+            },
+            {
+              "category": "Abraj Al-Bait Clock",
+              "Height_m": 601
+            },
+            {
+              "category": "Ping An Finance Ctr",
+              "Height_m": 599
+            },
+            {
+              "category": "Lotte World Tower",
+              "Height_m": 555
+            }
+          ],
+          "chartConfig": {
+            "series": [
+              {
+                "field": "Height_m",
+                "name": "Height_m"
+              }
+            ]
+          },
+          "sourceGridId": "grid_kmxl1nyls",
+          "selectedRange": {
+            "columns": [
+              "Building",
+              "Height_m"
+            ],
+            "startRow": 0,
+            "endRow": 5
+          }
+        }
+      },
+      "message": "Adding a line chart, for categories:[Burj Khalifa, Merdeka 118, Shanghai Tower, Abraj Al-Bait Clock, Ping An Finance Ctr, Lotte World Tower]"
+    },
+    {
+      "id": "1752054278140",
+      "timestamp": 1752054278140,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 8,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 16,
+            "i": "grid_kmxl1nyls",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 24,
+            "i": "line-chart-1752054278089",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054281993",
+      "timestamp": 1752054281993,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false,
+            "type": "pie-chart"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 8,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false,
+            "type": "bar-chart"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 16,
+            "i": "grid_kmxl1nyls",
+            "moved": false,
+            "static": false,
+            "type": "grid"
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 16,
+            "i": "line-chart-1752054278089",
+            "moved": false,
+            "static": false,
+            "type": "line-chart"
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054281993",
+      "timestamp": 1752054281993,
+      "type": "UPDATE_LAYOUT",
+      "details": {
+        "layout": [
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 0,
+            "i": "grid_rs3dq9sx6",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 0,
+            "i": "pie-chart-1752054223352",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 8,
+            "i": "grid_3br8dx98s",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 8,
+            "i": "bar-chart-1752054241638",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 0,
+            "y": 16,
+            "i": "grid_kmxl1nyls",
+            "moved": false,
+            "static": false
+          },
+          {
+            "w": 6,
+            "h": 8,
+            "x": 6,
+            "y": 16,
+            "i": "line-chart-1752054278089",
+            "moved": false,
+            "static": false
+          }
+        ]
+      },
+      "message": "Adjusting layout, height: 8, width: 6"
+    },
+    {
+      "id": "1752054285980",
+      "timestamp": 1752054285980,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "African Elephant",
+        "visible": true
+      },
+      "message": "Showing series \"African Elephant\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054286912",
+      "timestamp": 1752054286912,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "African Elephant",
+        "visible": true
+      },
+      "message": "Showing series \"African Elephant\" in chart chart-pie-chart-1752054223352"
+    },
+    {
+      "id": "1752054288052",
+      "timestamp": 1752054288052,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart-pie-chart-1752054223352",
+        "seriesName": "Hippopotamus",
+        "visible": true
+      },
+      "message": "Showing series \"Hippopotamus\" in chart chart-pie-chart-1752054223352"
+    }
+  ]
+}
