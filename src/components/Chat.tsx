@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button, Paper, Typography, IconButton, Tooltip } from '@mui/material';
+import { Box, TextField, Paper, Typography, IconButton, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
 import { OpenAIService } from '../services/OpenAIService';
@@ -116,7 +116,7 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad, prefi
       
       return () => clearTimeout(timer);
     }
-  }, [prefilledMessage, shouldAutoSend, input, isLoading, hasAutoSent, onMessageSent]);
+  }, [prefilledMessage, shouldAutoSend, input, isLoading, hasAutoSent, onMessageSent, handleSend]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

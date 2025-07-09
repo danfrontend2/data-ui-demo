@@ -79,18 +79,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
       })
     );
 
-    const colors = [
-      0x67B7DC, // blue
-      0xDC6967, // coral
-      0x84DC67, // emerald
-      0x8067DC, // violet
-      0xDCAB67, // gold
-      0x67DC96, // teal
-      0xDC67CE, // rose
-      0xA5DC67, // green
-      0x6771DC, // purple
-      0xDC8C67  // orange
-    ];
+
 
     // Helper function to get stroke color (make it darker)
     const getStrokeColor = (baseColor: number): am5.Color => {
@@ -165,17 +154,19 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
 
       pieSeries.data.setAll(data);
 
-      // Create legend (always show for hiding/showing values)
-      const legend = chart.children.push(
-        am5.Legend.new(root, {
-          centerX: am5.percent(50),
-          x: am5.percent(50),
-          useDefaultMarker: true,
-          clickTarget: "itemContainer"
-        })
-      );
+      // Create legend if enabled
+      if (chartConfig?.showLegend !== false) {
+        const legend = chart.children.push(
+          am5.Legend.new(root, {
+            centerX: am5.percent(50),
+            x: am5.percent(50),
+            useDefaultMarker: true,
+            clickTarget: "itemContainer"
+          })
+        );
 
-      legend.data.setAll(pieSeries.dataItems);
+        legend.data.setAll(pieSeries.dataItems);
+      }
     } else {
       // Multiple series - create separate series for each field
       series.forEach((seriesConfig) => {
@@ -217,23 +208,25 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
         pieSeries.data.setAll(data);
       });
 
-      // Create legend
-      const legend = chart.children.push(
-        am5.Legend.new(root, {
-          centerX: am5.percent(50),
-          x: am5.percent(50),
-          useDefaultMarker: true,
-          clickTarget: "itemContainer"
-        })
-      );
+      // Create legend if enabled
+      if (chartConfig?.showLegend !== false) {
+        const legend = chart.children.push(
+          am5.Legend.new(root, {
+            centerX: am5.percent(50),
+            x: am5.percent(50),
+            useDefaultMarker: true,
+            clickTarget: "itemContainer"
+          })
+        );
 
-      // Configure legend markers
-      legend.markers.template.setAll({
-        width: 16,
-        height: 16
-      });
+        // Configure legend markers
+        legend.markers.template.setAll({
+          width: 16,
+          height: 16
+        });
 
-      legend.data.setAll(chart.series.values);
+        legend.data.setAll(chart.series.values);
+      }
     }
 
     // Save root for cleanup
@@ -242,7 +235,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet]);
+  }, [data, chartId, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend]);
 
   return (
     <div id={chartId} style={{ 

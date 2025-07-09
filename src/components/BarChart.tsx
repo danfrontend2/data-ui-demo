@@ -174,17 +174,19 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
       );
     }
 
-    // Create legend (always show for hiding/showing values)
-    const legend = chart.children.push(
-      am5.Legend.new(root, {
-        centerX: am5.percent(50),
-        x: am5.percent(50),
-        useDefaultMarker: true,
-        clickTarget: "itemContainer"
-      })
-    );
+    // Create legend if enabled
+    if (chartConfig?.showLegend !== false) {
+      const legend = chart.children.push(
+        am5.Legend.new(root, {
+          centerX: am5.percent(50),
+          x: am5.percent(50),
+          useDefaultMarker: true,
+          clickTarget: "itemContainer"
+        })
+      );
 
-    legend.data.setAll(chart.series.values);
+      legend.data.setAll(chart.series.values);
+    }
 
     // Set data for X axis
     xAxis.data.setAll(data);
@@ -202,7 +204,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
     return () => {
       root.dispose();
     };
-  }, [chartId, data, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet]);
+  }, [chartId, data, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend]);
 
   return (
     <div id={chartId} style={{ 

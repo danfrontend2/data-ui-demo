@@ -143,14 +143,16 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
       lineSeries.data.setAll(data);
     });
 
-    // Create legend (always show for hiding/showing values)
-    const legend = chart.children.push(am5.Legend.new(root, {
-      centerX: am5.percent(50),
-      x: am5.percent(50),
-      marginTop: 15,
-      marginBottom: 15
-    }));
-    legend.data.setAll(chart.series.values);
+    // Create legend if enabled
+    if (chartConfig?.showLegend !== false) {
+      const legend = chart.children.push(am5.Legend.new(root, {
+        centerX: am5.percent(50),
+        x: am5.percent(50),
+        marginTop: 15,
+        marginBottom: 15
+      }));
+      legend.data.setAll(chart.series.values);
+    }
 
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
@@ -165,7 +167,7 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series, chartConfig?.strokeWidth, chartConfig?.colorSet]);
+  }, [data, chartId, series, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend]);
 
   return (
     <div id={chartId} style={{ 

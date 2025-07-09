@@ -75,13 +75,8 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   onArrangeItems
 }) => {
   const [localItems, setLocalItems] = useState<GridItem[]>(initialItems);
-  const [selectedData, setSelectedData] = useState<any[] | null>(null);
-  const [chartAnchorEl, setChartAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedGridId, setSelectedGridId] = useState<string | null>(null);
   const [gridData, setGridData] = useState<{ [key: string]: GridData[] }>({});
   const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
-  const [columns, setColumns] = useState<number>(2);
-  const [showArrangeControls, setShowArrangeControls] = useState<boolean>(false);
   const onArrangeItemsRef = useRef(onArrangeItems);
 
   // Update ref when prop changes
@@ -722,34 +717,32 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   };
 
   useEffect(() => {
-    if (onArrangeItems) {
-      onArrangeItems = (columns: number) => {
-        const itemWidth = Math.floor(12 / columns);
-        setLocalItems(prevItems => {
-          const newItems = prevItems.map((item, index) => ({
-            ...item,
-            w: itemWidth,
-            h: 9,
-            x: (index % columns) * itemWidth,
-            y: Math.floor(index / columns) * 9
-          }));
-          
-          // Call parent's onLayoutChange with the new arrangement
-          const layoutWithTypes = newItems.map(item => ({
-            i: item.i,
-            w: item.w,
-            h: item.h,
-            x: item.x,
-            y: item.y,
-            type: item.type
-          }));
-          onLayoutChange(layoutWithTypes);
-          
-          return newItems;
-        });
-      };
-    }
-  }, [onArrangeItems, onLayoutChange]);
+    onArrangeItemsRef.current = (columns: number) => {
+      const itemWidth = Math.floor(12 / columns);
+      setLocalItems(prevItems => {
+        const newItems = prevItems.map((item, index) => ({
+          ...item,
+          w: itemWidth,
+          h: 9,
+          x: (index % columns) * itemWidth,
+          y: Math.floor(index / columns) * 9
+        }));
+        
+        // Call parent's onLayoutChange with the new arrangement
+        const layoutWithTypes = newItems.map(item => ({
+          i: item.i,
+          w: item.w,
+          h: item.h,
+          x: item.x,
+          y: item.y,
+          type: item.type
+        }));
+        onLayoutChange(layoutWithTypes);
+        
+        return newItems;
+      });
+    };
+  }, [onLayoutChange]);
 
   return (
     <div

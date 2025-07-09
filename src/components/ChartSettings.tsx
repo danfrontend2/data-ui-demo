@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Typography, Slider, Button, FormControl, InputLabel, Select, MenuItem, IconButton } from '@mui/material';
+import { Box, Paper, Typography, Slider, FormControl, InputLabel, Select, MenuItem, IconButton, FormControlLabel, Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ActionManager from '../services/ActionManager';
 import { GridItem } from '../types';
@@ -26,6 +26,7 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
   const [opacity, setOpacity] = useState(1);
   const [strokeWidth, setStrokeWidth] = useState(2);
   const [colorSet, setColorSet] = useState('kelly');
+  const [showLegend, setShowLegend] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
   const actionManager = ActionManager.getInstance();
 
@@ -70,6 +71,7 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
       const newOpacity = selectedChart.chartConfig?.opacity ?? 1;
       const newStrokeWidth = selectedChart.chartConfig?.strokeWidth ?? 2;
       const newColorSet = selectedChart.chartConfig?.colorSet ?? 'kelly';
+      const newShowLegend = selectedChart.chartConfig?.showLegend ?? true;
       
       // Check if values changed (indicating programmatic change from macro)
       const opacityChanged = Math.abs(opacity - newOpacity) > 0.01;
@@ -87,9 +89,10 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
         setOpacity(newOpacity);
         setStrokeWidth(newStrokeWidth);
         setColorSet(newColorSet);
+        setShowLegend(newShowLegend);
       }
     }
-  }, [items, selectedChartId, isAnimating]);
+  }, [items, selectedChartId, isAnimating, opacity, strokeWidth, colorSet, showLegend, animateSliderChange, animateColorSetChange]);
 
   const handleOpacityChange = (_event: Event, value: number | number[]) => {
     const newOpacity = value as number;
@@ -114,6 +117,15 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
     setColorSet(newColorSet);
     actionManager.logAction('UPDATE_CHART_COLOR_SET', { 
       colorSet: newColorSet,
+      chartId: selectedChartId
+    });
+  };
+
+  const handleShowLegendChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newShowLegend = event.target.checked;
+    setShowLegend(newShowLegend);
+    actionManager.logAction('UPDATE_CHART_SHOW_LEGEND', { 
+      showLegend: newShowLegend,
       chartId: selectedChartId
     });
   };
@@ -266,6 +278,17 @@ const ChartSettings: React.FC<ChartSettingsProps> = ({ onClose, items, selectedC
             disabled={!isChartSelected || isAnimating}
           />
         </Box>
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showLegend}
+              onChange={handleShowLegendChange}
+              disabled={!isChartSelected || isAnimating}
+            />
+          }
+          label="Show Legend"
+        />
       </Box>
     </Paper>
   );

@@ -33,6 +33,7 @@ const ACTION_COLORS: Record<ActionType, string> = {
   'UPDATE_CHART_OPACITY': '#FF7A5C', // strong yellowish pink
   'UPDATE_CHART_STROKE_WIDTH': '#53377A', // strong violet
   'UPDATE_CHART_COLOR_SET': '#F6768E', // strong purplish pink
+  'UPDATE_CHART_SHOW_LEGEND': '#8B8680', // moderate yellowish brown
   'OPEN_AI_CHAT': '#FF6B35', // vivid orange
 };
 

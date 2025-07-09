@@ -17,7 +17,7 @@ import {
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import SaveIcon from '@mui/icons-material/Save';
-import UploadIcon from '@mui/icons-material/Upload';
+
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import GridViewIcon from '@mui/icons-material/GridView';
@@ -230,7 +230,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
     return () => {
       document.removeEventListener('click', handleClick);
     };
-  }, [isSettingsOpen]);
+  }, [isSettingsOpen, handleChartClick]);
 
   // Set up AI chat handler in ActionManager
   useEffect(() => {
@@ -285,7 +285,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
     actionManager.setCloseArrangeSettingsHandler(() => {
       setArrangeAnchorEl(null);
     });
-  }, [isChatOpen, actionManager]);
+  }, [isChatOpen, actionManager, animateArrangeSlider]);
 
   // When settings panel is closed, reset selected chart
   useEffect(() => {
@@ -300,7 +300,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
         setSelectedChartId(firstChart.i);
       }
     }
-  }, [isSettingsOpen]); // Remove items dependency
+  }, [isSettingsOpen, items, selectedChartId]);
 
   return (
     <AppBar position="static" sx={{ backgroundColor: 'white', boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)' }}>

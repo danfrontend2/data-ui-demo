@@ -4,9 +4,7 @@ import {
   Menu,
   MenuItem,
   Typography,
-  Box,
-  Tooltip,
-  Divider
+  Tooltip
 } from '@mui/material';
 import MovieIcon from '@mui/icons-material/Movie';
 import ChatIcon from '@mui/icons-material/Chat';

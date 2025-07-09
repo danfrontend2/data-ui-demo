@@ -516,6 +516,36 @@ export default class ActionManager {
       await new Promise(resolve => setTimeout(resolve, 800));
     });
 
+    this.registerHandler('UPDATE_CHART_SHOW_LEGEND', async ({ showLegend, chartId }) => {
+      // Open chart settings to show the change
+      if (this.onOpenChartSettings) {
+        this.onOpenChartSettings(chartId);
+        // Wait a bit to show the panel opening
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      if (!this.setItems || !this.items) return;
+      
+      const newItems = this.items.map(item => {
+        if ((item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart') && 
+            (!chartId || item.i === chartId)) {
+          return {
+            ...item,
+            chartConfig: {
+              ...item.chartConfig,
+              showLegend
+            }
+          };
+        }
+        return item;
+      });
+      
+      this.setItems(newItems);
+      
+      // Additional pause to show the visual change
+      await new Promise(resolve => setTimeout(resolve, 800));
+    });
+
     this.registerHandler('OPEN_AI_CHAT', ({ message, autoSend = true }) => {
       if (this.onOpenAIChat) {
         this.onOpenAIChat(message, autoSend);

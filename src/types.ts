@@ -34,6 +34,7 @@ export interface ChartConfig {
   opacity?: number;
   strokeWidth?: number;
   colorSet?: string;
+  showLegend?: boolean;
 }
 
 export interface GridItem extends Layout {

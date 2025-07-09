@@ -15,6 +15,7 @@ export type ActionType =
   | 'UPDATE_CHART_OPACITY'
   | 'UPDATE_CHART_STROKE_WIDTH'
   | 'UPDATE_CHART_COLOR_SET'
+  | 'UPDATE_CHART_SHOW_LEGEND'
   | 'OPEN_AI_CHAT';
 
 export interface Action {
