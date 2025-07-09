@@ -6,6 +6,9 @@
     "macro_animals_pie.json",
     "macro_ai_demo.json",
     "macro_chart_animations.json",
-    "macro_arrange_demo.json"
+    "macro_arrange_demo.json",
+    "macro_legend_toggle_demo.json",
+    "macro_pie_legend_demo.json",
+    "macro_simple_legend_test.json"
   ]
 } 

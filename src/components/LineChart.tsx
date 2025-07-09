@@ -143,6 +143,16 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
       lineSeries.data.setAll(data);
     });
 
+    // Apply hidden series configuration
+    if (chartConfig?.hiddenSeries) {
+      chart.series.each((series) => {
+        const seriesName = series.get("name");
+        if (seriesName && chartConfig.hiddenSeries?.includes(seriesName)) {
+          series.hide();
+        }
+      });
+    }
+
     // Create legend if enabled
     if (chartConfig?.showLegend !== false) {
       const legend = chart.children.push(am5.Legend.new(root, {
@@ -167,7 +177,7 @@ const LineChart: React.FC<LineChartProps> = ({ data, chartId, series, chartConfi
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend]);
+  }, [data, chartId, series, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend, chartConfig?.hiddenSeries]);
 
   return (
     <div id={chartId} style={{ 

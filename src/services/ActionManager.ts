@@ -591,6 +591,40 @@ export default class ActionManager {
       await new Promise(resolve => setTimeout(resolve, 800));
     });
 
+    this.registerHandler('TOGGLE_CHART_SERIES', async ({ chartId, seriesName, visible }) => {
+      if (!this.setItems || !this.items) return;
+      
+      const newItems = this.items.map(item => {
+        if ((item.type === 'bar-chart' || item.type === 'pie-chart' || item.type === 'line-chart') && 
+            (!chartId || item.i === chartId)) {
+          const currentHidden = item.chartConfig?.hiddenSeries || [];
+          let newHidden: string[];
+          
+          if (visible) {
+            // Show series - remove from hidden list
+            newHidden = currentHidden.filter(name => name !== seriesName);
+          } else {
+            // Hide series - add to hidden list
+            newHidden = currentHidden.includes(seriesName) ? currentHidden : [...currentHidden, seriesName];
+          }
+          
+          return {
+            ...item,
+            chartConfig: {
+              ...item.chartConfig,
+              hiddenSeries: newHidden
+            }
+          };
+        }
+        return item;
+      });
+      
+      this.setItems(newItems);
+      
+      // Brief pause to show the visual change
+      await new Promise(resolve => setTimeout(resolve, 300));
+    });
+
     this.registerHandler('OPEN_AI_CHAT', ({ message, autoSend = true }) => {
       if (this.onOpenAIChat) {
         this.onOpenAIChat(message, autoSend);

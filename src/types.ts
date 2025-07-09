@@ -35,6 +35,7 @@ export interface ChartConfig {
   strokeWidth?: number;
   colorSet?: string;
   showLegend?: boolean;
+  hiddenSeries?: string[]; // Array of hidden series names
 }
 
 export interface GridItem extends Layout {

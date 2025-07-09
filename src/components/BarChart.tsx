@@ -174,6 +174,16 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
       );
     }
 
+    // Apply hidden series configuration
+    if (chartConfig?.hiddenSeries) {
+      chart.series.each((series) => {
+        const seriesName = series.get("name");
+        if (seriesName && chartConfig.hiddenSeries?.includes(seriesName)) {
+          series.hide();
+        }
+      });
+    }
+
     // Create legend if enabled
     if (chartConfig?.showLegend !== false) {
       const legend = chart.children.push(
@@ -204,7 +214,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, chartId, series, chartConfig 
     return () => {
       root.dispose();
     };
-  }, [chartId, data, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend]);
+  }, [chartId, data, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend, chartConfig?.hiddenSeries]);
 
   return (
     <div id={chartId} style={{ 

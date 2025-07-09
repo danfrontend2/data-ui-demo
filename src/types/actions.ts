@@ -16,6 +16,7 @@ export type ActionType =
   | 'UPDATE_CHART_STROKE_WIDTH'
   | 'UPDATE_CHART_COLOR_SET'
   | 'UPDATE_CHART_SHOW_LEGEND'
+  | 'TOGGLE_CHART_SERIES'
   | 'OPEN_AI_CHAT';
 
 export interface Action {
@@ -112,6 +113,15 @@ export interface OpenAIChatAction extends Action {
   details: {
     message: string;
     autoSend?: boolean;
+  };
+}
+
+export interface ToggleChartSeriesAction extends Action {
+  type: 'TOGGLE_CHART_SERIES';
+  details: {
+    chartId?: string;
+    seriesName: string;
+    visible: boolean;
   };
 }
 

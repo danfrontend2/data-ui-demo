@@ -67,6 +67,13 @@ export function getActionMessage(action: Action): string {
         return `Changing color scheme to ${details.colorSet} for ${targetText}`;
       }
       return 'Updating chart colors...';
+    case 'TOGGLE_CHART_SERIES':
+      if (details.seriesName) {
+        const action = details.visible ? 'Showing' : 'Hiding';
+        const targetText = details.chartId ? `in chart ${details.chartId}` : 'in chart';
+        return `${action} series "${details.seriesName}" ${targetText}`;
+      }
+      return 'Toggling chart series visibility...';
     case 'OPEN_AI_CHAT':
       if (details.message) {
         return `Opening AI chat with message: "${details.message}"`;

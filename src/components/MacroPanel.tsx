@@ -34,6 +34,7 @@ const ACTION_COLORS: Record<ActionType, string> = {
   'UPDATE_CHART_STROKE_WIDTH': '#53377A', // strong violet
   'UPDATE_CHART_COLOR_SET': '#F6768E', // strong purplish pink
   'UPDATE_CHART_SHOW_LEGEND': '#8B8680', // moderate yellowish brown
+  'TOGGLE_CHART_SERIES': '#FF8F00', // vivid orange yellow
   'OPEN_AI_CHAT': '#FF6B35', // vivid orange
 };
 

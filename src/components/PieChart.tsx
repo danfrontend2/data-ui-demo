@@ -154,6 +154,16 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
 
       pieSeries.data.setAll(data);
 
+      // Apply hidden series configuration for pie chart (hide specific slices)
+      if (chartConfig?.hiddenSeries) {
+        pieSeries.dataItems.forEach((dataItem) => {
+          const category = dataItem.get("category");
+          if (category && chartConfig.hiddenSeries?.includes(category)) {
+            dataItem.hide();
+          }
+        });
+      }
+
       // Create legend if enabled
       if (chartConfig?.showLegend !== false) {
         const legend = chart.children.push(
@@ -235,7 +245,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, chartId, series, chartConfig 
     return () => {
       root.dispose();
     };
-  }, [data, chartId, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend]);
+  }, [data, chartId, series, chartConfig?.opacity, chartConfig?.strokeWidth, chartConfig?.colorSet, chartConfig?.showLegend, chartConfig?.hiddenSeries]);
 
   return (
     <div id={chartId} style={{ 

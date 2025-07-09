@@ -1,0 +1,124 @@
+{
+  "prompt": "Create a bar chart with multiple series and demonstrate hiding/showing series through legend clicks",
+  "show_panel": true,
+  "steps": [
+    {
+      "id": "start_legend_demo",
+      "timestamp": 1699000000000,
+      "type": "START",
+      "details": {},
+      "message": "Starting legend toggle demonstration..."
+    },
+    {
+      "id": "add_grid_legend",
+      "timestamp": 1699000001000,
+      "type": "ADD_GRID",
+      "details": {
+        "item": {
+          "i": "grid_legend_demo",
+          "x": 0,
+          "y": 0,
+          "w": 6,
+          "h": 8,
+          "type": "grid"
+        }
+      },
+      "message": "Adding data grid with country statistics"
+    },
+    {
+      "id": "load_data_legend",
+      "timestamp": 1699000002000,
+      "type": "DROP_FILE",
+      "details": {
+        "gridId": "grid_legend_demo",
+        "excelData": [
+          ["Country", "Population", "GDP", "Area"],
+          ["USA", 331, 23.3, 9834],
+          ["China", 1412, 17.7, 9597],
+          ["Japan", 125, 4.2, 378],
+          ["Germany", 83, 4.3, 357],
+          ["India", 1380, 3.7, 3287],
+          ["UK", 67, 3.1, 244]
+        ]
+      },
+      "message": "Loading country data with Population, GDP, and Area metrics"
+    },
+    {
+      "id": "create_chart_legend",
+      "timestamp": 1699000003000,
+      "type": "ADD_CHART",
+      "details": {
+        "item": {
+          "i": "chart_legend_demo",
+          "x": 6,
+          "y": 0,
+          "w": 6,
+          "h": 8,
+          "type": "bar-chart",
+          "chartData": [
+            {"category": "USA", "Population": 331, "GDP": 23.3, "Area": 9834},
+            {"category": "China", "Population": 1412, "GDP": 17.7, "Area": 9597},
+            {"category": "Japan", "Population": 125, "GDP": 4.2, "Area": 378},
+            {"category": "Germany", "Population": 83, "GDP": 4.3, "Area": 357},
+            {"category": "India", "Population": 1380, "GDP": 3.7, "Area": 3287},
+            {"category": "UK", "Population": 67, "GDP": 3.1, "Area": 244}
+          ],
+          "chartConfig": {
+            "series": [
+              {"field": "Population", "name": "Population (millions)"},
+              {"field": "GDP", "name": "GDP (trillion $)"},
+              {"field": "Area", "name": "Area (1000 km²)"}
+            ],
+            "showLegend": true,
+            "opacity": 0.8
+          }
+        }
+      },
+      "message": "Creating multi-series bar chart with Population, GDP, and Area"
+    },
+    {
+      "id": "hide_population",
+      "timestamp": 1699000004000,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart_legend_demo",
+        "seriesName": "Population (millions)",
+        "visible": false
+      },
+      "message": "Hiding Population series by clicking on legend"
+    },
+    {
+      "id": "hide_area",
+      "timestamp": 1699000005000,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart_legend_demo",
+        "seriesName": "Area (1000 km²)",
+        "visible": false
+      },
+      "message": "Hiding Area series - now showing only GDP data"
+    },
+    {
+      "id": "show_population",
+      "timestamp": 1699000006000,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart_legend_demo",
+        "seriesName": "Population (millions)",
+        "visible": true
+      },
+      "message": "Showing Population series again by clicking legend"
+    },
+    {
+      "id": "show_area",
+      "timestamp": 1699000007000,
+      "type": "TOGGLE_CHART_SERIES",
+      "details": {
+        "chartId": "chart_legend_demo",
+        "seriesName": "Area (1000 km²)",
+        "visible": true
+      },
+      "message": "Showing all series - complete data visualization"
+    }
+  ]
+} 
