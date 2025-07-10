@@ -807,8 +807,8 @@ export default class ActionManager {
 
   async executeMacro(steps: Action[]) {
     if (this.isExecuting) {
-      console.log('Already executing a macro');
-      return;
+      console.log('Interrupting current macro execution to start new one');
+      this.interruptMacroExecution();
     }
     
     console.log('ExecuteMacro called with steps:', steps);
@@ -845,6 +845,12 @@ export default class ActionManager {
 
     try {
       for (let i = 0; i < stepsToExecute.length; i++) {
+        // Check if execution was interrupted
+        if (!this.isExecuting) {
+          console.log('Macro execution was interrupted');
+          return;
+        }
+
         if (this.isPaused) {
           // Create a promise that will be resolved when resuming
           this.executionPromise = new Promise((resolve) => {
@@ -853,6 +859,12 @@ export default class ActionManager {
           await this.executionPromise;
           this.executionPromise = null;
           this.executionResolve = null;
+        }
+
+        // Check again after potentially waiting for resume
+        if (!this.isExecuting) {
+          console.log('Macro execution was interrupted during pause');
+          return;
         }
 
         const step = stepsToExecute[i];
@@ -920,6 +932,39 @@ export default class ActionManager {
     }
   }
 
+  interruptMacroExecution() {
+    if (this.isExecuting) {
+      console.log('Interrupting macro execution');
+      
+      // Stop current execution
+      this.isExecuting = false;
+      this.isPaused = false;
+      
+      // Resolve any pending execution promise to unblock the execution loop
+      if (this.executionResolve) {
+        this.executionResolve();
+        this.executionResolve = null;
+      }
+      
+      // Clear execution state
+      this.executionPromise = null;
+      this.currentStepIndex = -1;
+      this.currentSteps = [];
+      this.currentMacro = null;
+      
+      // Notify UI that macro is no longer playing
+      this.notifyPlayStateChange(false);
+      
+      // Close all settings panels
+      if (this.onCloseChartSettings) {
+        this.onCloseChartSettings();
+      }
+      if (this.onCloseArrangeSettings) {
+        this.onCloseArrangeSettings();
+      }
+    }
+  }
+
   resumeMacroExecution() {
     if (this.isPaused) {
       if (this.executionResolve) {
@@ -945,6 +990,12 @@ export default class ActionManager {
     try {
       // Continue from the next step after current
       for (let i = this.currentStepIndex + 1; i < this.currentSteps.length; i++) {
+        // Check if execution was interrupted
+        if (!this.isExecuting) {
+          console.log('Macro execution was interrupted during continuation');
+          return;
+        }
+
         // Check if we were paused again
         if (this.isPaused) {
           // Create a promise that will be resolved when resuming
@@ -954,6 +1005,12 @@ export default class ActionManager {
           await this.executionPromise;
           this.executionPromise = null;
           this.executionResolve = null;
+        }
+
+        // Check again after potentially waiting for resume
+        if (!this.isExecuting) {
+          console.log('Macro execution was interrupted during continuation pause');
+          return;
         }
 
         const step = this.currentSteps[i];
@@ -1075,7 +1132,7 @@ export default class ActionManager {
   async executeUpToStep(steps: Action[] | Record<string, Action>, targetStepIndex: number) {
     if (this.isExecuting) {
       // Stop current execution
-      this.pauseMacroExecution();
+      this.interruptMacroExecution();
     }
     
     // Convert steps to array if it's an object with numeric keys
@@ -1125,6 +1182,12 @@ export default class ActionManager {
       
       // Execute steps up to and including the target step (not beyond)
       for (let i = startIndex; i <= adjustedTargetIndex; i++) {
+        // Check if execution was interrupted
+        if (!this.isExecuting) {
+          console.log('Macro execution was interrupted during executeUpToStep');
+          return;
+        }
+
         // Skip execution if we've gone beyond the available steps
         if (i >= stepsToExecute.length) break;
         
