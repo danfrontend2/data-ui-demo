@@ -34,15 +34,15 @@ export class OpenAIService {
 
     async generateMacro(prompt: string): Promise<any> {
         try {
-            // Sanitize prompt to ensure it only contains valid characters
-            const sanitizedPrompt = prompt.replace(/[^\x20-\x7E\n\r\t]/g, '');
+            console.log(`Prompt received: "${prompt}"`);
+            console.log(`Prompt length: ${prompt?.length || 0}`);
+            console.log(`Prompt type: ${typeof prompt}`);
+            
+            if (!prompt || prompt.trim().length === 0) {
+                throw new Error('Empty or invalid prompt provided');
+            }
             
             console.log(`Sending request to model: ${this.model}`);
-            console.log(`API Key length: ${process.env.REACT_APP_OPENAI_API_KEY?.length}`);
-            console.log(`API Key (first 20 chars): ${process.env.REACT_APP_OPENAI_API_KEY?.substring(0, 20)}...`);
-            console.log(`API Key (last 10 chars): ...${process.env.REACT_APP_OPENAI_API_KEY?.slice(-10)}`);
-            console.log(`API Key contains asterisks: ${process.env.REACT_APP_OPENAI_API_KEY?.includes('*')}`);
-            console.log(`Full prompt: ${sanitizedPrompt}`);
             
             const requestBody = {
                 model: this.model,
@@ -74,9 +74,9 @@ Available action types:
 - ADD_CHART: Create chart from selected data
 - ARRANGE: Arrange items in layout
 
-Example for "show bar chart of countries population":
+Example - "show company revenue chart":
 {
-  "prompt": "show bar chart of countries population", 
+  "prompt": "show company revenue chart", 
   "steps": [
     {
       "id": "step_1",
@@ -100,10 +100,10 @@ Example for "show bar chart of countries population":
       "details": {
         "gridId": "grid_12345",
         "excelData": [
-          ["Country", "Population"],
-          ["China", 1412],
-          ["India", 1400], 
-          ["USA", 339]
+          ["Company", "Revenue", "Employees"],
+          ["Apple", 394328, 164000],
+          ["Microsoft", 198270, 221000],
+          ["Google", 307394, 182502]
         ]
       }
     },
@@ -120,13 +120,13 @@ Example for "show bar chart of countries population":
           "w": 12, 
           "h": 9,
           "chartData": [
-            {"Country": "China", "Population": 1412},
-            {"Country": "India", "Population": 1400},
-            {"Country": "USA", "Population": 339}
+            {"Company": "Apple", "Revenue": 394328, "Employees": 164000},
+            {"Company": "Microsoft", "Revenue": 198270, "Employees": 221000},
+            {"Company": "Google", "Revenue": 307394, "Employees": 182502}
           ],
           "chartConfig": {
-            "xField": "Country",
-            "yField": "Population"
+            "xField": "Company",
+            "yField": "Revenue"
           }
         }
       }
@@ -134,18 +134,58 @@ Example for "show bar chart of countries population":
   ]
 }
 
+For pie-chart example:
+{
+  "type": "pie-chart",
+  "chartData": [
+    {"category": "Apple", "Revenue": 394},
+    {"category": "Microsoft", "Revenue": 211}
+  ],
+  "chartConfig": {
+    "series": [
+      {
+        "field": "Revenue",
+        "name": "Revenue"
+      }
+    ]
+  }
+}
+
+CRITICAL RULES FOR CHARTS:
+1. ALWAYS analyze the user's request to determine what data they want
+2. Generate relevant data based on the user's request topic (companies, planets, countries, etc.)
+3. DO NOT copy data from the example above - create appropriate data for the user's request
+
+4. For ADD_CHART - chartData MUST include BOTH categories AND numeric values:
+   - WRONG: [{"Company": "Apple"}, {"Company": "Microsoft"}] - only categories
+   - CORRECT: [{"Company": "Apple", "Revenue": 394328}, {"Company": "Microsoft", "Revenue": 198270}] - categories + values
+   
+5. chartData MUST exactly match excelData:
+   - If excelData has ["Apple", 394328, 164000] 
+   - Then chartData MUST have {"Company": "Apple", "Revenue": 394328, "Employees": 164000}
+   - Copy ALL numbers from excelData to chartData - do NOT make up new numbers!
+   
+6. Steps connection: DROP_FILE data → exactly same data in ADD_CHART chartData
+7. Chart type configurations:
+   - bar-chart: use "xField" and "yField" in chartConfig
+   - pie-chart: use "category" field in chartData and "series" array in chartConfig with "field" and "name"
+   - line-chart: use "xField" and "yField" in chartConfig
+8. Column names MUST be in English: "Company", "Revenue", "Population", etc.
+9. Use simple field names without special characters: "Revenue_Billion" not "Доход__млрд___$__"
+
 Return ONLY the JSON, no other text.`
                     },
                     {
                         role: "user" as const,
-                        content: sanitizedPrompt
+                        content: prompt
                     }
                 ],
                 temperature: 0.7,
                 max_tokens: 10000,
             };
             
-            console.log('Request body:', JSON.stringify(requestBody, null, 2));
+            console.log('User message content:', JSON.stringify(requestBody.messages[1].content));
+            console.log('Request model:', requestBody.model);
             
             const completion = await this.openai.chat.completions.create(requestBody);
 
@@ -166,11 +206,19 @@ Return ONLY the JSON, no other text.`
                     throw new Error('Response must have a "steps" array');
                 }
                 
-                // Add prompt field if missing
-                if (!parsedResponse.prompt) {
-                    parsedResponse.prompt = sanitizedPrompt;
-                    console.log('Added missing prompt field to response');
-                }
+                // Always set prompt to user's original request
+                parsedResponse.prompt = prompt;
+                console.log('Set prompt field to user\'s original request');
+                
+                // Debug chartData in ADD_CHART steps
+                parsedResponse.steps?.forEach((step: any, index: number) => {
+                    if (step.type === 'ADD_CHART') {
+                        console.log(`Step ${index + 1} (ADD_CHART) chartData:`, 
+                            JSON.stringify(step.details?.item?.chartData, null, 2));
+                        console.log(`Step ${index + 1} (ADD_CHART) chartConfig:`, 
+                            JSON.stringify(step.details?.item?.chartConfig, null, 2));
+                    }
+                });
                 
                 return parsedResponse;
             } catch (e) {
