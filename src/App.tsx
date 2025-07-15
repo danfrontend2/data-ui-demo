@@ -21,6 +21,12 @@ function App() {
   const [showTooltip, setShowTooltip] = useState(false);
   const actionManager = ActionManager.getInstance();
 
+  // Universal function to hide demo button highlighting on any user interaction
+  const hideStartAnimation = () => {
+    setShowStartAnimation(false);
+    setShowTooltip(false);
+  };
+
   useEffect(() => {
     // Set items handler in ActionManager
     actionManager.setItemsHandler(setItems);
@@ -50,8 +56,7 @@ function App() {
 
   const handleAddItem = (newItem: Layout) => {
     // Hide start animation and tooltip when user interacts with the app
-    setShowStartAnimation(false);
-    setShowTooltip(false);
+    hideStartAnimation();
     
     // Calculate the maximum Y coordinate of existing items
     const maxY = items.reduce((max, item) => {
@@ -77,19 +82,23 @@ function App() {
   };
 
   const handleRemoveItem = (itemId: string) => {
+    hideStartAnimation();
     actionManager.logAction('REMOVE_GRID', { itemId });
   };
 
   const handleAddChart = (chartItem: GridItem) => {
+    hideStartAnimation();
     actionManager.logAction('ADD_CHART', { item: chartItem });
   };
 
   const handleRunMacro = () => {
+    hideStartAnimation();
     actionManager.executeMacro(DEMO_MACRO);
   };
 
   const handleExecuteMacro = async (macro: any): Promise<void> => {
     try {
+      hideStartAnimation();
       // Reset step index
       setCurrentStepIndex(-1);
       
@@ -114,30 +123,29 @@ function App() {
 
   const handleCloseAll = () => {
     // Hide start animation and tooltip when user interacts with the app
-    setShowStartAnimation(false);
-    setShowTooltip(false);
+    hideStartAnimation();
     
     actionManager.logAction('REMOVE_ALL_GRIDS', {});
   };
 
   const handleShowTimeClick = () => {
     // Hide start animation and tooltip when Show Time button is clicked
-    setShowStartAnimation(false);
-    setShowTooltip(false);
+    hideStartAnimation();
   };
 
   const handleLayoutChange = (layout: Layout[]) => {
+    hideStartAnimation();
     actionManager.logAction('UPDATE_LAYOUT', { layout });
   };
 
   const handleArrangeItems = (columns: number) => {
+    hideStartAnimation();
     actionManager.logAction('ARRANGE', { columns });
   };
 
   const handleMacroLoad = (macroData: MacroData) => {
     // Hide start animation and tooltip when user interacts with the app
-    setShowStartAnimation(false);
-    setShowTooltip(false);
+    hideStartAnimation();
     
     // Check if START action exists at the beginning, if not add it
     const updatedSteps = [...macroData.steps];
@@ -166,6 +174,7 @@ function App() {
   };
 
   const handlePlayPauseMacro = () => {
+    hideStartAnimation();
     if (isMacroPlaying) {
       // Pause execution
       actionManager.pauseMacroExecution();
@@ -182,10 +191,12 @@ function App() {
   };
 
   const handleNextStep = () => {
+    hideStartAnimation();
     actionManager.executeNextStep();
   };
 
   const handleStepClick = (stepIndex: number) => {
+    hideStartAnimation();
     // Only allow step clicks when macro is paused or not running
     if (currentMacro && !isMacroPlaying) {
       console.log(`Executing up to step ${stepIndex}`);
@@ -231,6 +242,7 @@ function App() {
           showInitialGlow={showStartAnimation}
           forceTooltipOpen={showTooltip}
           onShowTimeClick={handleShowTimeClick}
+          onUserInteraction={hideStartAnimation}
         />
         <Box sx={{ flex: 1 }}>
           <GridLayout 
@@ -238,6 +250,7 @@ function App() {
             onRemoveItem={handleRemoveItem}
             onAddChart={handleAddChart}
             onLayoutChange={handleLayoutChange}
+            onUserInteraction={hideStartAnimation}
           />
         </Box>
         

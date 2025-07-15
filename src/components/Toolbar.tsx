@@ -45,6 +45,7 @@ interface ToolbarProps {
   showInitialGlow?: boolean;
   forceTooltipOpen?: boolean;
   onShowTimeClick?: () => void;
+  onUserInteraction?: () => void;
 }
 
 const tooltipProps = {
@@ -62,7 +63,7 @@ const tooltipProps = {
   }
 };
 
-const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onCloseMacroPanel, onArrangeItems, onMacroLoad, onPromptSelect, items, isMacroPanelOpen, showInitialGlow = false, forceTooltipOpen = false, onShowTimeClick }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMacro, onCloseAll, onCloseMacroPanel, onArrangeItems, onMacroLoad, onPromptSelect, items, isMacroPanelOpen, showInitialGlow = false, forceTooltipOpen = false, onShowTimeClick, onUserInteraction }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
@@ -96,6 +97,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   };
 
   const handleAddItem = () => {
+    onUserInteraction?.();
     onAddItem({
       i: `grid_${Math.random().toString(36).substr(2, 9)}`,
       x: 0,
@@ -106,11 +108,13 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   };
 
   const handleStartRecording = () => {
+    onUserInteraction?.();
     setIsRecording(true);
     actionManager.startRecording();
   };
 
   const handleStopRecording = () => {
+    onUserInteraction?.();
     setIsRecording(false);
     const macro = actionManager.stopRecording();
     setRecordedMacro(macro);
@@ -157,6 +161,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   };
 
   const handleLoadMacro = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onUserInteraction?.();
     const file = event.target.files?.[0];
     console.log('Selected file:', file);
     if (file) {
@@ -193,6 +198,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
   };
 
   const handleArrangeClick = (event: React.MouseEvent<HTMLElement>) => {
+    onUserInteraction?.();
     setArrangeAnchorEl(event.currentTarget);
   };
 
@@ -200,13 +206,15 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
     setArrangeAnchorEl(null);
   };
 
-  const handleArrange = () => {
+  const handleArrange = async () => {
+    onUserInteraction?.();
     onArrangeItems(columns);
     handleArrangeClose();
   };
 
   // Handle close all - close dialogs and items
   const handleCloseAll = () => {
+    onUserInteraction?.();
     // Close all dialogs first
     setIsChatOpen(false);
     setIsSettingsOpen(false);
@@ -331,6 +339,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           <Button
             color="primary"
             onClick={() => {
+              onUserInteraction?.();
               if (isSettingsOpen) {
                 setIsSettingsOpen(false);
               } else {
@@ -382,6 +391,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ onAddItem, onRunMacro, onRunCustomMac
           <Button
             color="primary"
             onClick={() => {
+              onUserInteraction?.();
               if (isChatOpen) {
                 setIsChatOpen(false);
               } else {

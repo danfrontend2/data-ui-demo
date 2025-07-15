@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ReactGridLayout, { WidthProvider, Layout } from 'react-grid-layout';
 import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -34,9 +34,9 @@ const SimpleGridLayout = WidthProvider(ReactGridLayout);
 interface GridLayoutProps {
   items: GridItem[];
   onRemoveItem: (itemId: string) => void;
-  onAddChart: (item: GridItem) => void;
+  onAddChart: (chartItem: GridItem) => void;
   onLayoutChange: (layout: Layout[]) => void;
-  onArrangeItems?: (columns: number) => void;
+  onUserInteraction?: () => void;
 }
 
 declare global {
@@ -72,17 +72,11 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   onRemoveItem,
   onAddChart,
   onLayoutChange,
-  onArrangeItems
+  onUserInteraction
 }) => {
   const [localItems, setLocalItems] = useState<GridItem[]>(initialItems);
   const [gridData, setGridData] = useState<{ [key: string]: GridData[] }>({});
   const [columnDefs, setColumnDefs] = useState<{ [key: string]: ColDef[] }>({});
-  const onArrangeItemsRef = useRef(onArrangeItems);
-
-  // Update ref when prop changes
-  useEffect(() => {
-    onArrangeItemsRef.current = onArrangeItems;
-  }, [onArrangeItems]);
 
   // Update local items when props change
   useEffect(() => {
@@ -110,6 +104,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   }, [localItems, gridData, columnDefs]);
 
   const onCellValueChanged = (params: CellValueChangedEvent) => {
+    onUserInteraction?.();
     console.log('Cell changed:', {
       rowIndex: params.rowIndex,
       data: params.data,
@@ -166,6 +161,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   };
 
   const handleRemoveItem = (e: React.MouseEvent, itemId: string) => {
+    onUserInteraction?.();
     console.log('Click on close button');
     e.preventDefault();
     e.stopPropagation();
@@ -178,6 +174,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    onUserInteraction?.();
     e.preventDefault();
     e.stopPropagation();
     
@@ -274,6 +271,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   };
 
   const createChartItem = (type: 'pie-chart' | 'line-chart' | 'bar-chart', params: GetContextMenuItemsParams) => {
+    onUserInteraction?.();
     const selection = handleRangeSelection(params);
     if (!selection) {
       console.log('No range selected');
@@ -533,6 +531,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
             style={{ display: 'none' }}
             id={`file-input-${item.i}`}
             onChange={(e) => {
+              onUserInteraction?.();
               const file = e.target.files?.[0];
               if (file) {
                 processFile(file, item.i);
@@ -542,7 +541,10 @@ const GridLayout: React.FC<GridLayoutProps> = ({
             }}
           />
           <IconButton
-            onClick={() => document.getElementById(`file-input-${item.i}`)?.click()}
+            onClick={() => {
+              onUserInteraction?.();
+              document.getElementById(`file-input-${item.i}`)?.click();
+            }}
             size="small"
             sx={{ 
               mr: 0.5,
@@ -576,6 +578,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
 
 
   const onResizeStop = (layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent, element: HTMLElement) => {
+    onUserInteraction?.();
     console.log('Resize stopped - old item:', oldItem);
     console.log('Resize stopped - new item:', newItem);
     console.log('Resize stopped - full layout:', layout);
@@ -611,6 +614,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   };
 
   const onDragStop = (layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent, element: HTMLElement) => {
+    onUserInteraction?.();
     console.log('Drag stopped - old item:', oldItem);
     console.log('Drag stopped - new item:', newItem);
     console.log('Drag stopped - full layout:', layout);
@@ -720,31 +724,29 @@ const GridLayout: React.FC<GridLayoutProps> = ({
   };
 
   useEffect(() => {
-    onArrangeItemsRef.current = (columns: number) => {
-      const itemWidth = Math.floor(12 / columns);
-      setLocalItems(prevItems => {
-        const newItems = prevItems.map((item, index) => ({
-          ...item,
-          w: itemWidth,
-          h: 9,
-          x: (index % columns) * itemWidth,
-          y: Math.floor(index / columns) * 9
-        }));
+    // This effect is no longer needed as onArrangeItems is removed
+    // setLocalItems(prevItems => {
+    //   const newItems = prevItems.map((item, index) => ({
+    //     ...item,
+    //     w: itemWidth,
+    //     h: 9,
+    //     x: (index % columns) * itemWidth,
+    //     y: Math.floor(index / columns) * 9
+    //   }));
+      
+    //   // Call parent's onLayoutChange with the new arrangement
+    //   const layoutWithTypes = newItems.map(item => ({
+    //     i: item.i,
+    //     w: item.w,
+    //     h: item.h,
+    //     x: item.x,
+    //     y: item.y,
+    //     type: item.type
+    //   }));
+    //   onLayoutChange(layoutWithTypes);
         
-        // Call parent's onLayoutChange with the new arrangement
-        const layoutWithTypes = newItems.map(item => ({
-          i: item.i,
-          w: item.w,
-          h: item.h,
-          x: item.x,
-          y: item.y,
-          type: item.type
-        }));
-        onLayoutChange(layoutWithTypes);
-        
-        return newItems;
-      });
-    };
+    //   return newItems;
+    // });
   }, [onLayoutChange]);
 
   return (
