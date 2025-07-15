@@ -120,13 +120,17 @@ Example - "show company revenue chart":
           "w": 12, 
           "h": 9,
           "chartData": [
-            {"Company": "Apple", "Revenue": 394328, "Employees": 164000},
-            {"Company": "Microsoft", "Revenue": 198270, "Employees": 221000},
-            {"Company": "Google", "Revenue": 307394, "Employees": 182502}
+            {"category": "Apple", "Revenue": 394328},
+            {"category": "Microsoft", "Revenue": 198270},
+            {"category": "Google", "Revenue": 307394}
           ],
           "chartConfig": {
-            "xField": "Company",
-            "yField": "Revenue"
+            "series": [
+              {
+                "field": "Revenue",
+                "name": "Revenue"
+              }
+            ]
           }
         }
       }
@@ -166,10 +170,11 @@ CRITICAL RULES FOR CHARTS:
    - Copy ALL numbers from excelData to chartData - do NOT make up new numbers!
    
 6. Steps connection: DROP_FILE data → exactly same data in ADD_CHART chartData
-7. Chart type configurations:
-   - bar-chart: use "xField" and "yField" in chartConfig
-   - pie-chart: use "category" field in chartData and "series" array in chartConfig with "field" and "name"
-   - line-chart: use "xField" and "yField" in chartConfig
+7. Chart type configurations - ALL charts use the same format:
+   - bar-chart: use "category" field in chartData and "series" array in chartConfig
+   - pie-chart: use "category" field in chartData and "series" array in chartConfig  
+   - line-chart: use "category" field in chartData and "series" array in chartConfig
+   - Format: {"category": "ItemName", "FieldName": value} and chartConfig.series[{field: "FieldName", name: "FieldName"}]
 8. Column names MUST be in English: "Company", "Revenue", "Population", etc.
 9. Use simple field names without special characters: "Revenue_Billion" not "Доход__млрд___$__"
 
