@@ -69,9 +69,8 @@ export class OpenAIService {
                 throw new Error('No response from OpenAI');
             }
 
-            console.log('Successful response received');
+            console.log('Successful response received', response);
             console.log('Response length:', response.length);
-
             // Try to parse JSON
             try {
                 return JSON.parse(response);
