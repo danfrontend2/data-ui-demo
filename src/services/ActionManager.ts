@@ -757,6 +757,10 @@ export default class ActionManager {
     return this.recording;
   }
 
+  getActions(): Action[] {
+    return this.actionLog;
+  }
+
   isExecutingMacro(): boolean {
     return this.isExecuting;
   }
