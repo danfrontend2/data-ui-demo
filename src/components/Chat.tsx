@@ -188,7 +188,7 @@ const Chat: React.FC<ChatProps> = ({ onClose, onExecuteMacro, onMacroLoad, prefi
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-              <Typography variant="body2" sx={{ flex: 1 }}>{message.text}</Typography>
+              <Typography variant="body2" component="div" sx={{ flex: 1 }}>{message.text}</Typography>
               <Tooltip title="Copy message">
                 <IconButton
                   className="copy-button"
